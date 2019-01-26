@@ -9,7 +9,7 @@ LOG = logging.getLogger('cryptostore')
 
 class Spawn(Process):
     def __init__(self, queue):
-        super()
+        super().__init__()
         self.queue = queue
     
     def run(self):

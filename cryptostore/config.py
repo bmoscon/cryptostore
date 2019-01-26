@@ -11,6 +11,8 @@ class Config:
                 file_name = os.environ['CRYPTOSTORE_CONFIG']
             else:
                 file_name = os.path.join(os.getcwd(), 'config.yaml')
+        if not os.path.isfile(file_name):
+            raise FileNotFoundError(f"File {file_name} does not exist")
 
         self.config = {}
         self._load(file_name, reload_interval, callback)
@@ -32,4 +34,5 @@ class Config:
             await asyncio.sleep(interval)
 
     def _load(self, file, interval, callback):
-        asyncio.create_task(self.__loader(file, interval, callback))
+        loop = asyncio.get_event_loop()
+        loop.create_task(self.__loader(file, interval, callback))
