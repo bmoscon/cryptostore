@@ -1,0 +1,8 @@
+#!/usr/bin/env python
+from cryptostore import cryptostore as cs
+
+def main():
+    cs.run()
+
+if __name__ == '__main__':
+    main()
