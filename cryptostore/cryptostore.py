@@ -1,6 +1,7 @@
 from multiprocessing import Process, Queue
 import asyncio
 import logging
+import json
 
 from cryptostore.spawn import Spawn
 from cryptostore.config import Config
@@ -15,10 +16,49 @@ class Cryptostore:
         self.queue = Queue()
         self.spawner = Spawn(self.queue)
         self.running_config = {}
+
+    
+    async def _load_config(self, start, stop):
+        LOG.info("start: %s stop: %s", str(start), str(stop))
+        for exchange in stop:
+            self.queue.put(json.dumps({'op': 'stop', 'exchange': exchange}))
+            
+        for exchange in start:
+            self.queue.put(json.dumps({'op': 'start', 'exchange': exchange, 'data': self.running_config['exchanges'][exchange]}))
     
     async def _reconfigure(self, config):
+        stop = []
+        start = []
+
         if self.running_config != config:
-            pass
+            if 'exchanges' not in config or len(config['exchanges']) == 0:
+                # shut it all down
+                stop = list(self.running_config['exchanges'].keys())
+                self.running_config = config
+            elif 'exchanges' not in self.running_config or len(self.running_config['exchanges']) == 0:
+                # nothing running currently, start it all
+                self.running_config = config
+                start = list(self.running_config['exchanges'].keys())
+            else:
+                for e in config['exchanges']:
+                    if e in self.running_config['exchanges'] and config['exchanges'][e] == self.running_config['exchanges'][e]:
+                        continue
+                    elif e not in self.running_config['exchanges']:
+                        start.append(e)
+                    else:
+                        stop.append(e)
+                        start.append(e)
+                
+                for e in self.running_config['exchanges']:
+                    if e in config['exchanges'] and config['exchanges'][e] == self.running_config['exchanges'][e]:
+                        continue
+                    elif e not in config['exchanges']:
+                        stop.append(e)
+                    else:
+                        stop.append(e)
+                        start.append(e)
+            self.running_config = config
+        await self._load_config(list(set(start)), list(set(stop)))
 
     def run(self):
         LOG.info("Starting cryptostore")
