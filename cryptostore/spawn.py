@@ -34,12 +34,13 @@ class Spawn(Process):
                 elif msg['op'] == 'start':
                     LOG.info("Starting %s", msg)
                     exchange = msg['exchange']
-                    config = msg['data']
+                    collector = msg['collector']
+                    config = msg['config']
                     # spawn a cryptofeed handler
                     if exchange in procs:
                         LOG.warning("Collector exists for %s", exchange)
                         continue
-                    procs[exchange] = Collector(exchange, config)
+                    procs[exchange] = Collector(exchange, collector, config)
                     procs[exchange].start()
         except KeyboardInterrupt:
             pass

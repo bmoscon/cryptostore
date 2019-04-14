@@ -8,23 +8,18 @@ from multiprocessing import Process
 
 from cryptofeed import FeedHandler
 from cryptofeed.defines import TRADES
-from cryptofeed.callback import TradeCallback
-
-
-def trade(feed, pair, order_id, timestamp, side, amount, price):
-    print(f"Timestamp: {timestamp} Feed: {feed} Pair: {pair} ID: {order_id} Side: {side} Amount: {amount} Price: {price}")
+from cryptofeed.backends.redis import TradeStream
 
 
 class Collector(Process):
-    def __init__(self, exchange, config):
+    def __init__(self, exchange, exchange_config, config):
         self.exchange = exchange
+        self.exchange_config = exchange_config
         self.config = config
         super().__init__()
 
-    
     def run(self):
         fh = FeedHandler()
-        cb = {TRADES: TradeCallback(trade)}
-        print(type(self.config))
-        fh.add_feed(self.exchange, config=self.config, callbacks=cb)
+        cb = {TRADES: TradeStream(host=self.config['redis']['ip'], port=self.config['redis']['port'])}
+        fh.add_feed(self.exchange, config=self.exchange_config, callbacks=cb)
         fh.run()
