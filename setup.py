@@ -20,7 +20,7 @@ except BaseException:
 
 setup(
     name="cryptostore",
-    version="0.0.1",
+    version="0.0.2",
     author="Bryant Moscon",
     author_email="bmoscon@gmail.com",
     description=("Storage engine for cryptocurrency data"),
@@ -28,7 +28,7 @@ setup(
     long_description_content_type='text/x-rst',
     license="XFree86",
     keywords=["cryptocurrency", "bitcoin", "btc", "feed handler", "market feed", "market data", "data storage"],
-    url="https://github.com/bmoscon/cryptofeed",
+    url="https://github.com/bmoscon/cryptostore",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
