@@ -10,3 +10,8 @@ A storage engine for crypto market data. You supply the exchanges, data type (tr
 
 
 ### ** Work in Progress **
+Planned features
+
+* Dynamic/Reloadable Config
+* Store data to a variety of formats (databases, parquet, etc)
+* Missing data detection and correction (for exchanges that support historical data, typically only trade data)
