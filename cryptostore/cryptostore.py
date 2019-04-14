@@ -1,3 +1,9 @@
+'''
+Copyright (C) 2018-2019  Bryant Moscon - bmoscon@gmail.com
+
+Please see the LICENSE file for the terms and conditions
+associated with this software.
+'''
 from multiprocessing import Process, Queue
 import asyncio
 import logging
@@ -31,11 +37,11 @@ class Cryptostore:
         start = []
 
         if self.running_config != config:
-            if 'exchanges' not in config or len(config['exchanges']) == 0:
+            if not config or 'exchanges' not in config or len(config['exchanges']) == 0:
                 # shut it all down
-                stop = list(self.running_config['exchanges'].keys())
+                stop = list(self.running_config['exchanges'].keys()) if 'exchanges' in self.running_config else []
                 self.running_config = config
-            elif 'exchanges' not in self.running_config or len(self.running_config['exchanges']) == 0:
+            elif not self.running_config or 'exchanges' not in self.running_config or len(self.running_config['exchanges']) == 0:
                 # nothing running currently, start it all
                 self.running_config = config
                 start = list(self.running_config['exchanges'].keys())
