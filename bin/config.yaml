@@ -6,3 +6,7 @@ exchanges:
     COINBASE: 
         trades: [BTC-USD, ETH-USD]
         l2_book: [BTC-USD]
+
+storage: parquet
+
+storage_interval: 60

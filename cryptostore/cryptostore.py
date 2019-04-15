@@ -12,6 +12,7 @@ import json
 from cryptostore.spawn import Spawn
 from cryptostore.config import Config
 from cryptostore.log import get_logger
+from cryptostore.aggregator.aggregator import Aggregator
 
 
 LOG = get_logger('cryptostore', 'cryptostore.log', logging.INFO)
@@ -23,15 +24,15 @@ class Cryptostore:
         self.spawner = Spawn(self.queue)
         self.running_config = {}
 
-    
+
     async def _load_config(self, start, stop):
         LOG.info("start: %s stop: %s", str(start), str(stop))
         for exchange in stop:
             self.queue.put(json.dumps({'op': 'stop', 'exchange': exchange}))
-            
+
         for exchange in start:
             self.queue.put(json.dumps({'op': 'start', 'exchange': exchange, 'collector': self.running_config['exchanges'][exchange], 'config': {i : self.running_config[i] for i in self.running_config if i != 'exchanges'}}))
-    
+
     async def _reconfigure(self, config):
         stop = []
         start = []
@@ -54,7 +55,7 @@ class Cryptostore:
                     else:
                         stop.append(e)
                         start.append(e)
-                
+
                 for e in self.running_config['exchanges']:
                     if e in config['exchanges'] and config['exchanges'][e] == self.running_config['exchanges'][e]:
                         continue
@@ -70,8 +71,14 @@ class Cryptostore:
         LOG.info("Starting cryptostore")
         self.spawner.start()
         LOG.info("Spawner started")
-        
+
+        self.aggregator = Aggregator()
+        self.aggregator.start()
+        LOG.info("Aggregator started")
+
+
         loop = asyncio.get_event_loop()
         self.config = Config(callback=self._reconfigure)
+
         LOG.info("Cryptostore started")
         loop.run_forever()
