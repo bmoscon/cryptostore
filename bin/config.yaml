@@ -3,10 +3,12 @@ redis:
     port: 6379
 
 exchanges:
-    COINBASE: 
+    COINBASE:
         trades: [BTC-USD, ETH-USD]
         l2_book: [BTC-USD]
 
-storage: parquet
+storage: arctic
+
+arctic: mongodb://127.0.0.1
 
 storage_interval: 60

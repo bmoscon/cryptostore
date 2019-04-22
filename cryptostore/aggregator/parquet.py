@@ -29,6 +29,7 @@ class Parquet(Store):
         else:
             self.data = pa.concat_tables(self.data, table)
 
-    def write(self, file_name):
+    def write(self, exchange, data_type, pair, timestamp):
+        file_name = f'{data_type}-{exchange}-{pair}-{int(timestamp)}.parquet'
         pq.write_table(self.data, file_name)
         self.data = None

@@ -36,9 +36,11 @@ setup(
         "Programming Language :: Python :: 3.7",
     ],
     install_requires=[
-       "cryptofeed",
-       "pyyaml",
-       "aioredis",
-       "pyarrow"
+        "pandas"
+        "cryptofeed",
+        "pyyaml",
+        "aioredis",
+        "pyarrow",
+        "arctic"
     ],
 )

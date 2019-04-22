@@ -12,6 +12,7 @@ import logging
 import redis
 
 from cryptostore.aggregator.parquet import Parquet
+from cryptostore.aggregator.arctic import Arctic
 from cryptostore.config import Config
 
 
@@ -32,6 +33,8 @@ class Aggregator(Process):
     def __storage(self):
         if self.config.storage == 'parquet':
             return Parquet()
+        elif self.config.storage == 'arctic':
+            return Arctic(self.config.arctic)
         else:
             raise ValueError("Store type not supported")
 
@@ -55,6 +58,6 @@ class Aggregator(Process):
                             agg.append(update)
                         
                         store.aggregate(agg)
-                        store.write(f'{dtype}-{exchange}-{pair}-{int(time.time())}.parquet')
+                        store.write(exchange, dtype, pair, time.time())
                         r.xdel(f'{dtype}-{exchange}-{pair}', *ids)
             await asyncio.sleep(self.config.storage_interval)
