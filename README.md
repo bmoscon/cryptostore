@@ -8,10 +8,14 @@
 
 A storage engine for crypto market data. You supply the exchanges, data type (trade, book, etc), and trading pairs you're interested in and Cryptostore does the rest!
 
+Stores data to:
+* Parquet
+* Arctic
 
-### ** Work in Progress **
-Planned features
 
-* Dynamic/Reloadable Config
-* Store data to a variety of formats (databases, parquet, etc)
-* Missing data detection and correction (for exchanges that support historical data, typically only trade data)
+### Planned features
+* [x] Dynamic/Reloadable Config
+* [x] Parquet support
+* [x] Arctic support
+* [ ] Parquet files in S3/GC
+* [ ] Missing data detection and correction (for exchanges that support historical data, typically only trade data)
