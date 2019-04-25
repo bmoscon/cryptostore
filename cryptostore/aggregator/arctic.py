@@ -7,7 +7,7 @@ associated with this software.
 import pandas as pd
 from arctic import Arctic as ar
 from arctic import CHUNK_STORE
-from cryptofeed.defines import TRADES
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, BID, ASK
 
 from cryptostore.aggregator.store import Store
 
@@ -24,15 +24,23 @@ class Arctic(Store):
         chunk_size = None
         df = pd.DataFrame(self.data)
         self.data = []
+
         if data_type == TRADES:
-            df['amount'] = df.amount.astype('float')
             df['size'] = df.amount.astype('float')
+            df['price'] = df.price.astype('float')
             df['date'] = pd.to_datetime(df['timestamp'])
-            df = df.drop(['pair', 'feed', 'timestamp'], axis=1)
-            df.set_index('date', inplace=True)
-            # All timestamps are in UTC
-            df.index = df.index.tz_localize(None)
+            df = df.drop(['pair', 'feed'], axis=1)
             chunk_size = 'H'
+        elif data_type in { L2_BOOK, L3_BOOK }:
+            df['size'] = df.size.astype('float')
+            df['price'] = df.price.astype('float')
+            df['date'] = pd.to_datetime(df['timestamp'], unit='s')
+            chunk_size = 'T'
+
+        df.set_index('date', inplace=True)
+        df = df.drop(['timestamp'], axis=1)
+        # All timestamps are in UTC
+        df.index = df.index.tz_localize(None)
 
         if exchange not in self.con.list_libraries():
             self.con.initialize_library(exchange, lib_type=CHUNK_STORE)

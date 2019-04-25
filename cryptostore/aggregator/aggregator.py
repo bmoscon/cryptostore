@@ -23,7 +23,7 @@ class Aggregator(Process):
     def __init__(self, config_file=None):
         self.config_file = config_file
         super().__init__()
-    
+
     def run(self):
         loop = asyncio.get_event_loop()
         self.config = Config()
@@ -41,22 +41,22 @@ class Aggregator(Process):
     async def loop(self):
         while True:
             r = redis.Redis(self.config.redis['ip'], port=self.config.redis['port'], decode_responses=True)
-            store = self.__storage()
             for exchange in self.config.exchanges:
                 for dtype in self.config.exchanges[exchange]:
                     for pair in self.config.exchanges[exchange][dtype]:
+                        store = self.__storage()
                         LOG.info(f'Reading {dtype}-{exchange}-{pair}')
                         data = r.xread({f'{dtype}-{exchange}-{pair}': '0-0'})
 
                         if len(data) == 0:
                             continue
-                        
+
                         agg = []
                         ids = []
                         for update_id, update in data[0][1]:
                             ids.append(update_id)
                             agg.append(update)
-                        
+
                         store.aggregate(agg)
                         store.write(exchange, dtype, pair, time.time())
                         r.xdel(f'{dtype}-{exchange}-{pair}', *ids)

@@ -6,9 +6,12 @@ exchanges:
     COINBASE:
         trades: [BTC-USD, ETH-USD]
         l2_book: [BTC-USD]
+        l3_book: [BTC-USD]
+
+book_depth: 10
 
 storage: arctic
 
 arctic: mongodb://127.0.0.1
 
-storage_interval: 60
+storage_interval: 10
