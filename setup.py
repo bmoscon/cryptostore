@@ -41,6 +41,8 @@ setup(
         "pyyaml",
         "aioredis",
         "pyarrow",
-        "arctic"
+        "arctic",
+        "google-cloud-storage",
+        "boto3"
     ],
 )

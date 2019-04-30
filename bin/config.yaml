@@ -1,6 +1,7 @@
 redis:
     ip: '127.0.0.1'
     port: 6379
+    del_after_read: true
 
 exchanges:
     COINBASE:
@@ -12,6 +13,16 @@ book_depth: 10
 
 storage: arctic
 
+parquet:
+    S3:
+        # If NULL boto will default to using ENV vars or credentials file
+        key_id: null
+        secret: null
+    GCS:
+        # path to service account key, if null will default to using env vars or auth tokens
+        # on GCE node
+        service_account: null
+
 arctic: mongodb://127.0.0.1
 
-storage_interval: 10
+storage_interval: 60

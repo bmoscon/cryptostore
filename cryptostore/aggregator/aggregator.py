@@ -22,6 +22,7 @@ LOG = logging.getLogger('cryptostore')
 class Aggregator(Process):
     def __init__(self, config_file=None):
         self.config_file = config_file
+        self.last_id = {}
         super().__init__()
 
     def run(self):
@@ -40,13 +41,16 @@ class Aggregator(Process):
 
     async def loop(self):
         while True:
+            delete = self.config.redis['del_after_read']
             r = redis.Redis(self.config.redis['ip'], port=self.config.redis['port'], decode_responses=True)
             for exchange in self.config.exchanges:
                 for dtype in self.config.exchanges[exchange]:
                     for pair in self.config.exchanges[exchange][dtype]:
+                        key = f'{dtype}-{exchange}-{pair}'
                         store = self.__storage()
                         LOG.info(f'Reading {dtype}-{exchange}-{pair}')
-                        data = r.xread({f'{dtype}-{exchange}-{pair}': '0-0'})
+
+                        data = r.xread({key: '0-0' if key not in self.last_id else self.last_id[key]})
 
                         if len(data) == 0:
                             continue
@@ -57,7 +61,10 @@ class Aggregator(Process):
                             ids.append(update_id)
                             agg.append(update)
 
+                        self.last_id[key] = ids[-1]
+
                         store.aggregate(agg)
                         store.write(exchange, dtype, pair, time.time())
-                        r.xdel(f'{dtype}-{exchange}-{pair}', *ids)
+                        if delete:
+                            r.xdel(f'{dtype}-{exchange}-{pair}', *ids)
             await asyncio.sleep(self.config.storage_interval)
