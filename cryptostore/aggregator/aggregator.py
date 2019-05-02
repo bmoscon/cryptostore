@@ -39,11 +39,12 @@ class Aggregator(Process):
                     for pair in self.config.exchanges[exchange][dtype]:
                         key = f'{dtype}-{exchange}-{pair}'
                         store = Storage(self.config)
-                        LOG.info(f'Reading {dtype}-{exchange}-{pair}')
+                        LOG.info(f'Reading {key}')
 
                         data = r.xread({key: '0-0' if key not in self.last_id else self.last_id[key]})
 
                         if len(data) == 0:
+                            LOG.info(f'No data for {key}')
                             continue
 
                         agg = []
@@ -57,5 +58,7 @@ class Aggregator(Process):
                         store.aggregate(agg)
                         store.write(exchange, dtype, pair, time.time())
                         if delete:
-                            r.xdel(f'{dtype}-{exchange}-{pair}', *ids)
+                            r.xdel(key, *ids)
+                        LOG.info(f'Write Complete {key}')
+
             await asyncio.sleep(self.config.storage_interval)
