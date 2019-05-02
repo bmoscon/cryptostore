@@ -4,15 +4,26 @@ Copyright (C) 2018-2019  Bryant Moscon - bmoscon@gmail.com
 Please see the LICENSE file for the terms and conditions
 associated with this software.
 '''
+import os
+
 import pyarrow as pa
 import pyarrow.parquet as pq
 
 from cryptostore.aggregator.store import Store
+from cryptostore.aggregator.gc import google_cloud_write
 
 
 class Parquet(Store):
-    def __init__(self):
+    def __init__(self, config=None):
+        self._write = None
         self.data = None
+
+        if config:
+            if 'GCS' in config:
+                self._write = google_cloud_write
+                self.bucket = config['GCS']['bucket']
+                self.prefix = config['GCS']['prefix']
+                self.auth = config['GCS']['service_account']
     
     def aggregate(self, data):
         names = list(data[0].keys())
@@ -30,6 +41,13 @@ class Parquet(Store):
             self.data = pa.concat_tables(self.data, table)
 
     def write(self, exchange, data_type, pair, timestamp):
-        file_name = f'{data_type}-{exchange}-{pair}-{int(timestamp)}.parquet'
+        file_name = f'{exchange}-{data_type}-{pair}-{int(timestamp)}.parquet'
         pq.write_table(self.data, file_name)
         self.data = None
+
+        if self._write:
+            path = f'{exchange}/{data_type}/{pair}/{int(timestamp)}.parquet'
+            if self.prefix:
+                path = f"{self.prefix}/{path}"
+            self._write(self.bucket, path, file_name, creds=self.auth)
+            os.remove(file_name)

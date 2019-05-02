@@ -33,7 +33,7 @@ class Aggregator(Process):
 
     def __storage(self):
         if self.config.storage == 'parquet':
-            return Parquet()
+            return Parquet(self.config.parquet)
         elif self.config.storage == 'arctic':
             return Arctic(self.config.arctic)
         else:
