@@ -11,8 +11,7 @@ import logging
 
 import redis
 
-from cryptostore.aggregator.parquet import Parquet
-from cryptostore.aggregator.arctic import Arctic
+from cryptostore.data.storage import Storage
 from cryptostore.config import Config
 
 
@@ -31,14 +30,6 @@ class Aggregator(Process):
         loop.create_task(self.loop())
         loop.run_forever()
 
-    def __storage(self):
-        if self.config.storage == 'parquet':
-            return Parquet(self.config.parquet)
-        elif self.config.storage == 'arctic':
-            return Arctic(self.config.arctic)
-        else:
-            raise ValueError("Store type not supported")
-
     async def loop(self):
         while True:
             delete = self.config.redis['del_after_read']
@@ -47,7 +38,7 @@ class Aggregator(Process):
                 for dtype in self.config.exchanges[exchange]:
                     for pair in self.config.exchanges[exchange][dtype]:
                         key = f'{dtype}-{exchange}-{pair}'
-                        store = self.__storage()
+                        store = Storage(self.config)
                         LOG.info(f'Reading {dtype}-{exchange}-{pair}')
 
                         data = r.xread({key: '0-0' if key not in self.last_id else self.last_id[key]})

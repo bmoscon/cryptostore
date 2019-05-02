@@ -11,7 +11,7 @@ exchanges:
 
 book_depth: 10
 
-storage: parquet
+storage: [parquet, arctic]
 
 parquet:
     # only one of S3 or GCS should be specified
@@ -27,6 +27,7 @@ parquet:
         service_account: null
         bucket: null
         prefix: null
+        del_file: true
 
 arctic: mongodb://127.0.0.1
 

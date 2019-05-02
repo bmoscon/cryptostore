@@ -9,7 +9,7 @@ from arctic import Arctic as ar
 from arctic import CHUNK_STORE
 from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, BID, ASK
 
-from cryptostore.aggregator.store import Store
+from cryptostore.data.store import Store
 
 
 class Arctic(Store):
