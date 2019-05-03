@@ -24,7 +24,6 @@ class Cryptostore:
         self.spawner = Spawn(self.queue)
         self.running_config = {}
 
-
     async def _load_config(self, start, stop):
         LOG.info("start: %s stop: %s", str(start), str(stop))
         for exchange in stop:

@@ -2,12 +2,12 @@ redis:
     ip: '127.0.0.1'
     port: 6379
     del_after_read: true
+    start_flush: false
 
 exchanges:
     COINBASE:
         trades: [BTC-USD, ETH-USD]
         l2_book: [BTC-USD]
-        l3_book: [BTC-USD]
 
 book_depth: 10
 
@@ -31,4 +31,4 @@ parquet:
 
 arctic: mongodb://127.0.0.1
 
-storage_interval: 60
+storage_interval: 300

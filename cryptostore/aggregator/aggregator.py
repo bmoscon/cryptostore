@@ -31,6 +31,9 @@ class Aggregator(Process):
         loop.run_forever()
 
     async def loop(self):
+        if 'start_flush' in self.config.redis and self.config.redis['start_flush']:
+            LOG.info(f'Flushing cache')
+            redis.Redis(self.config.redis['ip'], port=self.config.redis['port']).flushall()
         while True:
             delete = self.config.redis['del_after_read']
             r = redis.Redis(self.config.redis['ip'], port=self.config.redis['port'], decode_responses=True)
