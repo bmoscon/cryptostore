@@ -18,7 +18,7 @@ class Config:
             else:
                 file_name = os.path.join(os.getcwd(), 'config.yaml')
         if not os.path.isfile(file_name):
-            raise FileNotFoundError(f"File {file_name} does not exist")
+            raise FileNotFoundError(f"Config file {file_name} not found")
 
         self.config = {}
         self._load(file_name, reload_interval, callback)

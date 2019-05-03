@@ -19,10 +19,11 @@ LOG = get_logger('cryptostore', 'cryptostore.log', logging.INFO)
 
 
 class Cryptostore:
-    def __init__(self):
+    def __init__(self, config=None):
         self.queue = Queue()
         self.spawner = Spawn(self.queue)
         self.running_config = {}
+        self.cfg_path = config
 
     async def _load_config(self, start, stop):
         LOG.info("start: %s stop: %s", str(start), str(stop))
@@ -71,13 +72,12 @@ class Cryptostore:
         self.spawner.start()
         LOG.info("Spawner started")
 
-        self.aggregator = Aggregator()
+        self.aggregator = Aggregator(config_file=self.cfg_path)
         self.aggregator.start()
         LOG.info("Aggregator started")
 
-
         loop = asyncio.get_event_loop()
-        self.config = Config(callback=self._reconfigure)
+        self.config = Config(file_name=self.cfg_path, callback=self._reconfigure)
 
         LOG.info("Cryptostore started")
         loop.run_forever()
