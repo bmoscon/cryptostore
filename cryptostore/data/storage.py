@@ -15,7 +15,7 @@ class Storage(Store):
             self.s = [self.__init_helper(s, config) for s in config.storage]
         else:
             self.s = [self.__init_helper(config.storage, config)]
-    
+
     def __init_helper(self, store, config):
         if store == 'parquet':
             return Parquet(config.parquet)
@@ -27,7 +27,7 @@ class Storage(Store):
     def write(self, exchange, data_type, pair, timestamp):
         for s in self.s:
             s.write(exchange, data_type, pair, timestamp)
-    
+
     def aggregate(self, data):
         for s in self.s:
             s.aggregate(data)

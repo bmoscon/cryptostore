@@ -4,11 +4,9 @@ Copyright (C) 2018-2019  Bryant Moscon - bmoscon@gmail.com
 Please see the LICENSE file for the terms and conditions
 associated with this software.
 '''
-import sys
-
 from setuptools import setup
 from setuptools import find_packages
-from setuptools.command.test import test as TestCommand
+
 
 ld = None
 try:

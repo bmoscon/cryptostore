@@ -1,6 +1,5 @@
 ## Changelog
 
-
 ### 0.0.4
   * Bugfix: missing comma in setup.py
 

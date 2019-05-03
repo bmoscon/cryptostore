@@ -7,7 +7,7 @@ associated with this software.
 import pandas as pd
 from arctic import Arctic as ar
 from arctic import CHUNK_STORE
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, BID, ASK
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK
 
 from cryptostore.data.store import Store
 

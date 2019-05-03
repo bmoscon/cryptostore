@@ -7,6 +7,6 @@ associated with this software.
 class Store:
     def write(self, exchange, data_type, pair, timestamp):
         raise NotImplementedError
-    
+
     def aggregate(self, data):
         raise NotImplementedError
