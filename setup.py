@@ -18,7 +18,7 @@ except BaseException:
 
 setup(
     name="cryptostore",
-    version="0.0.4",
+    version="0.0.5",
     author="Bryant Moscon",
     author_email="bmoscon@gmail.com",
     description=("Storage engine for cryptocurrency data"),
