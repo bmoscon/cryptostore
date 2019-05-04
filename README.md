@@ -11,11 +11,10 @@ A storage engine for crypto market data. You supply the exchanges, data type (tr
 Stores data to:
 * Parquet
 * Arctic
+* Google Cloud Storage
+* Amazon S3
 
+Support a dynamic configuration, removing the requirement that the service be restarted to pick up configuration changes.
 
 ### Planned features
-* [x] Dynamic/Reloadable Config
-* [x] Parquet support
-* [x] Arctic support
-* [ ] Parquet files in S3/GC
 * [ ] Missing data detection and correction (for exchanges that support historical data, typically only trade data)
