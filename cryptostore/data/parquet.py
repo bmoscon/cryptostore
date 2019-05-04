@@ -11,6 +11,7 @@ import pyarrow.parquet as pq
 
 from cryptostore.data.store import Store
 from cryptostore.data.gc import google_cloud_write
+from cryptostore.data.s3 import aws_write
 
 
 class Parquet(Store):
@@ -25,6 +26,12 @@ class Parquet(Store):
                 self.prefix = config['GCS']['prefix']
                 self.auth = config['GCS']['service_account']
                 self.del_file = False if 'del_file' in config['GCS'] and config['GCS']['del_file'] == False else True
+            elif 'S3' in config:
+                self._write = aws_write
+                self.bucket = config['S3']['bucket']
+                self.prefix = config['S3']['prefix']
+                self.auth = (config['S3']['key_id'], config['S3']['secret'])
+                self.del_file = False if 'del_file' in config['S3'] and config['S3']['del_file'] == False else True
 
     def aggregate(self, data):
         names = list(data[0].keys())

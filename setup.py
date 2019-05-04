@@ -38,9 +38,11 @@ setup(
         "cryptofeed",
         "pyyaml",
         "aioredis",
-        "pyarrow",
-        "arctic",
-        "google-cloud-storage",
-        "boto3"
+        "pyarrow"
     ],
+    extras_require={
+        'arctic': ['arctic'],
+        'gcs': ['google-cloud-storage'],
+        'aws': ['boto3']
+    },
 )
