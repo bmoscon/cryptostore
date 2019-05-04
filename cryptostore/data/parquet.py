@@ -16,22 +16,26 @@ from cryptostore.data.s3 import aws_write
 
 class Parquet(Store):
     def __init__(self, config=None):
-        self._write = None
+        self._write = []
+        self.bucket = []
+        self.kwargs = []
+        self.prefix = []
         self.data = None
 
+
         if config:
+            self.del_file = False if 'del_file' in config and config['del_file'] == False else True
+
             if 'GCS' in config:
-                self._write = google_cloud_write
-                self.bucket = config['GCS']['bucket']
-                self.prefix = config['GCS']['prefix']
-                self.auth = config['GCS']['service_account']
-                self.del_file = False if 'del_file' in config['GCS'] and config['GCS']['del_file'] == False else True
-            elif 'S3' in config:
-                self._write = aws_write
-                self.bucket = config['S3']['bucket']
-                self.prefix = config['S3']['prefix']
-                self.auth = (config['S3']['key_id'], config['S3']['secret'])
-                self.del_file = False if 'del_file' in config['S3'] and config['S3']['del_file'] == False else True
+                self._write.append(google_cloud_write)
+                self.bucket.append(config['GCS']['bucket'])
+                self.prefix.append(config['GCS']['prefix'])
+                self.kwargs.append({'creds': config['GCS']['service_account']})
+            if 'S3' in config:
+                self._write.append(aws_write)
+                self.bucket.append(config['S3']['bucket'])
+                self.prefix.append(config['S3']['prefix'])
+                self.kwargs.append({'creds': (config['S3']['key_id'], config['S3']['secret'])})
 
     def aggregate(self, data):
         names = list(data[0].keys())
@@ -54,9 +58,10 @@ class Parquet(Store):
         self.data = None
 
         if self._write:
-            path = f'{exchange}/{data_type}/{pair}/{int(timestamp)}.parquet'
-            if self.prefix:
-                path = f"{self.prefix}/{path}"
-            self._write(self.bucket, path, file_name, creds=self.auth)
+            for func, bucket, prefix, kwargs in zip(self._write, self.bucket, self.prefix, self.kwargs):
+                path = f'{exchange}/{data_type}/{pair}/{int(timestamp)}.parquet'
+                if prefix:
+                    path = f"{prefix}/{path}"
+                func(bucket, path, file_name, **kwargs)
             if self.del_file:
                 os.remove(file_name)

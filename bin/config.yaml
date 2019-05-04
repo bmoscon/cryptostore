@@ -11,25 +11,24 @@ exchanges:
 
 book_depth: 10
 
-storage: [parquet, arctic]
+storage: [parquet]
 
 parquet:
-    # only one of S3 or GCS should be specified
-    #S3:
-    #    # If NULL boto will default to using ENV vars or credentials file
-    #    key_id: null
-    #    secret: null
-    #    bucket: null
-    #    prefix: null
-    #    del_file: true
+    del_file: true
+
+    S3:
+        # If NULL boto will default to using ENV vars or credentials file
+        key_id: null
+        secret: null
+        bucket: null
+        prefix: null
     GCS:
         # path to service account key, if null will default to using env vars or auth tokens
         # on GCE node
         service_account: null
         bucket: null
         prefix: null
-        del_file: true
 
 arctic: mongodb://127.0.0.1
 
-storage_interval: 300
+storage_interval: 30
