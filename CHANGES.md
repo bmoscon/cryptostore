@@ -1,6 +1,6 @@
 ## Changelog
 
-### 0.0.4
+### 0.0.4 (2019-05-04)
   * Bugfix: missing comma in setup.py
   * Feature: S3 support
   * Feature: Command line option, --config/-c to provide path to configuration
