@@ -2,7 +2,7 @@ redis:
     ip: '127.0.0.1'
     port: 6379
     del_after_read: true
-    start_flush: false
+    start_flush: true
 
 exchanges:
     COINBASE:
@@ -11,7 +11,7 @@ exchanges:
 
 book_depth: 10
 
-storage: [parquet]
+storage: [arctic]
 
 parquet:
     del_file: true

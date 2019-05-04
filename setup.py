@@ -45,4 +45,7 @@ setup(
         'gcs': ['google-cloud-storage'],
         'aws': ['boto3']
     },
+    entry_points = {
+        'console_scripts': ['cryptostore=cryptostore.bin.cryptostore:main'],
+    }
 )

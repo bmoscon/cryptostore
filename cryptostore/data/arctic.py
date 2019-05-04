@@ -28,7 +28,7 @@ class Arctic(Store):
         if data_type == TRADES:
             df['size'] = df.amount.astype('float')
             df['price'] = df.price.astype('float')
-            df['date'] = pd.to_datetime(df['timestamp'])
+            df['date'] = pd.to_datetime(df['timestamp'], unit='s')
             df = df.drop(['pair', 'feed'], axis=1)
             chunk_size = 'H'
         elif data_type in { L2_BOOK, L3_BOOK }:

@@ -1,14 +1,12 @@
-#!/usr/bin/env python
 import argparse
 
 from cryptostore import Cryptostore
 
-def main(config):
-    cs = Cryptostore(config=config)
-    cs.run()
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config", help='path to the config file')
     args = parser.parse_args()
-    main(args.config)
+
+    cs = Cryptostore(config=args.config)
+    cs.run()
