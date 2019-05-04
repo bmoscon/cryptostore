@@ -12,6 +12,6 @@ def aws_write(bucket, key, data, creds=None):
         aws_access_key_id=creds[0],
         aws_secret_access_key=creds[1]
     )
-    
+
     with open(data, 'rb') as fp:
         client.upload_fileobj(fp, bucket, key)

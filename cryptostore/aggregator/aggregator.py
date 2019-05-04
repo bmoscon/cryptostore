@@ -8,7 +8,6 @@ import asyncio
 from multiprocessing import Process
 import time
 import logging
-import time
 
 import redis
 
