@@ -14,7 +14,7 @@ Stores data to:
 * Google Cloud Storage
 * Amazon S3
 
-Support a dynamic configuration, removing the requirement that the service be restarted to pick up configuration changes.
+Supports a dynamic configuration, removing the requirement that the service be restarted to pick up configuration changes.
 
 ### Planned features
 * [ ] Missing data detection and correction (for exchanges that support historical data, typically only trade data)
