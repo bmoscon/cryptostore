@@ -3,6 +3,7 @@
 ### 0.0.4
   * Bugfix: missing comma in setup.py
   * Feature: S3 support
+  * Feature: Command line option, --config/-c to provide path to configuration
 
 ### 0.0.3 (2019-05-02)
   * Initial Alpha Release - data storage to arctic, parquet and google cloud storage
