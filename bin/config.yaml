@@ -21,6 +21,7 @@ parquet:
     #    secret: null
     #    bucket: null
     #    prefix: null
+    #    del_file: true
     GCS:
         # path to service account key, if null will default to using env vars or auth tokens
         # on GCE node
