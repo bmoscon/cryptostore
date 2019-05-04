@@ -1,5 +1,8 @@
 ## Changelog
 
+### 0.0.5
+  * Feature: Install entry point script with setuptools
+
 ### 0.0.4 (2019-05-04)
   * Bugfix: missing comma in setup.py
   * Feature: S3 support
