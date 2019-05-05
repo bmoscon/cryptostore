@@ -16,5 +16,12 @@ Stores data to:
 
 Supports a dynamic configuration, removing the requirement that the service be restarted to pick up configuration changes.
 
+### Running Cryptostore
+
+Once installed with pip, an executable is placed on the path, so you can simply run `cryptostore` to start the collector. It depends on a config.yaml file. If its not in the current working directory, you can specify the path to the config with the `--config` option.
+
+An example [config](config.yaml), with documentation inline is provided in the root of the repository.
+
+
 ### Planned features
 * [ ] Missing data detection and correction (for exchanges that support historical data, typically only trade data)
