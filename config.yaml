@@ -13,7 +13,8 @@ redis:
 # Data sources and data types configured under exchanges. Exchange names follow the naming scheme in cryptofeed (they
 # must be capitalized) and only exchanges supported by cryptofeed are supported.
 # data types follow cryptofeed definitions, see defines.py in cryptofeed for more details, common ones are
-# trades, l2_book, l3_book, funding, ticker (only trades, l2_book, l3_book currently supported by cryptostore)
+# trades, l2_book, l3_book, funding, ticker (only trades, l2_book, l3_book currently supported by cryptostore).
+# Trading pairs for all exchanges (except BitMEX) follow the currency-quote format 
 exchanges:
     COINBASE:
         trades: [BTC-USD, ETH-USD]
