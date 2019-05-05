@@ -2,6 +2,7 @@
 
 ### 0.0.5
   * Feature: Install entry point script with setuptools
+  * Bugfix: Incorreclty storing level/order size in book updates in Arctic
 
 ### 0.0.4 (2019-05-04)
   * Bugfix: missing comma in setup.py
