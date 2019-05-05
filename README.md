@@ -6,7 +6,7 @@
 
 
 
-A storage engine for crypto market data. You supply the exchanges, data type (trade, book, etc), and trading pairs you're interested in and Cryptostore does the rest!
+A storage engine for cryptocurrency market data. You supply the exchanges, data type (trade, book, etc), and trading pairs you're interested in and Cryptostore does the rest!
 
 Stores data to:
 * Parquet
