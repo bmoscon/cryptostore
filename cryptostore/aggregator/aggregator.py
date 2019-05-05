@@ -28,7 +28,10 @@ class Aggregator(Process):
         loop = asyncio.get_event_loop()
         self.config = Config(file_name=self.config_file)
         loop.create_task(self.loop())
-        loop.run_forever()
+        try:
+            loop.run_forever()
+        except KeyboardInterrupt:
+            pass
 
     async def loop(self):
         if 'start_flush' in self.config.redis and self.config.redis['start_flush']:

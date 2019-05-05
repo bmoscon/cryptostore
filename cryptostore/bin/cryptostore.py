@@ -9,4 +9,7 @@ def main():
     args = parser.parse_args()
 
     cs = Cryptostore(config=args.config)
-    cs.run()
+    try:
+        cs.run()
+    except KeyboardInterrupt:
+        pass
