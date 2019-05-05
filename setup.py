@@ -37,7 +37,7 @@ setup(
         "pandas",
         "cryptofeed>=0.22.0",
         "pyyaml",
-        "aioredis",
+        "redis",
         "pyarrow"
     ],
     extras_require={
