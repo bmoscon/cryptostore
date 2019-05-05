@@ -18,7 +18,7 @@ Supports a dynamic configuration, removing the requirement that the service be r
 
 ### Running Cryptostore
 
-Once installed with pip, an executable is placed on the path, so you can simply run `cryptostore` to start the collector. It depends on a config.yaml file. If its not in the current working directory, you can specify the path to the config with the `--config` option.
+Once installed with pip, an executable is placed on the path, so you can simply run `cryptostore` to start the collector. It requires a `config.yaml` file. If its not in the current working directory, you can specify the path to the config with the `--config` option.
 
 An example [config](config.yaml), with documentation inline is provided in the root of the repository.
 
