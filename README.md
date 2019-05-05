@@ -14,13 +14,12 @@ Stores data to:
 * Google Cloud Storage
 * Amazon S3
 
-Supports a dynamic configuration, removing the requirement that the service be restarted to pick up configuration changes.
 
 ### Running Cryptostore
 
 Once installed with pip, an executable is placed on the path, so you can simply run `cryptostore` to start the collector. It requires a `config.yaml` file. If its not in the current working directory, you can specify the path to the config with the `--config` option.
 
-An example [config](config.yaml), with documentation inline is provided in the root of the repository.
+An example [config](config.yaml), with documentation inline is provided in the root of the repository. The config file is monitored by cryptostore, so you can change the options in the file and it will apply them without the need to reload the service (this is experimental. If you encounter issues with it, please raise an issue).
 
 
 ### Planned features
