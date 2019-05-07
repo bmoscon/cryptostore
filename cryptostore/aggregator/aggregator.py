@@ -9,8 +9,7 @@ from multiprocessing import Process
 import time
 import logging
 
-import redis
-
+from cryptostore.aggregator.redis import Redis
 from cryptostore.data.storage import Storage
 from cryptostore.config import Config
 
@@ -21,7 +20,6 @@ LOG = logging.getLogger('cryptostore')
 class Aggregator(Process):
     def __init__(self, config_file=None):
         self.config_file = config_file
-        self.last_id = {}
         super().__init__()
 
     def run(self):
@@ -34,40 +32,30 @@ class Aggregator(Process):
             pass
 
     async def loop(self):
-        if 'start_flush' in self.config.redis and self.config.redis['start_flush']:
-            LOG.info('Flushing cache')
-            redis.Redis(self.config.redis['ip'], port=self.config.redis['port']).flushall()
+        if 'redis' in self.config:
+            cache = Redis(self.config.redis['ip'],
+                          self.config.redis['port'],
+                          del_after_read=self.config.redis['del_after_read'],
+                          flush=self.config.redis['start_flush'])
 
         while True:
             start = time.time()
-            delete = self.config.redis['del_after_read']
-            r = redis.Redis(self.config.redis['ip'], port=self.config.redis['port'], decode_responses=True)
             for exchange in self.config.exchanges:
                 for dtype in self.config.exchanges[exchange]:
                     for pair in self.config.exchanges[exchange][dtype]:
-                        key = f'{dtype}-{exchange}-{pair}'
                         store = Storage(self.config)
-                        LOG.info('Reading %s', key)
+                        LOG.info('Reading %s-%s-%s', exchange, dtype, pair)
 
-                        data = r.xread({key: '0-0' if key not in self.last_id else self.last_id[key]})
-
+                        data = cache.read(exchange, dtype, pair)
                         if len(data) == 0:
-                            LOG.info('No data for %s', key)
+                            LOG.info('No data for %s-%s-%s', exchange, dtype, pair)
                             continue
 
-                        agg = []
-                        ids = []
-                        for update_id, update in data[0][1]:
-                            ids.append(update_id)
-                            agg.append(update)
-
-                        self.last_id[key] = ids[-1]
-
-                        store.aggregate(agg)
+                        store.aggregate(data)
                         store.write(exchange, dtype, pair, time.time())
-                        if delete:
-                            r.xdel(key, *ids)
-                        LOG.info("Write Complete %s", key)
+
+                        cache.delete(exchange, dtype, pair)
+                        LOG.info('Write Complete %s-%s-%s', exchange, dtype, pair)
 
             total = time.time() - start
             interval = self.config.storage_interval - total

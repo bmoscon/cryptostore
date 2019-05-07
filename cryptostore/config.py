@@ -26,6 +26,9 @@ class Config:
     def __getattr__(self, attr):
         return self.config[attr]
 
+    def __contains__(self, item):
+        return item in self.config
+
     async def __loader(self, file, interval, callback):
         last_modified = 0
         while True:

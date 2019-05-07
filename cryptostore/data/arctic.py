@@ -5,20 +5,19 @@ Please see the LICENSE file for the terms and conditions
 associated with this software.
 '''
 import pandas as pd
-from arctic import Arctic as ar
-from arctic import CHUNK_STORE
 from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK
 
 from cryptostore.data.store import Store
+from cryptostore.data.engines import StorageEngines
 
 
 class Arctic(Store):
     def __init__(self, connection: str):
         self.data = []
-        self.con = ar(connection)
+        self.con = StorageEngines.arctic.Arctic(connection)
 
     def aggregate(self, data):
-        self.data.extend(data)
+        self.data = data
 
     def write(self, exchange, data_type, pair, timestamp):
         chunk_size = None
@@ -43,5 +42,5 @@ class Arctic(Store):
         df.index = df.index.tz_localize(None)
 
         if exchange not in self.con.list_libraries():
-            self.con.initialize_library(exchange, lib_type=CHUNK_STORE)
+            self.con.initialize_library(exchange, lib_type=StorageEngines.arctic.CHUNK_STORE)
         self.con[exchange].append(f"{data_type}-{pair}", df, upsert=True, chunk_size=chunk_size)

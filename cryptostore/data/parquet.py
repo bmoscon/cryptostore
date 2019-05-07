@@ -13,7 +13,6 @@ from cryptostore.data.store import Store
 from cryptostore.data.gc import google_cloud_write
 from cryptostore.data.s3 import aws_write
 
-
 class Parquet(Store):
     def __init__(self, config=None):
         self._write = []
@@ -21,7 +20,6 @@ class Parquet(Store):
         self.kwargs = []
         self.prefix = []
         self.data = None
-
 
         if config:
             self.del_file = False if 'del_file' in config and config['del_file'] == False else True
@@ -46,11 +44,7 @@ class Parquet(Store):
                 cols[key].append(entry[key])
         arrays = [pa.array(cols[col]) for col in cols]
         table = pa.Table.from_arrays(arrays, names=names)
-
-        if self.data is None:
-            self.data = table
-        else:
-            self.data = pa.concat_tables(self.data, table)
+        self.data = table
 
     def write(self, exchange, data_type, pair, timestamp):
         file_name = f'{exchange}-{data_type}-{pair}-{int(timestamp)}.parquet'
