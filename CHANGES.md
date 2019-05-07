@@ -3,6 +3,8 @@
 ### 0.0.5
   * Feature: Install entry point script with setuptools
   * Bugfix: Incorreclty storing level/order size in book updates in Arctic
+  * Bugfix: Optional dependenices no longer required to be installed
+  * Feature: Redis decoupled from aggregator, in preparation for the caching backend to be user selected 
 
 ### 0.0.4 (2019-05-04)
   * Bugfix: missing comma in setup.py
