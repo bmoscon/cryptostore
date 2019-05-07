@@ -24,3 +24,4 @@ An example [config](config.yaml), with documentation inline is provided in the r
 
 ### Planned features
 * [ ] Missing data detection and correction (for exchanges that support historical data, typically only trade data)
+* [ ] Support other caching engines. Currently uses Redis Streams. Will also support kafka (and maybe others) in near future
