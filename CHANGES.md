@@ -1,6 +1,6 @@
 ## Changelog
 
-### 0.0.5
+### 0.0.5 (2019-05-08)
   * Feature: Install entry point script with setuptools
   * Bugfix: Incorreclty storing level/order size in book updates in Arctic
   * Bugfix: Optional dependenices no longer required to be installed
