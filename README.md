@@ -28,4 +28,5 @@ An example [config](config.yaml), with documentation inline is provided in the r
 * [ ] Storing data to InfluxDB
 * [ ] Storing data to MongoDB
 * [ ] Subscribing to Book Deltas
-* [ ] Support for enabling computation and storage of diverse metrics in parallel with data collection (eg configurable OHLCV)
+* [ ] Support for enabling computation and storage of diverse metrics in parallel with data collection (eg. configurable OHLCV)
+* [ ] Support for forwarding data to another service/sink (eg. to a trading engine). 
