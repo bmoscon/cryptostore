@@ -7,6 +7,6 @@ associated with this software.
 class Cache:
     def read(self, exchange, dtype, pair):
         raise NotImplementedError
-    
-    def delete(self, *args):
+
+    def delete(self, exchange, dtype, pair):
         raise NotImplementedError

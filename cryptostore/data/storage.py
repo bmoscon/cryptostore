@@ -12,11 +12,12 @@ from cryptostore.data.arctic import Arctic
 class Storage(Store):
     def __init__(self, config):
         if isinstance(config.storage, list):
-            self.s = [self.__init_helper(s, config) for s in config.storage]
+            self.s = [Storage.__init_helper(s, config) for s in config.storage]
         else:
-            self.s = [self.__init_helper(config.storage, config)]
+            self.s = [Storage.__init_helper(config.storage, config)]
 
-    def __init_helper(self, store, config):
+    @staticmethod
+    def __init_helper(store, config):
         if store == 'parquet':
             return Parquet(config.parquet)
         elif store == 'arctic':
