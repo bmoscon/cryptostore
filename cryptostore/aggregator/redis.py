@@ -32,14 +32,14 @@ class Redis(Cache):
 
         if len(data) == 0:
             return []
-        else:
-            ret = []
-            for update_id, update in data[0][1]:
-                self.ids[key].append(update_id)
-                ret.append(update)
 
-            self.last_id[key] = self.ids[key][-1]
-            return ret
+        ret = []
+        for update_id, update in data[0][1]:
+            self.ids[key].append(update_id)
+            ret.append(update)
+
+        self.last_id[key] = self.ids[key][-1]
+        return ret
 
     def delete(self, exchange, dtype, pair):
         key = f'{dtype}-{exchange}-{pair}'
