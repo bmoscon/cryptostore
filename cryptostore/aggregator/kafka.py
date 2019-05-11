@@ -49,7 +49,7 @@ class Kafka(Cache):
     def read(self, exchange, dtype, pair):
         key = f'{dtype}-{exchange}-{pair}'
         data = self._conn(key).consume(1000000, timeout=0.5)
-        print(len(data))
+        LOG.info("%s: Read %d messages from Kafka", key, len(data))
         ret = []
         for message in data:
             self.ids[key] = message
@@ -72,6 +72,6 @@ class Kafka(Cache):
 
     def delete(self, exchange, dtype, pair):
         key = f'{dtype}-{exchange}-{pair}'
-        LOG.info("Committing offset %d", self.ids[key].offset())
+        LOG.info("%s: Committing offset %d", key, self.ids[key].offset())
         self._conn(key).commit(message=self.ids[key])
         self.ids[key] = None

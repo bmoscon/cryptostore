@@ -33,6 +33,7 @@ class Redis(Cache):
         if len(data) == 0:
             return []
 
+        LOG.info("%s: Read %d messages from Redis", key, len(data[0][1]))
         ret = []
         for update_id, update in data[0][1]:
             self.ids[key].append(update_id)
@@ -46,5 +47,5 @@ class Redis(Cache):
 
         if self.del_after_read:
             self.conn.xdel(key, *self.ids[key])
-
+        LOG.info("%s: Removed through id %s", key, self.ids[key][-1])
         self.ids[key] = []
