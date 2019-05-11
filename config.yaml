@@ -1,9 +1,16 @@
 # Cryptostore sample config file
 
-# Redis is required, it is used to batch updates from cryptofeed and the storage medium of choice
+# Redis or Kafka are required. They are used to batch updates from cryptofeed and the storage medium of choice
 #
-# del_after_read: toggles the removal of data from redis after its processed with cryptostore.
-# start_flush: toggles if redis should be flushed at the start. Primarily for debugging, it will flush ALL of redis
+# del_after_read: (redis only) toggles the removal of data from redis after it has been processed with cryptostore.
+# start_flush: toggles if redis/kafka should be flushed at the start. Primarily for debugging, it will flush ALL of redis/kafka
+cache: kafka
+
+kafka:
+    # ip/port are for the bootstrap server
+    ip: '127.0.0.1'
+    port: 9092
+    start_flush: true
 redis:
     ip: '127.0.0.1'
     port: 6379
@@ -16,9 +23,11 @@ redis:
 # trades, l2_book, l3_book, funding, ticker (only trades, l2_book, l3_book currently supported by cryptostore).
 # Trading pairs for all exchanges (except BitMEX) follow the currency-quote format 
 exchanges:
+    BITMEX:
+        l2_book: [XBTUSD]
     COINBASE:
-        trades: [BTC-USD, ETH-USD]
         l2_book: [BTC-USD]
+        trades: [BTC-USD, ETH-USD, ETH-BTC]
 
 # number of levels per side to store from book updates. Remove this option to store all available data
 book_depth: 10
@@ -52,4 +61,4 @@ parquet:
 arctic: mongodb://127.0.0.1
 
 # Data batching window, in seconds
-storage_interval: 30
+storage_interval: 10

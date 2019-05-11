@@ -14,6 +14,10 @@ Stores data to:
 * Google Cloud Storage
 * Amazon S3
 
+### Requirements
+
+Cryptostore currently requires either Kafka or Redis to be installed. The extra dependencies for your backend of choice must be installed as well (eg `pip install cryptostore[redis]`). Redis requires Redis Streams, which is supported in versions > 5.0.
+
 
 ### Running Cryptostore
 
@@ -22,9 +26,20 @@ Once installed with pip, an executable is placed on the path, so you can simply 
 An example [config](config.yaml), with documentation inline is provided in the root of the repository. The config file is monitored by cryptostore, so you can change the options in the file and it will apply them without the need to reload the service (this is experimental. If you encounter issues with it, please raise an issue).
 
 
+### Running with other consumers
+
+Cryptostore can operate with other consumers of the exchange data (eg. a trading engine consuming updates).
+
+For Redis
+  - Disable the message removal in the Redis settings in `config.yaml`. The other consumer will need to be responsible for
+  message removal (if so desired), and it must ensure messages are not removed before cryptostore has had a chance to process them.
+  
+For Kafka
+  - You need only supply a different consumer group id for the other consumers to ensure all consumers receive all messages. Kafka's configuration controls the removal of committed messages in a topic (typically by time or size).
+
+
 ### Planned features
 * [ ] Missing data detection and correction (for exchanges that support historical data, typically only trade data)
-* [ ] Support other caching engines. Currently uses Redis Streams. Will also support kafka (and maybe others) in near future
 * [ ] Storing data to InfluxDB
 * [ ] Storing data to MongoDB
 * [ ] Subscribing to Book Deltas

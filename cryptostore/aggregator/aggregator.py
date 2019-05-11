@@ -10,6 +10,7 @@ import time
 import logging
 
 from cryptostore.aggregator.redis import Redis
+from cryptostore.aggregator.kafka import Kafka
 from cryptostore.data.storage import Storage
 from cryptostore.config import Config
 
@@ -32,11 +33,15 @@ class Aggregator(Process):
             pass
 
     async def loop(self):
-        if 'redis' in self.config:
+        if self.config.cache == 'redis':
             cache = Redis(self.config.redis['ip'],
                           self.config.redis['port'],
                           del_after_read=self.config.redis['del_after_read'],
                           flush=self.config.redis['start_flush'])
+        elif self.config.cache == 'kafka':
+            cache = Kafka(self.config.kafka['ip'],
+                          self.config.kafka['port'],
+                          flush=self.config.kafka['start_flush'])
 
         while True:
             start = time.time()
