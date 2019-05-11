@@ -23,7 +23,6 @@ class Kafka(Cache):
         self.conn = {}
         self.ip = ip
         self.port = port
-        self.del_after_read
         self.ids = {}
 
         if flush:

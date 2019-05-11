@@ -41,7 +41,6 @@ class Aggregator(Process):
         elif self.config.cache == 'kafka':
             cache = Kafka(self.config.kafka['ip'],
                           self.config.kafka['port'],
-                          del_after_read=self.config.kafka['del_after_read'],
                           flush=self.config.kafka['start_flush'])
 
         while True:
