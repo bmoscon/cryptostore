@@ -28,21 +28,21 @@ class Collector(Process):
             depth = self.config['book_depth']
 
         cache = self.config['cache']
+        if cache == 'redis':
+            trade_cb = TradeStream
+            book_cb = BookStream
+            kwargs = {'host': self.config['redis']['ip'], 'port': self.config['redis']['port']}
+        elif cache == 'kafka':
+            trade_cb = TradeKafka
+            book_cb = BookKafka
+            kwargs = {'host': self.config['kafka']['ip'], 'port': self.config['kafka']['port']}
 
         if TRADES in self.exchange_config:
-            if cache == 'redis':
-                cb[TRADES] = TradeStream(host=self.config['redis']['ip'], port=self.config['redis']['port'])
-            elif cache == 'kafka':
-                cb[TRADES] = TradeKafka(host=self.config['kafka']['ip'], port=self.config['kafka']['port'])
-
+            cb[TRADES] = trade_cb(**kwargs)
         if L2_BOOK in self.exchange_config:
-            if cache == 'redis':
-                cb[L2_BOOK] = BookStream(depth=depth, key=L2_BOOK, host=self.config['redis']['ip'], port=self.config['redis']['port'])
-            elif cache == 'kafka':
-                cb[L2_BOOK] = BookKafka(depth=depth, key=L2_BOOK, host=self.config['kafka']['ip'], port=self.config['kafka']['port'])
-        
+            cb[L2_BOOK] = book_cb(key=L2_BOOK, depth=depth, **kwargs)
         if L3_BOOK in self.exchange_config:
-            cb[L3_BOOK] = BookStream(depth=depth, key=L3_BOOK, host=self.config['redis']['ip'], port=self.config['redis']['port'])
+            cb[L3_BOOK] = book_cb(key=L3_BOOK, depth=depth, **kwargs)
 
         fh.add_feed(self.exchange, config=self.exchange_config, callbacks=cb)
         fh.run()

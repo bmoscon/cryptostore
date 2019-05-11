@@ -6,7 +6,6 @@ associated with this software.
 '''
 import json
 import logging
-from collections import defaultdict
 
 from cryptofeed.defines import L2_BOOK, L3_BOOK, BID, ASK
 
@@ -30,7 +29,7 @@ class Kafka(Cache):
             topics = list(ac.list_topics().topics.keys())
             for topic, status in ac.delete_topics(topics).items():
                 try:
-                    status.result()  
+                    status.result()
                     LOG.info("Topic %s deleted", topic)
                 except Exception as e:
                     LOG.warning("Failed to delete topic %s: %s", topic, e)
@@ -66,7 +65,7 @@ class Kafka(Cache):
                             for order_id, size in data.items():
                                 d.append({'side': side, 'price': price, 'size': size, 'order_id': order_id, 'timestamp': ts})
                         else:
-                            d.append({'side': side, 'price': price, 'size': data, 'timestamp': ts})                
+                            d.append({'side': side, 'price': price, 'size': data, 'timestamp': ts})
             ret = d
 
         return ret

@@ -25,6 +25,9 @@ redis:
 exchanges:
     BITMEX:
         l2_book: [XBTUSD]
+    COINBASE:
+        l2_book: [BTC-USD]
+        trades: [BTC-USD, ETH-USD, ETH-BTC]
 
 # number of levels per side to store from book updates. Remove this option to store all available data
 book_depth: 10
