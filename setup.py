@@ -35,12 +35,13 @@ setup(
     ],
     install_requires=[
         "pandas",
-        "cryptofeed[redis]>=0.22.0",
+        "cryptofeed>=0.22.0",
         "pyyaml",
-        "redis",
         "pyarrow"
     ],
     extras_require={
+        'redis': ['redis', 'aioredis'],
+        'kafka': ['aiokafka', 'confluent-kafka'],
         'arctic': ['arctic'],
         'gcs': ['google-cloud-storage'],
         'aws': ['boto3']
