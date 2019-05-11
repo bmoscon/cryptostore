@@ -4,7 +4,7 @@ Copyright (C) 2018-2019  Bryant Moscon - bmoscon@gmail.com
 Please see the LICENSE file for the terms and conditions
 associated with this software.
 '''
-from cryptostore.data.engines import StorageEngines
+from cryptostore.engines import StorageEngines
 
 
 def aws_write(bucket, key, data, creds=None):

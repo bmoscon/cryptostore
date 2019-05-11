@@ -4,7 +4,7 @@
 #
 # del_after_read: (redis only) toggles the removal of data from redis after it has been processed with cryptostore.
 # start_flush: toggles if redis/kafka should be flushed at the start. Primarily for debugging, it will flush ALL of redis/kafka
-cache: redis
+cache: kafka
 
 kafka:
     # ip/port are for the bootstrap server

@@ -8,7 +8,7 @@ import pandas as pd
 from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK
 
 from cryptostore.data.store import Store
-from cryptostore.data.engines import StorageEngines
+from cryptostore.engines import StorageEngines
 
 
 class Arctic(Store):

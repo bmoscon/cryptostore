@@ -4,11 +4,11 @@ Copyright (C) 2018-2019  Bryant Moscon - bmoscon@gmail.com
 Please see the LICENSE file for the terms and conditions
 associated with this software.
 '''
-import redis
 import logging
 from collections import defaultdict
 
 from cryptostore.aggregator.cache import Cache
+from cryptostore.engines import StorageEngines
 
 
 LOG = logging.getLogger('cryptostore')
@@ -19,7 +19,7 @@ class Redis(Cache):
         self.del_after_read = del_after_read
         self.last_id = {}
         self.ids = defaultdict(list)
-        self.conn = redis.Redis(ip, port, decode_responses=True)
+        self.conn = StorageEngines.redis.Redis(ip, port, decode_responses=True)
         if flush:
             LOG.info('Flushing cache')
             self.conn.flushall()

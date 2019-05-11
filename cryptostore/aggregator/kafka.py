@@ -5,13 +5,12 @@ Please see the LICENSE file for the terms and conditions
 associated with this software.
 '''
 import json
-
-from confluent_kafka import Consumer, TopicPartition
-from confluent_kafka.admin import AdminClient
 import logging
 from collections import defaultdict
+
 from cryptofeed.defines import L2_BOOK, L3_BOOK, BID, ASK
 
+from cryptostore.engines import StorageEngines
 from cryptostore.aggregator.cache import Cache
 
 
@@ -26,7 +25,8 @@ class Kafka(Cache):
         self.ids = {}
 
         if flush:
-            ac = AdminClient({'bootstrap.servers': f"{ip}:{port}"})
+            kafka = StorageEngines.__getattr__('confluent_kafka.admin')
+            ac = kafka.admin.AdminClient({'bootstrap.servers': f"{ip}:{port}"})
             topics = list(ac.list_topics().topics.keys())
             for topic, status in ac.delete_topics(topics).items():
                 try:
@@ -38,11 +38,12 @@ class Kafka(Cache):
     def _conn(self, key):
         if key not in self.conn:
             self.ids[key] = None
-            self.conn[key] = Consumer({'bootstrap.servers': f"{self.ip}:{self.port}",
-                                       'client.id': f'cryptostore-{key}',
-                                       'enable.auto.commit': False,
-                                       'group.id': f'cryptofeed-{key}',
-                                       'max.poll.interval.ms': 3000000})
+            kafka = StorageEngines.confluent_kafka
+            self.conn[key] = kafka.Consumer({'bootstrap.servers': f"{self.ip}:{self.port}",
+                                             'client.id': f'cryptostore-{key}',
+                                             'enable.auto.commit': False,
+                                             'group.id': f'cryptofeed-{key}',
+                                             'max.poll.interval.ms': 3000000})
             self.conn[key].subscribe([key])
         return self.conn[key]
 
