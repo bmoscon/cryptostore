@@ -6,7 +6,7 @@ associated with this software.
 '''
 import json
 
-from kafka import KafkaConsumer, TopicPartition
+from confluent_kafka import Consumer, TopicPartition
 from confluent_kafka.admin import AdminClient
 import logging
 from collections import defaultdict
@@ -19,12 +19,12 @@ LOG = logging.getLogger('cryptostore')
 
 
 class Kafka(Cache):
-    def __init__(self, ip, port, del_after_read=True, flush=False):
-        self.del_after_read = del_after_read
+    def __init__(self, ip, port, flush=False):
         self.conn = {}
         self.ip = ip
         self.port = port
         self.del_after_read
+        self.ids = {}
 
         if flush:
             ac = AdminClient({'bootstrap.servers': f"{ip}:{port}"})
@@ -38,25 +38,23 @@ class Kafka(Cache):
 
     def _conn(self, key):
         if key not in self.conn:
-            self.conn[key] = KafkaConsumer(key,
-                                           bootstrap_servers=f"{self.ip}:{self.port}",
-                                           client_id=f'cryptostore-{key}',
-                                           enable_auto_commit=self.del_after_read,
-                                           group_id=f'cryptofeed-{key}',
-                                           max_poll_records=100000)
-        LOG.info("Next message offset %s", self.conn[key].end_offsets([TopicPartition(topic=key, partition=0)]))
+            self.ids[key] = None
+            self.conn[key] = Consumer({'bootstrap.servers': f"{self.ip}:{self.port}",
+                                       'client.id': f'cryptostore-{key}',
+                                       'enable.auto.commit': False,
+                                       'group.id': f'cryptofeed-{key}',
+                                       'max.poll.interval.ms': 3000000})
+            self.conn[key].subscribe([key])
         return self.conn[key]
 
     def read(self, exchange, dtype, pair):
         key = f'{dtype}-{exchange}-{pair}'
-
-        data = self._conn(key).poll()
+        data = self._conn(key).consume(1000000, timeout=0.5)
         print(len(data))
         ret = []
-        for _, records in data.items():
-            print(len(records))
-            for entry in records:
-                ret.append(json.loads(entry.value.decode('utf8')))
+        for message in data:
+            self.ids[key] = message
+            ret.append(json.loads(message.value().decode('utf8')))
         if dtype in {L2_BOOK, L3_BOOK}:
             d = []
             for book in ret:
@@ -74,5 +72,7 @@ class Kafka(Cache):
         return ret
 
     def delete(self, exchange, dtype, pair):
-        # kafka handles this internally if not disabled
-        return
+        key = f'{dtype}-{exchange}-{pair}'
+        LOG.info("Committing offset %d", self.ids[key].offset())
+        self._conn(key).commit(message=self.ids[key])
+        self.ids[key] = None

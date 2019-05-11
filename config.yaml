@@ -2,7 +2,7 @@
 
 # Redis or Kafka are required. They are used to batch updates from cryptofeed and the storage medium of choice
 #
-# del_after_read: toggles the removal of data from redis/kafka after it has been processed with cryptostore.
+# del_after_read: (redis only) toggles the removal of data from redis after it has been processed with cryptostore.
 # start_flush: toggles if redis/kafka should be flushed at the start. Primarily for debugging, it will flush ALL of redis/kafka
 cache: kafka
 
@@ -10,8 +10,7 @@ kafka:
     # ip/port are for the bootstrap server
     ip: '127.0.0.1'
     port: 9092
-    del_after_read: true
-    start_flush: false
+    start_flush: true
 redis:
     ip: '127.0.0.1'
     port: 6379
@@ -59,4 +58,4 @@ parquet:
 arctic: mongodb://127.0.0.1
 
 # Data batching window, in seconds
-storage_interval: 60
+storage_interval: 10

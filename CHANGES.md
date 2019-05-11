@@ -1,5 +1,8 @@
 ## Changelog
 
+### 0.0.6
+  * Feature: Kafka support
+
 ### 0.0.5 (2019-05-08)
   * Feature: Install entry point script with setuptools
   * Bugfix: Incorreclty storing level/order size in book updates in Arctic
