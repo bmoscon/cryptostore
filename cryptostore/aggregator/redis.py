@@ -6,6 +6,9 @@ associated with this software.
 '''
 import logging
 from collections import defaultdict
+import json
+
+from cryptofeed.backends._util import book_flatten
 
 from cryptostore.aggregator.cache import Cache
 from cryptostore.engines import StorageEngines
@@ -36,8 +39,10 @@ class Redis(Cache):
         LOG.info("%s: Read %d messages from Redis", key, len(data[0][1]))
         ret = []
         for update_id, update in data[0][1]:
+            update = json.loads(update['data'])
+            update = book_flatten(update, update['timestamp'])
             self.ids[key].append(update_id)
-            ret.append(update)
+            ret.extend(update)
 
         self.last_id[key] = self.ids[key][-1]
         return ret
