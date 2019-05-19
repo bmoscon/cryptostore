@@ -8,7 +8,7 @@ from cryptostore.engines import StorageEngines
 
 
 def google_cloud_write(bucket, key, data, creds=None):
-    google = StorageEngines.__getattr__('google.cloud.storage')
+    google = StorageEngines['google.cloud.storage']
 
     if creds:
         client = google.cloud.storage.Client.from_service_account_json(creds)

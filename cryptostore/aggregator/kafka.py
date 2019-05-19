@@ -24,7 +24,7 @@ class Kafka(Cache):
         self.ids = {}
 
         if flush:
-            kafka = StorageEngines.__getattr__('confluent_kafka.admin')
+            kafka = StorageEngines['confluent_kafka.admin']
             ac = kafka.admin.AdminClient({'bootstrap.servers': f"{ip}:{port}"})
             topics = list(ac.list_topics().topics.keys())
             for topic, status in ac.delete_topics(topics).items():

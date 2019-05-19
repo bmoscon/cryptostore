@@ -8,8 +8,6 @@ from multiprocessing import Process
 
 from cryptofeed import FeedHandler
 from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK
-from cryptofeed.backends.redis import TradeStream, BookStream
-from cryptofeed.backends.kafka import TradeKafka, BookKafka
 
 
 class Collector(Process):
@@ -29,10 +27,12 @@ class Collector(Process):
 
         cache = self.config['cache']
         if cache == 'redis':
+            from cryptofeed.backends.redis import TradeStream, BookStream
             trade_cb = TradeStream
             book_cb = BookStream
             kwargs = {'host': self.config['redis']['ip'], 'port': self.config['redis']['port']}
         elif cache == 'kafka':
+            from cryptofeed.backends.kafka import TradeKafka, BookKafka
             trade_cb = TradeKafka
             book_cb = BookKafka
             kwargs = {'host': self.config['kafka']['ip'], 'port': self.config['kafka']['port']}
