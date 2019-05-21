@@ -8,8 +8,9 @@ import logging
 from collections import defaultdict
 import json
 
-from cryptofeed.backends._util import book_flatten
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK
 
+from cryptostore.aggregator.util import book_flatten
 from cryptostore.aggregator.cache import Cache
 from cryptostore.engines import StorageEngines
 
@@ -39,10 +40,13 @@ class Redis(Cache):
         LOG.info("%s: Read %d messages from Redis", key, len(data[0][1]))
         ret = []
         for update_id, update in data[0][1]:
-            update = json.loads(update['data'])
-            update = book_flatten(update, update['timestamp'])
+            if dtype in {L2_BOOK, L3_BOOK}:
+                update = json.loads(update['data'])
+                update = book_flatten(update, update['timestamp'], update['delta'])
+                ret.extend(update)
+            if dtype == TRADES:
+                ret.append(update)
             self.ids[key].append(update_id)
-            ret.extend(update)
 
         self.last_id[key] = self.ids[key][-1]
         return ret

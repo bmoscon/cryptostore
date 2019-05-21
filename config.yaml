@@ -4,7 +4,7 @@
 #
 # del_after_read: (redis only) toggles the removal of data from redis after it has been processed with cryptostore.
 # start_flush: toggles if redis/kafka should be flushed at the start. Primarily for debugging, it will flush ALL of redis/kafka
-cache: kafka
+cache: redis
 
 kafka:
     # ip/port are for the bootstrap server
@@ -21,7 +21,7 @@ redis:
 # must be capitalized) and only exchanges supported by cryptofeed are supported.
 # data types follow cryptofeed definitions, see defines.py in cryptofeed for more details, common ones are
 # trades, l2_book, l3_book, funding, ticker (only trades, l2_book, l3_book currently supported by cryptostore).
-# Trading pairs for all exchanges (except BitMEX) follow the currency-quote format 
+# Trading pairs for all exchanges (except BitMEX) follow the currency-quote format
 exchanges:
     BITMEX:
         l2_book: [XBTUSD]
@@ -29,8 +29,14 @@ exchanges:
         l2_book: [BTC-USD]
         trades: [BTC-USD, ETH-USD, ETH-BTC]
 
-# number of levels per side to store from book updates. Remove this option to store all available data
+# Number of levels per side to store from book updates.
+# Remove this option to store all available data.
+# Cannot enable book_depth with book_deltas
 book_depth: 10
+# Store book deltas as opposed to complete books on every update
+# Cannot enable book deltas with book_depth (delta will be ignored if depth enabled).
+# Not all exchanges support deltas
+book_delta: True
 
 # Where to store the data. Currently arctic and parquet are supported
 storage: [arctic]

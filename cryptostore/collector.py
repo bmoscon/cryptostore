@@ -7,7 +7,7 @@ associated with this software.
 from multiprocessing import Process
 
 from cryptofeed import FeedHandler
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, BOOK_DELTA
 
 
 class Collector(Process):
@@ -27,9 +27,10 @@ class Collector(Process):
 
         cache = self.config['cache']
         if cache == 'redis':
-            from cryptofeed.backends.redis import TradeStream, BookStream
+            from cryptofeed.backends.redis import TradeStream, BookStream, BookDeltaStream
             trade_cb = TradeStream
             book_cb = BookStream
+            book_up = BookDeltaStream if not depth and self.config['book_delta'] else None
             kwargs = {'host': self.config['redis']['ip'], 'port': self.config['redis']['port']}
         elif cache == 'kafka':
             from cryptofeed.backends.kafka import TradeKafka, BookKafka
@@ -41,8 +42,12 @@ class Collector(Process):
             cb[TRADES] = trade_cb(**kwargs)
         if L2_BOOK in self.exchange_config:
             cb[L2_BOOK] = book_cb(key=L2_BOOK, depth=depth, **kwargs)
+            if book_up:
+                cb[BOOK_DELTA] = book_up(key=L2_BOOK, **kwargs)
         if L3_BOOK in self.exchange_config:
             cb[L3_BOOK] = book_cb(key=L3_BOOK, depth=depth, **kwargs)
+            if book_up:
+                cb[BOOK_DELTA] = book_up(key=L3_BOOK, **kwargs)
 
         fh.add_feed(self.exchange, config=self.exchange_config, callbacks=cb)
         fh.run()
