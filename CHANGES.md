@@ -1,5 +1,9 @@
 ## Changelog
 
+### 0.0.7
+  * Bugfix: Trades not working correctly with redis aggregator
+  * Feature: Book delta support for redis aggregator
+
 ### 0.0.6 (2019-05-19)
   * Feature: Kafka support
 
