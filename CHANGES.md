@@ -1,6 +1,6 @@
 ## Changelog
 
-### 0.0.7
+### 0.0.7 (2019-05-23)
   * Bugfix: Trades not working correctly with redis aggregator
   * Feature: Book delta support
 
