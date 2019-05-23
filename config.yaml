@@ -36,7 +36,7 @@ book_depth: 10
 # Store book deltas as opposed to complete books on every update
 # Cannot enable book deltas with book_depth (delta will be ignored if depth enabled).
 # Not all exchanges support deltas
-book_delta: True
+book_delta: False
 
 # Where to store the data. Currently arctic and parquet are supported
 storage: [arctic]

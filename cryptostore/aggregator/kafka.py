@@ -7,10 +7,11 @@ associated with this software.
 import json
 import logging
 
-from cryptofeed.defines import L2_BOOK, L3_BOOK, BID, ASK
+from cryptofeed.defines import L2_BOOK, L3_BOOK, BID, ASK, TRADES
 
 from cryptostore.engines import StorageEngines
 from cryptostore.aggregator.cache import Cache
+from cryptostore.aggregator.util import book_flatten
 
 
 LOG = logging.getLogger('cryptostore')
@@ -53,21 +54,13 @@ class Kafka(Cache):
         ret = []
         for message in data:
             self.ids[key] = message
-            ret.append(json.loads(message.value().decode('utf8')))
-        if dtype in {L2_BOOK, L3_BOOK}:
-            d = []
-            for book in ret:
-                ts = book['timestamp']
-                for side in (BID, ASK):
-                    for price, data in book[side].items():
-                        if isinstance(data, dict):
-                            # L3 book
-                            for order_id, size in data.items():
-                                d.append({'side': side, 'price': price, 'size': size, 'order_id': order_id, 'timestamp': ts})
-                        else:
-                            d.append({'side': side, 'price': price, 'size': data, 'timestamp': ts})
-            ret = d
+            update = json.loads(message.value().decode('utf8'))
 
+            if dtype in {L2_BOOK, L3_BOOK}:
+                update = book_flatten(update, update['timestamp'], update['delta'])
+                ret.extend(update)
+            if dtype == TRADES:
+                ret.append(update)
         return ret
 
     def delete(self, exchange, dtype, pair):
