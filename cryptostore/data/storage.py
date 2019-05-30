@@ -25,10 +25,16 @@ class Storage(Store):
         else:
             raise ValueError("Store type not supported")
 
-    def write(self, exchange, data_type, pair, timestamp):
+    def write(self, exchange, data_type: str, pair: str, timestamp: float):
         for s in self.s:
             s.write(exchange, data_type, pair, timestamp)
 
-    def aggregate(self, data):
+    def aggregate(self, data: list):
         for s in self.s:
             s.aggregate(data)
+
+    def get_start_date(self, exchange: str, data_type: str, pair: str) -> list:
+        ret = []
+        for s in self.s:
+            ret.append(s.get_start_date(exchange, data_type, pair))
+        return ret

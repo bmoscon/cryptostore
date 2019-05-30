@@ -25,43 +25,56 @@ redis:
 exchanges:
     BITMEX:
         l2_book: [XBTUSD]
+        trades: [XBTUSD]
     COINBASE:
         l2_book: [BTC-USD]
         trades: [BTC-USD, ETH-USD, ETH-BTC]
 
+# If configured, backfill will run in a separate process (one per exchange) and
+# backfill trade data from the specifed start date, until it finds existing data
+# in the storage medium.
+backfill:
+    BITMEX:
+        XBTUSD:
+            start: '2019-05-01'
+    COINBASE:
+        BTC-USD:
+            start: '2017-01-01'
+
 # Number of levels per side to store from book updates.
 # Remove this option to store all available data.
 # Cannot enable book_depth with book_deltas
-book_depth: 10
+book_depth: null
+
 # Store book deltas as opposed to complete books on every update
 # Cannot enable book deltas with book_depth (delta will be ignored if depth enabled).
 # Not all exchanges support deltas
-book_delta: False
+book_delta: True
 
 # Where to store the data. Currently arctic and parquet are supported
 storage: [arctic]
 
 
 # Parquet specific options. Parquet will default to storing the data on disk unless these are specified
-parquet:
+#parquet:
     # if storing the data to an external source (like S3) toggle this to enable the removal of the local file after
     # writing to external store
-    del_file: true
+#    del_file: true
 
-    S3:
+#    S3:
         # If NULL boto will default to using ENV vars or credentials file
         # prefix: a prefix to append to the default data path
-        key_id: null
-        secret: null
-        bucket: null
-        prefix: null
-    GCS:
+#        key_id: null
+#        secret: null
+#        bucket: null
+#        prefix: null
+#    GCS:
         # path to service account key, if null will default to using env vars or auth tokens
         # on GCE node
         # prefix: a prefix to append to the default data path
-        service_account: null
-        bucket: null
-        prefix: null
+#        service_account: null
+#        bucket: null
+#        prefix: null
 
 # arctic specific configuration options - the mongo URL
 arctic: mongodb://127.0.0.1

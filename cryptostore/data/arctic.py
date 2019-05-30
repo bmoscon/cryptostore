@@ -44,3 +44,9 @@ class Arctic(Store):
         if exchange not in self.con.list_libraries():
             self.con.initialize_library(exchange, lib_type=StorageEngines.arctic.CHUNK_STORE)
         self.con[exchange].append(f"{data_type}-{pair}", df, upsert=True, chunk_size=chunk_size)
+
+    def get_start_date(self, exchange: str, data_type: str, pair: str) -> float:
+        try:
+            return next(self.con[exchange].iterator(f"{data_type}-{pair}")).index[0].timestamp()
+        except:
+            return None

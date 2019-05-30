@@ -7,7 +7,7 @@ associated with this software.
 from cryptostore.engines import StorageEngines
 
 
-def google_cloud_write(bucket, key, data, creds=None):
+def _get_bucket(bucket, creds):
     google = StorageEngines['google.cloud.storage']
 
     if creds:
@@ -15,8 +15,22 @@ def google_cloud_write(bucket, key, data, creds=None):
     else:
         # defaults env var GOOGLE_APPLICATION_CREDENTIALS, or on box creds if on GCE
         client = google.cloud.storage.Client()
+    return client.get_bucket(bucket)
 
-    bucket = client.get_bucket(bucket)
 
-    blob = bucket.blob(key)
+def google_cloud_write(bucket, key, data, creds=None):
+
+    blob =  _get_bucket(bucket, creds).blob(key)
     blob.upload_from_filename(data)
+
+
+def google_cloud_list(bucket, key, creds=None):
+    blobs = _get_bucket(bucket, creds).list_blobs(prefix=key)
+    if blobs:
+        return [b.name for b in blobs]
+    return None
+
+
+def google_cloud_read(bucket, key, file_name, creds=None):
+    blob = _get_bucket(bucket, creds).blob(key)
+    blob.download_to_filename(file_name)

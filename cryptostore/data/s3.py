@@ -7,7 +7,7 @@ associated with this software.
 from cryptostore.engines import StorageEngines
 
 
-def aws_write(bucket, key, data, creds=None):
+def aws_write(bucket, key, data, creds=(None, None)):
     client = StorageEngines.boto3.client('s3',
         aws_access_key_id=creds[0],
         aws_secret_access_key=creds[1]
@@ -15,3 +15,24 @@ def aws_write(bucket, key, data, creds=None):
 
     with open(data, 'rb') as fp:
         client.upload_fileobj(fp, bucket, key)
+
+
+def aws_list(bucket, key, creds=(None, None)):
+    client = StorageEngines.boto3.client('s3',
+        aws_access_key_id=creds[0],
+        aws_secret_access_key=creds[1]
+    )
+
+    ret = client.list_objects_v2(Bucket=bucket, Prefix=key)
+    if ret and 'Contents' in ret:
+        return [entry['Key'] for entry in ret['Contents']]
+    return None
+
+
+def aws_read(bucket, key, file_name, creds=(None, None)):
+    client = StorageEngines.boto3.client('s3',
+        aws_access_key_id=creds[0],
+        aws_secret_access_key=creds[1]
+    )
+
+    client.download_file(bucket, key, file_name)
