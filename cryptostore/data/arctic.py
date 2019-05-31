@@ -48,5 +48,5 @@ class Arctic(Store):
     def get_start_date(self, exchange: str, data_type: str, pair: str) -> float:
         try:
             return next(self.con[exchange].iterator(f"{data_type}-{pair}")).index[0].timestamp()
-        except:
+        except Exception:
             return None

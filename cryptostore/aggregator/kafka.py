@@ -7,7 +7,7 @@ associated with this software.
 import json
 import logging
 
-from cryptofeed.defines import L2_BOOK, L3_BOOK, BID, ASK, TRADES
+from cryptofeed.defines import L2_BOOK, L3_BOOK, TRADES
 
 from cryptostore.engines import StorageEngines
 from cryptostore.aggregator.cache import Cache
