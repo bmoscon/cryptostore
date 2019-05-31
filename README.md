@@ -26,6 +26,10 @@ Once installed with pip, an executable is placed on the path, so you can simply 
 An example [config](config.yaml), with documentation inline is provided in the root of the repository. The config file is monitored by cryptostore, so you can change the options in the file and it will apply them without the need to reload the service (this is experimental. If you encounter issues with it, please raise an issue).
 
 
+### Backfilling Trade Data
+Cryptstore can backfill trade data - but be aware not all exchanges support historical trade data, and some only provide a limited amount. The backfill is not designed to be interrupted, so if it is, the backfill start date will need to be changed to the last backfilled trade date.
+
+
 ### Running with other consumers
 
 Cryptostore can operate with other consumers of the exchange data (eg. a trading engine consuming updates).
