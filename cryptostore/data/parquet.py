@@ -25,6 +25,7 @@ class Parquet(Store):
         self.kwargs = []
         self.prefix = []
         self.data = None
+        self.del_file = True
 
         if config:
             self.del_file = False if 'del_file' in config and config['del_file'] == False else True

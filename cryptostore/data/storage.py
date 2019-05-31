@@ -19,7 +19,7 @@ class Storage(Store):
     @staticmethod
     def __init_helper(store, config):
         if store == 'parquet':
-            return Parquet(config.parquet)
+            return Parquet(config.parquet if 'parquet' in config else None)
         elif store == 'arctic':
             return Arctic(config.arctic)
         else:
