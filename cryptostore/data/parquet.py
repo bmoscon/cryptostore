@@ -102,7 +102,8 @@ class Parquet(Store):
         if files:
             return float(pq.read_table(files[0], columns=['timestamp']).to_pandas().timestamp[0])
         else:
-            self._read[0](self.bucket[0], sorted(objs[0])[0], 'temp.parquet', **self.kwargs[0])
-            start = float(pq.read_table('temp.parquet', columns=['timestamp']).to_pandas().timestamp[0])
-            os.remove('temp.parquet')
+            tmp = f'{exchange}-{pair}-temp.parquet'
+            self._read[0](self.bucket[0], sorted(objs[0])[0], tmp, **self.kwargs[0])
+            start = float(pq.read_table(tmp, columns=['timestamp']).to_pandas().timestamp[0])
+            os.remove(tmp)
             return start
