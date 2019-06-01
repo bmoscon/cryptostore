@@ -38,19 +38,20 @@ class Backfill(Process):
                 if end:
                     break
                 time.sleep(10)
-
-            if Timestamp(end, unit='s') <= Timestamp(start):
+            end = Timestamp(end, unit='s')
+            if end <= Timestamp(start):
                 LOG.info("Data in storage is earlier than backfill start date for %s - %s", self.exchange, pair)
                 continue
 
-            LOG.info("Backfill - Starting for %s - %s for range %s - %s", self.exchange, pair, start, Timestamp(end, unit='s'))
+            LOG.info("Backfill - Starting for %s - %s for range %s - %s", self.exchange, pair, start, str(end))
 
-            for trades in r[self.exchange].trades(pair, start, end):
+            for trades in r[self.exchange].trades(pair, start, str(end)):
                 if not trades:
                     continue
                 period_start = Timestamp(trades[0]['timestamp'], unit='s')
                 period_end = Timestamp(trades[-1]['timestamp'], unit='s')
                 if period_start >= Timestamp(end, unit='s'):
+                    LOG.warning("Backfill - Period start exceeds end timestamp")
                     # should never happen
                     break
                 storage.aggregate(trades)
