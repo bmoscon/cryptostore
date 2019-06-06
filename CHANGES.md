@@ -2,6 +2,7 @@
 
 ### 0.0.8
   * Feature: Trade Data backfill
+  * Bugfix: Stop storing extra column in arctic
 
 ### 0.0.7 (2019-05-23)
   * Bugfix: Trades not working correctly with redis aggregator
