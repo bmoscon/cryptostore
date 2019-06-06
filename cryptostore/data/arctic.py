@@ -25,10 +25,11 @@ class Arctic(Store):
         self.data = []
 
         if data_type == TRADES:
+            df['id'] = df['id'].astype(str)
             df['size'] = df.amount.astype('float64')
             df['price'] = df.price.astype('float64')
             df['date'] = pd.to_datetime(df['timestamp'], unit='s')
-            df = df.drop(['pair', 'feed'], axis=1)
+            df = df.drop(['pair', 'feed', 'amount'], axis=1)
             chunk_size = 'H'
         elif data_type in { L2_BOOK, L3_BOOK }:
             df['size'] = df['size'].astype('float64')
@@ -40,7 +41,6 @@ class Arctic(Store):
         df = df.drop(['timestamp'], axis=1)
         # All timestamps are in UTC
         df.index = df.index.tz_localize(None)
-
         if exchange not in self.con.list_libraries():
             self.con.initialize_library(exchange, lib_type=StorageEngines.arctic.CHUNK_STORE)
         self.con[exchange].append(f"{data_type}-{pair}", df, upsert=True, chunk_size=chunk_size)

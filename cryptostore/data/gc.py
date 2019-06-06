@@ -24,10 +24,20 @@ def google_cloud_write(bucket, key, data, creds=None):
     blob.upload_from_filename(data)
 
 
-def google_cloud_list(bucket, key, creds=None):
+def google_cloud_list(bucket, key, creds=None, limit=False):
     blobs = _get_bucket(bucket, creds).list_blobs(prefix=key)
+
     if blobs:
-        return [b.name for b in blobs]
+        ret = []
+        if limit:
+            for b in blobs:
+                ret.append(b.name)
+                limit -= 1
+                if not limit:
+                    break
+            return ret
+        else:
+            return [b.name for b in blobs]
     return None
 
 

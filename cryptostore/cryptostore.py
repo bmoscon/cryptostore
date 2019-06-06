@@ -44,7 +44,7 @@ class Cryptostore:
         start = []
 
         if self.running_config != config:
-            if not config or 'exchanges' not in config or len(config['exchanges']) == 0:
+            if not config or 'exchanges' not in config or not config['exchanges'] or len(config['exchanges']) == 0:
                 # shut it all down
                 stop = list(self.running_config['exchanges'].keys()) if 'exchanges' in self.running_config else []
                 self.running_config = config

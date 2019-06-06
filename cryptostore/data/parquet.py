@@ -83,27 +83,26 @@ class Parquet(Store):
                 path = f'{exchange}/{data_type}/{pair}/'
                 if prefix:
                     path = f"{prefix}/{path}"
-                ret = func(bucket, path, **kwargs)
-                if ret:
-                    objs.append(ret)
-        if not files and not objs:
+                ret = func(bucket, path, limit=1, **kwargs)
+                objs.append(ret)
+        if not files and not any(objs):
             return None
 
         if files:
             files = sorted(files)
             start = files[0]
         else:
-            start = sorted(objs[0])[0]
+            start = objs[0][0]
 
         for entry in objs:
-            if sorted(entry)[0] != start:
+            if entry[0] != start:
                 raise InconsistentStorage("Stored data differs, cannot backfill")
 
         if files:
             return float(pq.read_table(files[0], columns=['timestamp']).to_pandas().timestamp[0])
         else:
             tmp = f'{exchange}-{pair}-temp.parquet'
-            self._read[0](self.bucket[0], sorted(objs[0])[0], tmp, **self.kwargs[0])
+            self._read[0](self.bucket[0], objs[0][0], tmp, **self.kwargs[0])
             start = float(pq.read_table(tmp, columns=['timestamp']).to_pandas().timestamp[0])
             os.remove(tmp)
             return start

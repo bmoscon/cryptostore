@@ -17,15 +17,24 @@ def aws_write(bucket, key, data, creds=(None, None)):
         client.upload_fileobj(fp, bucket, key)
 
 
-def aws_list(bucket, key, creds=(None, None)):
+def aws_list(bucket, key, creds=(None, None), limit=None):
     client = StorageEngines.boto3.client('s3',
         aws_access_key_id=creds[0],
         aws_secret_access_key=creds[1]
     )
 
-    ret = client.list_objects_v2(Bucket=bucket, Prefix=key)
-    if ret and 'Contents' in ret:
-        return [entry['Key'] for entry in ret['Contents']]
+    objs = client.list_objects_v2(Bucket=bucket, Prefix=key)
+    if objs and 'Contents' in objs:
+        ret = []
+        if limit:
+            for obj in objs['Contents']:
+                ret.append(obj['Key'])
+                limit -= 1
+                if not limit:
+                    break
+            return ret
+        else:
+            return [obj['Key'] for obj in objs['Contents']]
     return None
 
 

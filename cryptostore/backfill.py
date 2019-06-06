@@ -7,7 +7,7 @@ associated with this software.
 import time
 import logging
 from multiprocessing import Process
-from pandas import Timestamp
+from pandas import Timestamp, Timedelta
 
 from cryptofeed.rest import Rest
 
@@ -28,33 +28,42 @@ class Backfill(Process):
         r = Rest()
         storage = Storage(self.config)
         for pair in self.config.backfill[self.exchange]:
-            start = self.config.backfill[self.exchange][pair]['start']
+            try:
+                start = self.config.backfill[self.exchange][pair]['start']
 
-            while True:
-                end = storage.get_start_date(self.exchange, 'trades', pair)
-                if not all(e == end[0] for e in end):
-                    raise InconsistentStorage("Stored data differs, cannot backfill")
-                end = end[0]
-                if end:
-                    break
-                time.sleep(10)
-            end = Timestamp(end, unit='s')
-            if end <= Timestamp(start):
-                LOG.info("Data in storage is earlier than backfill start date for %s - %s", self.exchange, pair)
-                continue
-
-            LOG.info("Backfill - Starting for %s - %s for range %s - %s", self.exchange, pair, start, str(end))
-
-            for trades in r[self.exchange].trades(pair, start, str(end)):
-                if not trades:
+                while True:
+                    end = storage.get_start_date(self.exchange, 'trades', pair)
+                    if not all(e == end[0] for e in end):
+                        raise InconsistentStorage("Stored data differs, cannot backfill")
+                    end = end[0]
+                    if end:
+                        break
+                    time.sleep(10)
+                end = Timestamp(end, unit='s')
+                end -= Timedelta(microseconds=1)
+                start = Timestamp(start)
+                if end <= Timestamp(start):
+                    LOG.info("Data in storage is earlier than backfill start date for %s - %s", self.exchange, pair)
                     continue
-                period_start = Timestamp(trades[0]['timestamp'], unit='s')
-                period_end = Timestamp(trades[-1]['timestamp'], unit='s')
-                if period_start >= Timestamp(end, unit='s'):
-                    LOG.warning("Backfill - Period start exceeds end timestamp")
-                    # should never happen
-                    break
-                storage.aggregate(trades)
-                storage.write(self.exchange, 'trades', pair, period_end.timestamp())
-                LOG.info("Backfill - Wrote %s to %s for %s - %s", period_start, period_end, self.exchange, pair)
-            LOG.info("Backfill for %s - %s completed", self.exchange, pair)
+
+                LOG.info("Backfill - Starting for %s - %s for range %s - %s", self.exchange, pair, start, str(end))
+
+                # Backfill from end date to start date, 1 day at a time, in reverse order (from end -> start)
+                while start < end:
+                    seg_start = end.replace(hour=0, minute=0, second=0, microsecond=0, nanosecond=0)
+                    LOG.info("Backfill - Reading %s to %s for %s - %s", seg_start, end, self.exchange, pair)
+
+                    trades = []
+                    for t in r[self.exchange].trades(pair, str(seg_start), str(end)):
+                        trades.extend(t)
+                    if not trades:
+                        end = seg_start - Timedelta(nanoseconds=1)
+                        continue
+
+                    storage.aggregate(trades)
+                    storage.write(self.exchange, 'trades', pair, end.timestamp())
+                    LOG.info("Backfill - Wrote %s to %s for %s - %s", seg_start, end, self.exchange, pair)
+                    end = seg_start - Timedelta(nanoseconds=1)
+                LOG.info("Backfill for %s - %s completed", self.exchange, pair)
+            except Exception:
+                LOG.error("Backfill failed for %s - %s", self.exchange, pair, exc_info=True)

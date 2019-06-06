@@ -45,26 +45,29 @@ class Aggregator(Process):
 
         while True:
             start = time.time()
-            for exchange in self.config.exchanges:
-                for dtype in self.config.exchanges[exchange]:
-                    for pair in self.config.exchanges[exchange][dtype]:
-                        store = Storage(self.config)
-                        LOG.info('Reading %s-%s-%s', exchange, dtype, pair)
+            if 'exchanges' in self.config and self.config.exchanges:
+                for exchange in self.config.exchanges:
+                    for dtype in self.config.exchanges[exchange]:
+                        for pair in self.config.exchanges[exchange][dtype]:
+                            store = Storage(self.config)
+                            LOG.info('Reading %s-%s-%s', exchange, dtype, pair)
 
-                        data = cache.read(exchange, dtype, pair)
-                        if len(data) == 0:
-                            LOG.info('No data for %s-%s-%s', exchange, dtype, pair)
-                            continue
+                            data = cache.read(exchange, dtype, pair)
+                            if len(data) == 0:
+                                LOG.info('No data for %s-%s-%s', exchange, dtype, pair)
+                                continue
 
-                        store.aggregate(data)
-                        store.write(exchange, dtype, pair, time.time())
+                            store.aggregate(data)
+                            store.write(exchange, dtype, pair, time.time())
 
-                        cache.delete(exchange, dtype, pair)
-                        LOG.info('Write Complete %s-%s-%s', exchange, dtype, pair)
+                            cache.delete(exchange, dtype, pair)
+                            LOG.info('Write Complete %s-%s-%s', exchange, dtype, pair)
 
-            total = time.time() - start
-            interval = self.config.storage_interval - total
-            if interval <= 0:
-                LOG.warning("Storage operations currently take %.1f seconds, longer than the interval of %d", total, self.config.storage_interval)
-                interval = 0.5
-            await asyncio.sleep(interval)
+                total = time.time() - start
+                interval = self.config.storage_interval - total
+                if interval <= 0:
+                    LOG.warning("Storage operations currently take %.1f seconds, longer than the interval of %d", total, self.config.storage_interval)
+                    interval = 0.5
+                await asyncio.sleep(interval)
+            else:
+                await asyncio.sleep(30)
