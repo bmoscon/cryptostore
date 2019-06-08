@@ -10,22 +10,23 @@ import logging
 import json
 
 from cryptostore.spawn import Spawn
-from cryptostore.config import Config
+from cryptostore.config import DynamicConfig
 from cryptostore.log import get_logger
 from cryptostore.aggregator.aggregator import Aggregator
-from cryptostore.backfill import Backfill
+from cryptostore.plugin.controller import PluginController
 
 
 LOG = get_logger('cryptostore', 'cryptostore.log', logging.INFO)
 
 
 class Cryptostore:
-    def __init__(self, config=None):
+    def __init__(self, config=None, plugin=None):
         self.queue = Queue()
         self.spawner = Spawn(self.queue)
         self.running_config = {}
         self.cfg_path = config
-        self.backfill = []
+        self.plugin = PluginController(plugin)
+        self.plugin.start()
 
     async def _load_config(self, start, stop):
         LOG.info("start: %s stop: %s", str(start), str(stop))
@@ -36,10 +37,6 @@ class Cryptostore:
             self.queue.put(json.dumps({'op': 'start', 'exchange': exchange, 'collector': self.running_config['exchanges'][exchange], 'config': {i : self.running_config[i] for i in self.running_config if i != 'exchanges'}}))
 
     async def _reconfigure(self, config):
-        if self.backfill == [] and 'backfill' in config:
-            self.backfill = [Backfill(e, self.config).start() for e in self.config.backfill]
-            LOG.info("Backfill started")
-
         stop = []
         start = []
 
@@ -83,7 +80,7 @@ class Cryptostore:
         LOG.info("Aggregator started")
 
         loop = asyncio.get_event_loop()
-        self.config = Config(file_name=self.cfg_path, callback=self._reconfigure)
+        self.config = DynamicConfig(file_name=self.cfg_path, callback=self._reconfigure)
 
         LOG.info("Cryptostore started")
         loop.run_forever()

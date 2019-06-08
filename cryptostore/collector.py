@@ -16,6 +16,7 @@ class Collector(Process):
         self.exchange_config = exchange_config
         self.config = config
         super().__init__()
+        self.daemon = True
 
     def run(self):
         fh = FeedHandler()

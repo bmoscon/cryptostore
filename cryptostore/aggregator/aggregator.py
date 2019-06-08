@@ -12,7 +12,7 @@ import logging
 from cryptostore.aggregator.redis import Redis
 from cryptostore.aggregator.kafka import Kafka
 from cryptostore.data.storage import Storage
-from cryptostore.config import Config
+from cryptostore.config import DynamicConfig
 
 
 LOG = logging.getLogger('cryptostore')
@@ -22,10 +22,11 @@ class Aggregator(Process):
     def __init__(self, config_file=None):
         self.config_file = config_file
         super().__init__()
+        self.daemon = True
 
     def run(self):
         loop = asyncio.get_event_loop()
-        self.config = Config(file_name=self.config_file)
+        self.config = DynamicConfig(file_name=self.config_file)
         loop.create_task(self.loop())
         try:
             loop.run_forever()

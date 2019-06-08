@@ -30,17 +30,6 @@ exchanges:
         l2_book: [BTC-USD]
         trades: [BTC-USD, ETH-USD, ETH-BTC]
 
-# If configured, backfill will run in a separate process (one per exchange) and
-# backfill trade data from the specifed start date, until it finds existing data
-# in the storage medium.
-backfill:
-    BITMEX:
-        XBTUSD:
-            start: '2019-05-01'
-    COINBASE:
-        BTC-USD:
-            start: '2017-01-01'
-
 # Number of levels per side to store from book updates.
 # Remove this option to store all available data.
 # Cannot enable book_depth with book_deltas
@@ -80,4 +69,26 @@ storage: [arctic]
 arctic: mongodb://127.0.0.1
 
 # Data batching window, in seconds
-storage_interval: 10
+storage_interval: 60
+
+
+# Cryptostore Plugin Interface
+plugins:
+  backfill:
+    # The import path, and class name
+    # from cryptostore.plugin.backfill import Backfill
+    module: [cryptostore.plugin.backfill, Backfill]
+    # Config path, config can be added to this file, or in a separate config
+    # backfill does not use a dynamic config, so its fine to put its config here
+    config: config.yaml
+
+# If configured, backfill will run in a separate process and
+# backfill trade data from the specifed start date, until it finds existing data
+# in the storage medium.
+backfill:
+    BITMEX:
+        XBTUSD:
+            start: '2019-06-08 06:00:00'
+    COINBASE:
+        BTC-USD:
+            start: '2017-01-01'
