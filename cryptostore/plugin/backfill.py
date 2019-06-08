@@ -6,7 +6,6 @@ associated with this software.
 '''
 import time
 import logging
-from multiprocessing import Process
 from pandas import Timestamp, Timedelta
 from threading import Thread
 
