@@ -41,7 +41,7 @@ class Config:
 
     def __contains__(self, item):
         return item in self.config
-        
+
 
 class DynamicConfig(Config):
     def __init__(self, file_name=None, reload_interval=10, callback=None):

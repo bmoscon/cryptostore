@@ -10,7 +10,6 @@ from multiprocessing import Process
 from pandas import Timestamp, Timedelta
 from threading import Thread
 
-import yaml
 from cryptofeed.rest import Rest
 
 from cryptostore.config import Config
@@ -28,7 +27,7 @@ class Backfill(Plugin):
         self.config = Config(config)
         self.daemon = True
         self.threads = []
-    
+
     def _worker(self, exchange):
         r = Rest()
         storage = Storage(self.config)
@@ -89,4 +88,3 @@ class Backfill(Plugin):
 
             for t in self.threads:
                 t.join()
-        

@@ -21,10 +21,10 @@ class PluginController:
                 file_name = os.environ['CRYPTOSTORE_CONFIG']
             else:
                 file_name = os.path.join(os.getcwd(), 'config.yaml')
-            
+
             if os.path.isfile(file_name):
                 self.cfg = Config(file_name)
-    
+
     def start(self):
         if self.cfg:
             for _, plugin in self.cfg.plugins.items():
@@ -35,7 +35,7 @@ class PluginController:
                     obj = __import__(module)
                 self.plugins.append(obj(plugin.config))
                 self.plugins[-1].start()
-    
+
     def stop(self):
         for p in self.plugins:
             p.terminate()
