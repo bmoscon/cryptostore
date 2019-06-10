@@ -20,12 +20,12 @@ LOG = get_logger('cryptostore', 'cryptostore.log', logging.INFO)
 
 
 class Cryptostore:
-    def __init__(self, config=None, plugin=None):
+    def __init__(self, config=None):
         self.queue = Queue()
         self.spawner = Spawn(self.queue)
         self.running_config = {}
         self.cfg_path = config
-        self.plugin = PluginController(plugin)
+        self.plugin = PluginController(config)
         self.plugin.start()
 
     async def _load_config(self, start, stop):
