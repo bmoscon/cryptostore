@@ -27,7 +27,7 @@ An example [config](config.yaml), with documentation inline is provided in the r
 
 
 ### Backfilling Trade Data
-Cryptstore can backfill trade data - but be aware not all exchanges support historical trade data, and some only provide a limited amount. The backfill is not designed to be interrupted, so if it is, the backfill start date will need to be changed to the last backfilled trade date.
+Cryptstore can backfill trade data - but be aware not all exchanges support historical trade data, and some only provide a limited amount. Backfill fills from the earliest date in data storage until the start date specified in the config. Backfill is restartable.
 
 
 ### Running with other consumers
