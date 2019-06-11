@@ -10,13 +10,13 @@ A storage engine for cryptocurrency market data. You supply the exchanges, data 
 
 Stores data to:
 * Parquet
-* Arctic
+* [Arctic](https://github.com/manahl/arctic)
 * Google Cloud Storage
 * Amazon S3
 
 ### Requirements
 
-Cryptostore currently requires either Kafka or Redis to be installed. The extra dependencies for your backend of choice must be installed as well (eg `pip install cryptostore[redis]`). Redis requires Redis Streams, which is supported in versions > 5.0.
+Cryptostore currently requires either Kafka or Redis to be installed. The extra dependencies for your backend of choice must be installed as well (eg `pip install cryptostore[redis]`). Redis requires Redis Streams, which is supported in versions >= 5.0.
 
 
 ### Running Cryptostore
