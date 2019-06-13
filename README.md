@@ -10,13 +10,13 @@ A storage engine for cryptocurrency market data. You supply the exchanges, data 
 
 Stores data to:
 * Parquet
-* Arctic
+* [Arctic](https://github.com/manahl/arctic)
 * Google Cloud Storage
 * Amazon S3
 
 ### Requirements
 
-Cryptostore currently requires either Kafka or Redis to be installed. The extra dependencies for your backend of choice must be installed as well (eg `pip install cryptostore[redis]`). Redis requires Redis Streams, which is supported in versions > 5.0.
+Cryptostore currently requires either Kafka or Redis to be installed. The extra dependencies for your backend of choice must be installed as well (eg `pip install cryptostore[redis]`). Redis requires Redis Streams, which is supported in versions >= 5.0.
 
 
 ### Running Cryptostore
@@ -27,7 +27,7 @@ An example [config](config.yaml), with documentation inline is provided in the r
 
 
 ### Backfilling Trade Data
-Cryptstore can backfill trade data - but be aware not all exchanges support historical trade data, and some only provide a limited amount. The backfill is not designed to be interrupted, so if it is, the backfill start date will need to be changed to the last backfilled trade date.
+Cryptstore can backfill trade data - but be aware not all exchanges support historical trade data, and some only provide a limited amount. Backfill fills from the earliest date in data storage until the start date specified in the config. Backfill is restartable.
 
 
 ### Running with other consumers
