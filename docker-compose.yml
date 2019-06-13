@@ -1,0 +1,18 @@
+version: "3.7"
+services:
+  cryptostore:
+    build:
+      context: .
+      dockerfile: Dockerfile
+  redisdb:
+    image: redis:5.0.5
+    expose:
+      - 6379
+    command: ["redis-server", "--save", "''", "--appendonly", "no"]
+  mongo:
+    container_name: mongo
+    image: mongo:4.0.9-xenial
+    ports:
+      - '37017:27017'
+    expose:
+      - 27017
