@@ -1,11 +1,11 @@
 FROM python:3.7.3-stretch
 
-ADD config-docker.yaml /config.yaml
-ADD setup.py /
-ADD cryptostore /cryptostore
+COPY config-docker.yaml /config.yaml
+COPY setup.py /
+COPY cryptostore /cryptostore
 
 ## Add any keys, config files, etc needed here
-# ADD access-key.json /
+# COPY access-key.json /
 
 
 RUN apt install gcc git
