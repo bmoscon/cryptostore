@@ -8,6 +8,7 @@ import time
 import logging
 from pandas import Timestamp, Timedelta
 from threading import Thread
+import os
 
 from cryptofeed.rest import Rest
 
@@ -80,6 +81,7 @@ class Backfill(Plugin):
                 LOG.error("Backfill failed for %s - %s", exchange, pair, exc_info=True)
 
     def run(self):
+        LOG.info("Backfill running on PID %d", os.getpid())
         if 'backfill' in self.config:
             for exchange in self.config.backfill:
                 self.threads.append(Thread(target=self._worker, args=(exchange,)))

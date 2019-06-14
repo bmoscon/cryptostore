@@ -7,6 +7,7 @@ associated with this software.
 from multiprocessing import Process
 import logging
 import json
+import os
 
 from cryptostore.collector import Collector
 
@@ -20,6 +21,7 @@ class Spawn(Process):
         super().__init__()
 
     def run(self):
+        LOG.info("Spawner running on PID %d", os.getpid())
         procs = {}
         try:
             while True:

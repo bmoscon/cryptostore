@@ -8,6 +8,7 @@ import asyncio
 from multiprocessing import Process
 import time
 import logging
+import os
 
 from cryptostore.aggregator.redis import Redis
 from cryptostore.aggregator.kafka import Kafka
@@ -25,6 +26,7 @@ class Aggregator(Process):
         self.daemon = True
 
     def run(self):
+        LOG.info("Aggregator running on PID %d", os.getpid())
         loop = asyncio.get_event_loop()
         self.config = DynamicConfig(file_name=self.config_file)
         loop.create_task(self.loop())

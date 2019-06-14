@@ -8,6 +8,7 @@ from multiprocessing import Queue
 import asyncio
 import logging
 import json
+import os
 
 from cryptostore.spawn import Spawn
 from cryptostore.config import DynamicConfig
@@ -72,6 +73,8 @@ class Cryptostore:
 
     def run(self):
         LOG.info("Starting cryptostore")
+        LOG.info("Cryptostore running on PID %d", os.getpid())
+
         self.spawner.start()
         LOG.info("Spawner started")
 
