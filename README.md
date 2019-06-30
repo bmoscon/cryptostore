@@ -13,6 +13,7 @@ Stores data to:
 * [Arctic](https://github.com/manahl/arctic)
 * Google Cloud Storage
 * Amazon S3
+* [InfluxDB](https://github.com/influxdata/influxdb)
 
 ### Requirements
 
