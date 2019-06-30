@@ -27,7 +27,7 @@ exchanges:
         l2_book: [XBTUSD]
         trades: [XBTUSD]
     COINBASE:
-        l2_book: [BTC-USD]
+        l3_book: [BTC-USD, ETH-USD]
         trades: [BTC-USD, ETH-USD, ETH-BTC]
 
 # Number of levels per side to store from book updates.
@@ -41,8 +41,12 @@ book_depth: null
 book_delta: True
 
 # Where to store the data. Currently arctic and parquet are supported
-storage: [arctic]
+storage: [influx]
 
+influx:
+    host: 'http://127.0.0.1:8086'
+    db: example
+    create: true
 
 # Parquet specific options. Parquet will default to storing the data on disk unless these are specified
 #parquet:
@@ -74,21 +78,18 @@ storage_interval: 60
 
 # Cryptostore Plugin Interface
 plugins:
-  backfill:
-    # The import path, and class name
-    # from cryptostore.plugin.backfill import Backfill
-    module: [cryptostore.plugin.backfill, Backfill]
-    # Config path, config can be added to this file, or in a separate config
-    # backfill does not use a dynamic config, so its fine to put its config here
-    config: config.yaml
+    backfill:
+        # The import path, and class name
+        # from cryptostore.plugin.backfill import Backfill
+        module: [cryptostore.plugin.backfill, Backfill]
+        # Config path, config can be added to this file, or in a separate config
+        # backfill does not use a dynamic config, so its fine to put its config here
+        config: config.yaml
 
 # If configured, backfill will run in a separate process and
 # backfill trade data from the specifed start date, until it finds existing data
 # in the storage medium.
 backfill:
-    BITMEX:
-        XBTUSD:
-            start: '2019-06-08 06:00:00'
     COINBASE:
         BTC-USD:
             start: '2017-01-01'

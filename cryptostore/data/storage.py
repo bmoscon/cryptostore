@@ -7,6 +7,7 @@ associated with this software.
 from cryptostore.data.store import Store
 from cryptostore.data.parquet import Parquet
 from cryptostore.data.arctic import Arctic
+from cryptostore.data.influx import InfluxDB
 
 
 class Storage(Store):
@@ -22,6 +23,8 @@ class Storage(Store):
             return Parquet(config.parquet if 'parquet' in config else None)
         elif store == 'arctic':
             return Arctic(config.arctic)
+        elif store == 'influx':
+            return InfluxDB(config.influx)
         else:
             raise ValueError("Store type not supported")
 
