@@ -53,7 +53,7 @@ class InfluxDB(Store):
             for entry in self.data:
                 agg.append(f'{data_type}-{exchange},pair={pair},delta={entry["delta"]} side="{entry["side"]}",id="{entry["order_id"]}",timestamp={entry["timestamp"]},price="{entry["price"]}",amount="{entry["size"]}" {ts}')
                 ts += 1
-        
+
         for c in chunk(agg, 100000):
             c = '\n'.join(c)
             r = requests.post(self.addr, data=c)
