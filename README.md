@@ -48,7 +48,6 @@ You can run Cryptostore in a docker container. A Dockerfile and a docker-compose
 
 ### Planned features
 * [ ] Missing data detection and correction (for exchanges that support historical data, typically only trade data)
-* [ ] Storing data to InfluxDB
 * [ ] Storing data to MongoDB
 * [ ] Support for enabling computation and storage of diverse metrics in parallel with data collection (eg. configurable OHLCV)
 * [ ] Support for forwarding data to another service/sink (eg. to a trading engine). 
