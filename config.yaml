@@ -40,8 +40,8 @@ book_depth: null
 # Not all exchanges support deltas
 book_delta: True
 
-# Where to store the data. Currently arctic and parquet are supported
-storage: [influx]
+# Where to store the data. Currently arctic, influx, and parquet are supported. More than one can be enabled
+storage: [arctic]
 
 influx:
     host: 'http://127.0.0.1:8086'
@@ -49,25 +49,25 @@ influx:
     create: true
 
 # Parquet specific options. Parquet will default to storing the data on disk unless these are specified
-#parquet:
+parquet:
     # if storing the data to an external source (like S3) toggle this to enable the removal of the local file after
     # writing to external store
-#    del_file: true
+    del_file: true
 
-#    S3:
+    S3:
         # If NULL boto will default to using ENV vars or credentials file
         # prefix: a prefix to append to the default data path
-#        key_id: null
-#        secret: null
-#        bucket: null
-#        prefix: null
-#    GCS:
+        key_id: null
+        secret: null
+        bucket: null
+        prefix: null
+    GCS:
         # path to service account key, if null will default to using env vars or auth tokens
         # on GCE node
         # prefix: a prefix to append to the default data path
-#        service_account: null
-#        bucket: null
-#        prefix: null
+        service_account: null
+        bucket: null
+        prefix: null
 
 # arctic specific configuration options - the mongo URL
 arctic: mongodb://127.0.0.1
