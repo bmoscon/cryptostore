@@ -17,7 +17,7 @@ from cryptostore.aggregator.aggregator import Aggregator
 from cryptostore.plugin.controller import PluginController
 
 
-LOG = get_logger('cryptostore', 'cryptostore.log', logging.INFO)
+LOG = get_logger('cryptostore', 'cryptostore.log', logging.INFO, size=50000000, num_files=10)
 
 
 class Cryptostore:

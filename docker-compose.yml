@@ -1,15 +1,30 @@
 version: "3.7"
 services:
   cryptostore:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2000k"
+        max-file: "10"
     build:
       context: .
       dockerfile: Dockerfile
   redisdb:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2000k"
+        max-file: "10"
     image: redis:5.0.5
     expose:
       - 6379
     command: ["redis-server", "--save", "''", "--appendonly", "no"]
   mongo:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2000k"
+        max-file: "10"
     container_name: mongo
     image: mongo:4.0.9-xenial
     ports:

@@ -5,12 +5,13 @@ Please see the LICENSE file for the terms and conditions
 associated with this software.
 '''
 import logging
+from logging.handlers import RotatingFileHandler
 
 
 FORMAT = logging.Formatter('%(asctime)-15s : %(levelname)s : %(message)s')
 
 
-def get_logger(name, filename, level=logging.WARNING):
+def get_logger(name, filename, level=logging.WARNING, size=200000, num_files=5):
     logger = logging.getLogger(name)
     logger.setLevel(level)
 
@@ -18,7 +19,7 @@ def get_logger(name, filename, level=logging.WARNING):
     stream.setFormatter(FORMAT)
     logger.addHandler(stream)
 
-    fh = logging.FileHandler(filename)
+    fh = RotatingFileHandler(filename, maxBytes=size, backupCount=num_files)
     fh.setFormatter(FORMAT)
     logger.addHandler(fh)
     logger.propagate = False
