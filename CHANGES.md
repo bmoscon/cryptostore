@@ -1,6 +1,6 @@
 ## Changelog
 
-### 0.0.8
+### 0.0.8 (2019-07-06)
   * Feature: Trade Data backfill
   * Bugfix: Stop storing extra column in arctic
   * Feature: Plugin interface to allow configurable 3rd party/non core functionality
