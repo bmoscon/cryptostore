@@ -18,18 +18,18 @@ except BaseException:
 
 setup(
     name="cryptostore",
-    version="0.0.8",
+    version="0.1.0",
     author="Bryant Moscon",
     author_email="bmoscon@gmail.com",
     description=("Storage engine for cryptocurrency data"),
     long_description=ld,
     long_description_content_type='text/x-rst',
     license="XFree86",
-    keywords=["cryptocurrency", "bitcoin", "btc", "market data", "data storage", "redis", "database"],
+    keywords=["cryptocurrency", "bitcoin", "btc", "market data", "data storage", "redis", "database", "kafka"],
     url="https://github.com/bmoscon/cryptostore",
     packages=find_packages(),
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
     ],
