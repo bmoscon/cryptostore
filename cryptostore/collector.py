@@ -31,7 +31,7 @@ class Collector(Process):
         window = 1000
 
         if 'book_delta_window' in self.config:
-            window = self.config.book_delta_window
+            window = self.config['book_delta_window']
 
         if 'book_depth' in self.config:
             depth = self.config['book_depth']
