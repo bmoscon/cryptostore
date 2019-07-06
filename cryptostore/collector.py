@@ -28,6 +28,10 @@ class Collector(Process):
         fh = FeedHandler()
         cb = {}
         depth = None
+        window = 1000
+
+        if 'book_delta_window' in self.config:
+            window = self.config.book_delta_window
 
         if 'book_depth' in self.config:
             depth = self.config['book_depth']
@@ -57,5 +61,5 @@ class Collector(Process):
             if book_up:
                 cb[BOOK_DELTA] = book_up(key=L3_BOOK, **kwargs)
 
-        fh.add_feed(self.exchange, config=self.exchange_config, callbacks=cb)
+        fh.add_feed(self.exchange, book_interval=window, config=self.exchange_config, callbacks=cb)
         fh.run()

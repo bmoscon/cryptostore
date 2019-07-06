@@ -39,6 +39,8 @@ book_depth: null
 # Cannot enable book deltas with book_depth (delta will be ignored if depth enabled).
 # Not all exchanges support deltas
 book_delta: True
+# Number of deltas between full book updates
+book_delta_window: 10000
 
 # Where to store the data. Currently arctic, influx, and parquet are supported. More than one can be enabled
 storage: [arctic]
