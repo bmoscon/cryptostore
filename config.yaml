@@ -29,7 +29,6 @@ exchanges:
     COINBASE:
         l3_book: [BTC-USD, ETH-USD]
         trades: [BTC-USD, ETH-USD, ETH-BTC]
-
 # Number of levels per side to store from book updates.
 # Remove this option to store all available data.
 # Cannot enable book_depth with book_deltas
@@ -44,6 +43,9 @@ book_delta_window: 10000
 
 # Where to store the data. Currently arctic, influx, and parquet are supported. More than one can be enabled
 storage: [arctic]
+
+elastic:
+    host: 'http://localhost:9200'
 
 influx:
     host: 'http://127.0.0.1:8086'

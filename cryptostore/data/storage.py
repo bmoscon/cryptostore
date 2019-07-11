@@ -8,6 +8,7 @@ from cryptostore.data.store import Store
 from cryptostore.data.parquet import Parquet
 from cryptostore.data.arctic import Arctic
 from cryptostore.data.influx import InfluxDB
+from cryptostore.data.elastic import ElasticSearch
 
 
 class Storage(Store):
@@ -25,6 +26,8 @@ class Storage(Store):
             return Arctic(config.arctic)
         elif store == 'influx':
             return InfluxDB(config.influx)
+        elif store == 'elastic':
+            return ElasticSearch(config.elastic)
         else:
             raise ValueError("Store type not supported")
 

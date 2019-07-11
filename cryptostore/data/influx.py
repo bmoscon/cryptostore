@@ -12,8 +12,10 @@ import requests
 
 from cryptostore.data.store import Store
 
+
 def chunk(iterable, length):
     return (iterable[i : i + length] for i in range(0, len(iterable), length))
+
 
 class InfluxDB(Store):
     def __init__(self, config: dict):
@@ -23,8 +25,7 @@ class InfluxDB(Store):
         self.addr = f"{config.host}/write?db={config.db}"
         if 'create' in config and config.create:
             r = requests.post(f'{config.host}/query', data={'q': f'CREATE DATABASE {config.db}'})
-            if r.status_code != 200:
-                r.raise_for_status()
+            r.raise_for_status()
 
     def aggregate(self, data):
         self.data = data
