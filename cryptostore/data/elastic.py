@@ -4,11 +4,9 @@ Copyright (C) 2018-2019  Bryant Moscon - bmoscon@gmail.com
 Please see the LICENSE file for the terms and conditions
 associated with this software.
 '''
-from decimal import Decimal
 import json
 import itertools
 
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK
 import requests
 
 from cryptostore.data.store import Store
