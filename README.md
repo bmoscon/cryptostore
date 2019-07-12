@@ -51,3 +51,8 @@ You can run Cryptostore in a docker container. A Dockerfile and a docker-compose
 * [ ] Storing data to MongoDB
 * [ ] Support for enabling computation and storage of diverse metrics in parallel with data collection (eg. configurable OHLCV)
 * [ ] Support for forwarding data to another service/sink (eg. to a trading engine). 
+
+
+## Contributing
+Issues and PRs are welcomed. If you'd like to discuss ongoing development please join the [slack](https://join.slack.com/t/cryptofeed-dev/shared_invite/enQtNjY4ODIwODA1MzQ3LTIzMzY3Y2YxMGVhNmQ4YzFhYTc3ODU1MjQ5MDdmY2QyZjdhMGU5ZDFhZDlmMmYzOTUzOTdkYTZiOGUwNGIzYTk)
+ (use the #cryptostore channel).
