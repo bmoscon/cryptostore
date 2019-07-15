@@ -45,7 +45,7 @@ book_delta_window: 10000
 storage: [arctic]
 
 elastic:
-    host: 'https://dc63384a379f414eb30be7b3fdc63bc0.europe-west1.gcp.cloud.es.io:9243'
+    host: 'http://localhost:9200'
     user: null
     token: null
 
