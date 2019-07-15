@@ -20,6 +20,8 @@ class ElasticSearch(Store):
     def __init__(self, config: dict):
         self.data = None
         self.host = config.host
+        self.user = config.user
+        self.token = config.token
 
     def aggregate(self, data):
         self.data = data
@@ -29,7 +31,7 @@ class ElasticSearch(Store):
             data = itertools.chain(*zip([json.dumps({ "index":{} })] * len(c), [json.dumps(d) for d in c]))
             data = '\n'.join(data)
             data = f"{data}\n"
-            r = requests.post(f"{self.host}/{data_type}/{data_type}/_bulk", data=data, headers={'content-type': 'application/x-ndjson'})
+            r = requests.post(f"{self.host}/{data_type}/{data_type}/_bulk", auth=(self.user, self.token), data=data, headers={'content-type': 'application/x-ndjson'})
             r.raise_for_status()
         self.data = None
 
@@ -48,7 +50,7 @@ class ElasticSearch(Store):
                 "aggs" : {
                     "min_timestamp" : { "min" : { "field" : "timestamp" }}}
             }
-            r = requests.post(f"{self.host}/{data_type}/{data_type}/_search?size=0", data=json.dumps(data), headers={'content-type': 'application/json'})
+            r = requests.post(f"{self.host}/{data_type}/{data_type}/_search?size=0", auth=(self.user, self.token), data=json.dumps(data), headers={'content-type': 'application/json'})
             return r.json()['aggregations']['min_timestamp']['value']
         except Exception:
             return None
