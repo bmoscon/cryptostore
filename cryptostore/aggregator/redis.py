@@ -39,12 +39,20 @@ class Redis(Cache):
 
         LOG.info("%s: Read %d messages from Redis", key, len(data[0][1]))
         ret = []
+
         for update_id, update in data[0][1]:
             if dtype in {L2_BOOK, L3_BOOK}:
                 update = json.loads(update['data'])
                 update = book_flatten(update, update['timestamp'], update['delta'])
+                for u in update:
+                    for k in ('size', 'amount', 'price', 'timestamp'):
+                        if k in u:
+                            u[k] = float(u[k])
                 ret.extend(update)
             if dtype == TRADES:
+                for k in ('size', 'amount', 'price', 'timestamp'):
+                    if k in update:
+                        update[k] = float(update[k])
                 ret.append(update)
             self.ids[key].append(update_id)
 
