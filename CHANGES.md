@@ -1,5 +1,9 @@
 ## Changelog
 
+### 0.1.0
+  * Feature: Elasticsearch support
+  * Feature: Data passthrough support
+
 ### 0.0.8 (2019-07-06)
   * Feature: Trade Data backfill
   * Bugfix: Stop storing extra column in arctic
