@@ -41,8 +41,15 @@ book_delta: True
 # Number of deltas between full book updates
 book_delta_window: 10000
 
-# Where to store the data. Currently arctic, influx, and parquet are supported. More than one can be enabled
+# Where to store the data. Currently arctic, influx, elastic, and parquet are supported. More than one can be enabled
 storage: [arctic]
+
+# Configurable passthrough for data - data will be sent in realtime (no aggregation in redis)
+pass_through:
+    type: zmq
+    host: '127.0.0.1'
+    port: 5678
+
 
 elastic:
     host: 'http://localhost:9200'

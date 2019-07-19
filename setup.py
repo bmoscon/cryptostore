@@ -45,7 +45,8 @@ setup(
         'kafka': ['aiokafka', 'confluent-kafka'],
         'arctic': ['arctic'],
         'gcs': ['google-cloud-storage'],
-        'aws': ['boto3']
+        'aws': ['boto3'],
+        'zmq': ['pyzmq']
     },
     entry_points = {
         'console_scripts': ['cryptostore=cryptostore.bin.cryptostore:main'],

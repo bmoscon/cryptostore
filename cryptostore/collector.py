@@ -51,15 +51,32 @@ class Collector(Process):
             kwargs = {'host': self.config['kafka']['ip'], 'port': self.config['kafka']['port']}
 
         if TRADES in self.exchange_config:
-            cb[TRADES] = trade_cb(**kwargs)
+            cb[TRADES] = [trade_cb(**kwargs)]
         if L2_BOOK in self.exchange_config:
-            cb[L2_BOOK] = book_cb(key=L2_BOOK, depth=depth, **kwargs)
+            cb[L2_BOOK] = [book_cb(key=L2_BOOK, depth=depth, **kwargs)]
             if book_up:
-                cb[BOOK_DELTA] = book_up(key=L2_BOOK, **kwargs)
+                cb[BOOK_DELTA] = [book_up(key=L2_BOOK, **kwargs)]
         if L3_BOOK in self.exchange_config:
-            cb[L3_BOOK] = book_cb(key=L3_BOOK, depth=depth, **kwargs)
+            cb[L3_BOOK] = [book_cb(key=L3_BOOK, depth=depth, **kwargs)]
             if book_up:
-                cb[BOOK_DELTA] = book_up(key=L3_BOOK, **kwargs)
+                cb[BOOK_DELTA] = [book_up(key=L3_BOOK, **kwargs)]
+
+
+        if 'pass_through' in self.config:
+            if self.config['pass_through']['type'] == 'zmq':
+                from cryptofeed.backends.zmq import TradeZMQ, BookDeltaZMQ, BookZMQ
+                import zmq
+                host = self.config['pass_through']['host']
+                port = self.config['pass_through']['port']
+
+                if TRADES in cb:
+                    cb[TRADES].append(TradeZMQ(host=host, port=port, zmq_type=zmq.PUB))
+                if BOOK_DELTA in cb:
+                    cb[BOOK_DELTA].append(BookDeltaZMQ(host=host, port=port, zmq_type=zmq.PUB))
+                if L2_BOOK in cb:
+                    cb[L2_BOOK].append(BookZMQ(host=host, port=port, zmq_type=zmq.PUB))
+                if L3_BOOK in cb:
+                    cb[L3_BOOK].append(BookZMQ(host=host, port=port, zmq_type=zmq.PUB))
 
         fh.add_feed(self.exchange, book_interval=window, config=self.exchange_config, callbacks=cb)
         fh.run()
