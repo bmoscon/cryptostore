@@ -42,6 +42,8 @@ For Redis
 For Kafka
   - You need only supply a different consumer group id for the other consumers to ensure all consumers receive all messages. Kafka's configuration controls the removal of committed messages in a topic (typically by time or size).
 
+With a pass through
+  - Cryptostore supports forwarding realtime data using ZeroMQ. To enable, use the `pass_through` option in the config. Data will be sent in real time (not subject to aggregation in redis/kafka). This can be used with or without data aggregation and storage.  
 
 ### Running in a container
 You can run Cryptostore in a docker container. A Dockerfile and a docker-compose.yml are provided. It uses the config in config-docker.yaml, and its set up to use redis and store the data into Arctic/MongoDB. The port is mapped to 37017 (as opposed to 27017) so when connecting to Arctic from outside the container make sure you specify the port. Additionally, a volume should be configured in the docker-compose so that the mongoDB data will persist across restarts.
