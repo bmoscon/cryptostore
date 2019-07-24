@@ -52,8 +52,6 @@ class Parquet(Store):
         for entry in data:
             for key in entry:
                 val = entry[key]
-                if key in {'timestamp', 'amount', 'size', 'price'}:
-                    val = float(val)
                 cols[key].append(val)
         arrays = [pa.array(cols[col]) for col in cols]
         table = pa.Table.from_arrays(arrays, names=names)

@@ -52,9 +52,12 @@ pass_through:
 
 
 elastic:
-    host: 'http://localhost:9200'
+    host: 'http://127.0.0.1:9200'
     user: null
     token: null
+    shards: 10
+    replicas: 0
+    refresh_interval: '30s'
 
 influx:
     host: 'http://127.0.0.1:8086'
