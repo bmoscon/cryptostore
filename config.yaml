@@ -42,12 +42,15 @@ book_delta: True
 book_delta_window: 10000
 
 # Where to store the data. Currently arctic, influx, and parquet are supported. More than one can be enabled
-storage: [elastic]
+storage: [arctic]
 
 elastic:
     host: 'http://192.168.86.41:9200'
     user: null
     token: null
+    shards: 10
+    replicas: 0
+    refresh_interval: '30s'
 
 influx:
     host: 'http://127.0.0.1:8086'
@@ -79,7 +82,7 @@ parquet:
 arctic: mongodb://127.0.0.1
 
 # Data batching window, in seconds
-storage_interval: 10
+storage_interval: 60
 
 
 # Cryptostore Plugin Interface

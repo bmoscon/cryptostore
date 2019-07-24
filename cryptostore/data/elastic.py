@@ -16,57 +16,6 @@ from cryptostore.data.store import Store
 LOG = logging.getLogger('cryptostore')
 
 
-SETTINGS = {
-        "index" : {
-            "number_of_shards" : 5, 
-            "number_of_replicas" : 0
-        }
-    }
-MAPPINGS = {'trades': {
-                "settings": SETTINGS,
-                "mappings":{
-                    "properties":{
-                        "feed": {"type": "keyword"},
-                        "pair": {"type": "keyword"},
-                        "timestamp": {"type": "double"},
-                        "amount": {"type": "double"},
-                        "price": {"type":"double"},
-                        "id": {"type": "text"},
-                        "side": {"type": "text"}
-                    }
-                }
-            },
-            'l2_book': {
-                "settings": SETTINGS,
-                "mappings":{
-                    "properties":{
-                        "feed": {"type": "keyword"},
-                        "pair": {"type": "keyword"},
-                        "timestamp": {"type": "double"},
-                        "size": {"type": "double"},
-                        "price": {"type":"double"},
-                        "side": {"type": "text"},
-                        "delta": {"type": "boolean"}
-                    }
-                }
-            },
-            'l3_book': {
-                "settings": SETTINGS,
-                "mappings":{
-                    "properties":{
-                        "feed": {"type": "keyword"},
-                        "pair": {"type": "keyword"},
-                        "timestamp": {"type": "double"},
-                        "size": {"type": "double"},
-                        "price": {"type":"double"},
-                        "side": {"type": "text"},
-                        "order_id": {"type": "text"},
-                        "delta": {"type": "boolean"}
-                    }
-                }
-            }
-        }
-
 def chunk(iterable, length):
     return (iterable[i : i + length] for i in range(0, len(iterable), length))
 
@@ -77,19 +26,28 @@ class ElasticSearch(Store):
         self.host = config.host
         self.user = config.user
         self.token = config.token
+        self.settings = {'settings': {
+                            "index" : {
+                                "number_of_shards" : config.shards,
+                                "number_of_replicas" : config.replicas,
+                                "refresh_interval": config.refresh_interval
+                                }
+                            }
+                        }
 
     def aggregate(self, data):
         self.data = data
 
     def write(self, exchange, data_type, pair, timestamp):
         if requests.head(f"{self.host}/{data_type}").status_code != 200:
-            r = requests.put(f"{self.host}/{data_type}", data=json.dumps(MAPPINGS[data_type]), auth=(self.user, self.token), headers={'content-type': 'application/json'})
+            r = requests.put(f"{self.host}/{data_type}", data=json.dumps(self.settings), auth=(self.user, self.token), headers={'content-type': 'application/json'})
             if r.status_code != 200:
                 LOG.error("Elasticsearch Index creation failed: %s", r.text)
             r.raise_for_status()
 
-        for c in chunk(self.data, 100000):
-            data = itertools.chain(*zip([json.dumps({'index': {}})] * len(c), [json.dumps(d) for d in c]))
+        LOG.info("Writing %d documents to Elasticsearch", len(self.data))
+        for c in chunk(self.data, 10000):
+            data = itertools.chain(*zip(['{"index": {}}'] * len(c), [json.dumps(d) for d in c]))
             data = '\n'.join(data)
             data = f"{data}\n"
             r = requests.post(f"{self.host}/{data_type}/{data_type}/_bulk", auth=(self.user, self.token), data=data, headers={'content-type': 'application/x-ndjson'})
