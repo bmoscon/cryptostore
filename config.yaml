@@ -45,7 +45,7 @@ book_delta_window: 10000
 storage: [arctic]
 
 elastic:
-    host: 'http://192.168.86.41:9200'
+    host: 'http://127.0.0.1:9200'
     user: null
     token: null
     shards: 10
