@@ -14,6 +14,7 @@ Stores data to:
 * Google Cloud Storage
 * Amazon S3
 * [InfluxDB](https://github.com/influxdata/influxdb)
+* Elasticsearch
 
 ### Requirements
 
