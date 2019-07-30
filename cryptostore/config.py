@@ -34,7 +34,7 @@ class AttrDict(dict):
 class Config:
     def __init__(self, file_name):
         with open(file_name) as fp:
-            self.config = AttrDict(yaml.load(fp))
+            self.config = AttrDict(yaml.load(fp, Loader=yaml.FullLoader))
 
     def __getattr__(self, attr):
         return self.config[attr]
@@ -62,7 +62,7 @@ class DynamicConfig(Config):
             cur_mtime = os.stat(file).st_mtime
             if cur_mtime != last_modified:
                 with open(file, 'r') as fp:
-                    self.config = AttrDict(yaml.load(fp))
+                    self.config = AttrDict(yaml.load(fp, Loader=yaml.FullLoader))
                     if callback is not None:
                         await callback(self.config)
                     last_modified = cur_mtime

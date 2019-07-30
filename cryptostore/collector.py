@@ -29,25 +29,32 @@ class Collector(Process):
         cb = {}
         depth = None
         window = 1000
+        delta = False
 
-        if 'book_delta_window' in self.config:
-            window = self.config['book_delta_window']
+        for _, value in self.exchange_config.items():
+            if 'book_delta_window' in value:
+                window = value['book_delta_window']
+            if 'book_delta' in value and value['book_delta']:
+                delta = True
+            elif 'book_depth' in value:
+                depth = value['book_depth']
 
-        if 'book_depth' in self.config:
-            depth = self.config['book_depth']
+        for book_type in (L2_BOOK, L3_BOOK):
+            if book_type in self.exchange_config:
+                self.exchange_config[book_type] = self.exchange_config[book_type]['symbols']
 
         cache = self.config['cache']
         if cache == 'redis':
             from cryptofeed.backends.redis import TradeStream, BookStream, BookDeltaStream
             trade_cb = TradeStream
             book_cb = BookStream
-            book_up = BookDeltaStream if not depth and self.config['book_delta'] else None
+            book_up = BookDeltaStream if not depth and delta else None
             kwargs = {'host': self.config['redis']['ip'], 'port': self.config['redis']['port'], 'numeric_type': float}
         elif cache == 'kafka':
             from cryptofeed.backends.kafka import TradeKafka, BookKafka, BookDeltaKafka
             trade_cb = TradeKafka
             book_cb = BookKafka
-            book_up = BookDeltaKafka if not depth and self.config['book_delta'] else None
+            book_up = BookDeltaKafka if not depth and delta else None
             kwargs = {'host': self.config['kafka']['ip'], 'port': self.config['kafka']['port']}
 
         if TRADES in self.exchange_config:

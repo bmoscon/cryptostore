@@ -22,24 +22,27 @@ redis:
 # data types follow cryptofeed definitions, see defines.py in cryptofeed for more details, common ones are
 # trades, l2_book, l3_book, funding, ticker (only trades, l2_book, l3_book currently supported by cryptostore).
 # Trading pairs for all exchanges (except BitMEX) follow the currency-quote format
-exchanges:
-    BITMEX:
-        l2_book: [XBTUSD]
-        trades: [XBTUSD]
-    COINBASE:
-        l3_book: [BTC-USD, ETH-USD]
-        trades: [BTC-USD, ETH-USD, ETH-BTC]
-# Number of levels per side to store from book updates.
-# Remove this option to store all available data.
-# Cannot enable book_depth with book_deltas
-book_depth: null
-
-# Store book deltas as opposed to complete books on every update
+#
+# book_depth controls the size of the book to return. The top N levels will be returned, only when those N levels
+# have changed.
+# book_delta enables book deltas (snapshot, then only deltas are delivered). Snapshops are delivered
+# every book_interval updates. book_interval defaults to 1000 if not specified
 # Cannot enable book deltas with book_depth (delta will be ignored if depth enabled).
 # Not all exchanges support deltas
-book_delta: True
-# Number of deltas between full book updates
-book_delta_window: 10000
+
+exchanges:
+    BITMEX:
+        l2_book:
+            symbols: [XBTUSD]
+            book_depth: 10
+        trades: [XBTUSD]
+    COINBASE:
+        l3_book:
+            symbols: [BTC-USD, ETH-USD]
+            book_delta: True
+            book_interval: 10000
+        trades: [BTC-USD, ETH-USD, ETH-BTC]
+
 
 # Where to store the data. Currently arctic, influx, elastic, and parquet are supported. More than one can be enabled
 storage: [arctic]

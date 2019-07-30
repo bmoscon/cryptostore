@@ -51,7 +51,7 @@ class Aggregator(Process):
             if 'exchanges' in self.config and self.config.exchanges:
                 for exchange in self.config.exchanges:
                     for dtype in self.config.exchanges[exchange]:
-                        for pair in self.config.exchanges[exchange][dtype]:
+                        for pair in self.config.exchanges[exchange][dtype] if 'symbols' not in self.config.exchanges[exchange][dtype] else self.config.exchanges[exchange][dtype]['symbols']:
                             store = Storage(self.config)
                             LOG.info('Reading %s-%s-%s', exchange, dtype, pair)
 
