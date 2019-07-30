@@ -39,7 +39,7 @@ exchanges:
     COINBASE:
         l3_book:
             symbols: [BTC-USD, ETH-USD]
-            book_delta: True
+            book_delta: true
             book_interval: 10000
         trades: [BTC-USD, ETH-USD, ETH-BTC]
 

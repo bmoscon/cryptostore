@@ -10,14 +10,16 @@ redis:
 
 exchanges:
     BITMEX:
-        l2_book: [XBTUSD]
+        l2_book:
+            symbols: [XBTUSD]
+            book_depth: 10
         trades: [XBTUSD]
     COINBASE:
-        l2_book: [BTC-USD]
+        l3_book:
+            symbols: [BTC-USD, ETH-USD]
+            book_delta: true
+            book_interval: 10000
         trades: [BTC-USD, ETH-USD, ETH-BTC]
-
-book_depth: null
-book_delta: True
 
 storage: [arctic]
 arctic: mongodb://mongo:27017
