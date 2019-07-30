@@ -3,6 +3,7 @@
 ### 0.1.0
   * Feature: Elasticsearch support
   * Feature: Data passthrough support
+  * Feature: Config for book data is more granular
 
 ### 0.0.8 (2019-07-06)
   * Feature: Trade Data backfill
