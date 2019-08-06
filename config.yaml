@@ -29,14 +29,18 @@ redis:
 # every book_interval updates. book_interval defaults to 1000 if not specified
 # Cannot enable book deltas with book_depth (delta will be ignored if depth enabled).
 # Not all exchanges support deltas
+#
+# Retries are the number of times the connection to the exchange will be retried before exiting. -1 is infinity
 
 exchanges:
     BITMEX:
+        retries: -1
         l2_book:
             symbols: [XBTUSD]
             book_depth: 10
         trades: [XBTUSD]
     COINBASE:
+        retries: -1
         l3_book:
             symbols: [BTC-USD, ETH-USD]
             book_delta: true

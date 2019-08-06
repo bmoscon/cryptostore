@@ -25,7 +25,9 @@ class Collector(Process):
 
     def run(self):
         LOG.info("Collector for %s running on PID %d", self.exchange, os.getpid())
-        fh = FeedHandler()
+
+        retries = self.exchange_config.pop('retries', 30)
+        fh = FeedHandler(retries=retries)
         cb = {}
         depth = None
         window = 1000
