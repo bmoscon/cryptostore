@@ -110,8 +110,7 @@ plugins:
         config: config.yaml
 
 # If configured, backfill will run in a separate process and
-# backfill trade data from the specifed start date, until it finds existing data
-# in the storage medium.
+# backfill trade data from earliest data (in storage) up to `start` (inclusive).
 backfill:
     COINBASE:
         BTC-USD:
