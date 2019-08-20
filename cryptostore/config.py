@@ -1,9 +1,9 @@
-'''
+"""
 Copyright (C) 2018-2019  Bryant Moscon - bmoscon@gmail.com
 
 Please see the LICENSE file for the terms and conditions
 associated with this software.
-'''
+"""
 import asyncio
 import os
 
@@ -46,10 +46,10 @@ class Config:
 class DynamicConfig(Config):
     def __init__(self, file_name=None, reload_interval=10, callback=None):
         if file_name is None:
-            if 'CRYPTOSTORE_CONFIG' in os.environ:
-                file_name = os.environ['CRYPTOSTORE_CONFIG']
+            if "CRYPTOSTORE_CONFIG" in os.environ:
+                file_name = os.environ["CRYPTOSTORE_CONFIG"]
             else:
-                file_name = os.path.join(os.getcwd(), 'config.yaml')
+                file_name = os.path.join(os.getcwd(), "config.yaml")
         if not os.path.isfile(file_name):
             raise FileNotFoundError(f"Config file {file_name} not found")
 
@@ -61,7 +61,7 @@ class DynamicConfig(Config):
         while True:
             cur_mtime = os.stat(file).st_mtime
             if cur_mtime != last_modified:
-                with open(file, 'r') as fp:
+                with open(file, "r") as fp:
                     self.config = AttrDict(yaml.load(fp, Loader=yaml.FullLoader))
                     if callback is not None:
                         await callback(self.config)

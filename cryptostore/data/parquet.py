@@ -1,9 +1,9 @@
-'''
+"""
 Copyright (C) 2018-2019  Bryant Moscon - bmoscon@gmail.com
 
 Please see the LICENSE file for the terms and conditions
 associated with this software.
-'''
+"""
 import os
 import glob
 
@@ -28,26 +28,30 @@ class Parquet(Store):
         self.del_file = True
 
         if config:
-            self.del_file = False if 'del_file' in config and config['del_file'] == False else True
+            self.del_file = (
+                False if "del_file" in config and config["del_file"] == False else True
+            )
 
-            if 'GCS' in config:
+            if "GCS" in config:
                 self._write.append(google_cloud_write)
                 self._read.append(google_cloud_read)
                 self._list.append(google_cloud_list)
-                self.bucket.append(config['GCS']['bucket'])
-                self.prefix.append(config['GCS']['prefix'])
-                self.kwargs.append({'creds': config['GCS']['service_account']})
-            if 'S3' in config:
+                self.bucket.append(config["GCS"]["bucket"])
+                self.prefix.append(config["GCS"]["prefix"])
+                self.kwargs.append({"creds": config["GCS"]["service_account"]})
+            if "S3" in config:
                 self._write.append(aws_write)
                 self._read.append(aws_read)
                 self._list.append(aws_list)
-                self.bucket.append(config['S3']['bucket'])
-                self.prefix.append(config['S3']['prefix'])
-                self.kwargs.append({'creds': (config['S3']['key_id'], config['S3']['secret'])})
+                self.bucket.append(config["S3"]["bucket"])
+                self.prefix.append(config["S3"]["prefix"])
+                self.kwargs.append(
+                    {"creds": (config["S3"]["key_id"], config["S3"]["secret"])}
+                )
 
     def aggregate(self, data):
         names = list(data[0].keys())
-        cols = {name : [] for name in names}
+        cols = {name: [] for name in names}
 
         for entry in data:
             for key in entry:
@@ -58,13 +62,15 @@ class Parquet(Store):
         self.data = table
 
     def write(self, exchange, data_type, pair, timestamp):
-        file_name = f'{exchange}-{data_type}-{pair}-{int(timestamp)}.parquet'
+        file_name = f"{exchange}-{data_type}-{pair}-{int(timestamp)}.parquet"
         pq.write_table(self.data, file_name)
         self.data = None
 
         if self._write:
-            for func, bucket, prefix, kwargs in zip(self._write, self.bucket, self.prefix, self.kwargs):
-                path = f'{exchange}/{data_type}/{pair}/{int(timestamp)}.parquet'
+            for func, bucket, prefix, kwargs in zip(
+                self._write, self.bucket, self.prefix, self.kwargs
+            ):
+                path = f"{exchange}/{data_type}/{pair}/{int(timestamp)}.parquet"
                 if prefix:
                     path = f"{prefix}/{path}"
                 func(bucket, path, file_name, **kwargs)
@@ -76,12 +82,14 @@ class Parquet(Store):
         files = []
 
         if not self.del_file:
-            file_pattern = f'{exchange}-{data_type}-{pair}-[0-9]*.parquet'
+            file_pattern = f"{exchange}-{data_type}-{pair}-[0-9]*.parquet"
             files = glob.glob(file_pattern)
 
         if self._read:
-            for func, bucket, prefix, kwargs in zip(self._list, self.bucket, self.prefix, self.kwargs):
-                path = f'{exchange}/{data_type}/{pair}/'
+            for func, bucket, prefix, kwargs in zip(
+                self._list, self.bucket, self.prefix, self.kwargs
+            ):
+                path = f"{exchange}/{data_type}/{pair}/"
                 if prefix:
                     path = f"{prefix}/{path}"
                 ret = func(bucket, path, limit=1, **kwargs)
@@ -100,10 +108,14 @@ class Parquet(Store):
                 raise InconsistentStorage("Stored data differs, cannot backfill")
 
         if files:
-            return float(pq.read_table(files[0], columns=['timestamp']).to_pandas().timestamp[0])
+            return float(
+                pq.read_table(files[0], columns=["timestamp"]).to_pandas().timestamp[0]
+            )
         else:
-            tmp = f'{exchange}-{pair}-temp.parquet'
+            tmp = f"{exchange}-{pair}-temp.parquet"
             self._read[0](self.bucket[0], objs[0][0], tmp, **self.kwargs[0])
-            start = float(pq.read_table(tmp, columns=['timestamp']).to_pandas().timestamp[0])
+            start = float(
+                pq.read_table(tmp, columns=["timestamp"]).to_pandas().timestamp[0]
+            )
             os.remove(tmp)
             return start

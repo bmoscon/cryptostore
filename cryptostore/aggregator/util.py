@@ -1,10 +1,10 @@
-'''
+"""
 Copyright (C) 2018-2019  Bryant Moscon - bmoscon@gmail.com
 
 Please see the LICENSE file for the terms and conditions
 associated with this software.
-'''
-from cryptofeed. defines import BID, ASK
+"""
+from cryptofeed.defines import BID, ASK
 
 
 def book_flatten(book: dict, timestamp: float, delta: str) -> dict:
@@ -25,7 +25,24 @@ def book_flatten(book: dict, timestamp: float, delta: str) -> dict:
             if isinstance(data, dict):
                 # L3 book
                 for order_id, size in data.items():
-                    ret.append({'side': side, 'price': price, 'size': size, 'order_id': order_id, 'timestamp': timestamp, 'delta': delta})
+                    ret.append(
+                        {
+                            "side": side,
+                            "price": price,
+                            "size": size,
+                            "order_id": order_id,
+                            "timestamp": timestamp,
+                            "delta": delta,
+                        }
+                    )
             else:
-                ret.append({'side': side, 'price': price, 'size': data, 'timestamp': timestamp, 'delta': delta})
+                ret.append(
+                    {
+                        "side": side,
+                        "price": price,
+                        "size": data,
+                        "timestamp": timestamp,
+                        "delta": delta,
+                    }
+                )
     return ret

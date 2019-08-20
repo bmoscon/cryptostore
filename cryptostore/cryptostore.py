@@ -1,9 +1,9 @@
-'''
+"""
 Copyright (C) 2018-2019  Bryant Moscon - bmoscon@gmail.com
 
 Please see the LICENSE file for the terms and conditions
 associated with this software.
-'''
+"""
 from multiprocessing import Queue
 import asyncio
 import logging
@@ -17,10 +17,27 @@ from cryptostore.aggregator.aggregator import Aggregator
 from cryptostore.plugin.controller import PluginController
 
 
-LOG = get_logger('cryptostore', 'cryptostore.log', logging.INFO, size=50000000, num_files=10)
+LOG = get_logger(
+    "cryptostore", "cryptostore.log", logging.INFO, size=50000000, num_files=10
+)
 
 
 class Cryptostore:
+    """
+    This class loads the config_file as well as checks if such config_file was
+    modified in between, if so then it updates the current parameters to reflect 
+    such changes.
+    
+    Such changes could be starting to store data from a particular exchange or
+    modify the type of data one wishes to store from a particular exchange that
+    cryptostore is already interacting with. 
+
+    All these changes can be made without the need to stop cryptostore, modify
+    the config_file and then starting cryptostore again. The DynamicConfig file
+    keeps track of any changes so one can just change the config_file and
+    cryptostore will react to it and modify itself accordingly.
+    """
+
     def __init__(self, config=None):
         self.queue = Queue()
         self.spawner = Spawn(self.queue)
@@ -30,40 +47,84 @@ class Cryptostore:
         self.plugin.start()
 
     async def _load_config(self, start, stop):
+        """
+        This function loads the confi_file and spawns a new cryptofeed
+        connection. 
+        """
         LOG.info("start: %s stop: %s", str(start), str(stop))
         for exchange in stop:
-            self.queue.put(json.dumps({'op': 'stop', 'exchange': exchange}))
+            self.queue.put(json.dumps({"op": "stop", "exchange": exchange}))
 
         for exchange in start:
-            self.queue.put(json.dumps({'op': 'start', 'exchange': exchange, 'collector': self.running_config['exchanges'][exchange], 'config': {i : self.running_config[i] for i in self.running_config if i != 'exchanges'}}))
+            self.queue.put(
+                json.dumps(
+                    {
+                        "op": "start",
+                        "exchange": exchange,
+                        "collector": self.running_config["exchanges"][exchange],
+                        "config": {
+                            i: self.running_config[i]
+                            for i in self.running_config
+                            if i != "exchanges"
+                        },
+                    }
+                )
+            )
 
     async def _reconfigure(self, config):
+        """
+        As documented in the class doc string, this function will detect any
+        changes made to the config_file and make the necessary changes to
+        cryptostore so its updated to the (new) user's directions.
+        """
+
         stop = []
         start = []
 
         if self.running_config != config:
-            if not config or 'exchanges' not in config or not config['exchanges'] or len(config['exchanges']) == 0:
+            if (
+                not config
+                or "exchanges" not in config
+                or not config["exchanges"]
+                or len(config["exchanges"]) == 0
+            ):
                 # shut it all down
-                stop = list(self.running_config['exchanges'].keys()) if 'exchanges' in self.running_config else []
+                stop = (
+                    list(self.running_config["exchanges"].keys())
+                    if "exchanges" in self.running_config
+                    else []
+                )
                 self.running_config = config
-            elif not self.running_config or 'exchanges' not in self.running_config or len(self.running_config['exchanges']) == 0:
+            elif (
+                not self.running_config
+                or "exchanges" not in self.running_config
+                or len(self.running_config["exchanges"]) == 0
+            ):
                 # nothing running currently, start it all
                 self.running_config = config
-                start = list(self.running_config['exchanges'].keys())
+                start = list(self.running_config["exchanges"].keys())
             else:
-                for e in config['exchanges']:
-                    if e in self.running_config['exchanges'] and config['exchanges'][e] == self.running_config['exchanges'][e]:
+                for e in config["exchanges"]:
+                    if (
+                        e in self.running_config["exchanges"]
+                        and config["exchanges"][e]
+                        == self.running_config["exchanges"][e]
+                    ):
                         continue
-                    elif e not in self.running_config['exchanges']:
+                    elif e not in self.running_config["exchanges"]:
                         start.append(e)
                     else:
                         stop.append(e)
                         start.append(e)
 
-                for e in self.running_config['exchanges']:
-                    if e in config['exchanges'] and config['exchanges'][e] == self.running_config['exchanges'][e]:
+                for e in self.running_config["exchanges"]:
+                    if (
+                        e in config["exchanges"]
+                        and config["exchanges"][e]
+                        == self.running_config["exchanges"][e]
+                    ):
                         continue
-                    elif e not in config['exchanges']:
+                    elif e not in config["exchanges"]:
                         stop.append(e)
                     else:
                         stop.append(e)

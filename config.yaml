@@ -34,18 +34,22 @@ redis:
 
 exchanges:
     BITMEX:
-        retries: -1
-        l2_book:
-            symbols: [XBTUSD]
-            book_depth: 10
-        trades: [XBTUSD]
+         retries: -1
+         l2_book:
+             symbols: [XBTUSD]
+             book_depth: 10
+             trades: [XBTUSD]
     COINBASE:
-        retries: -1
-        l3_book:
+         retries: -1
+         l2_book:
+             symbols: [BTC-USD]
+             book_depth: 50
+
+         l3_book:
             symbols: [BTC-USD, ETH-USD]
             book_delta: true
             book_interval: 10000
-        trades: [BTC-USD, ETH-USD, ETH-BTC]
+         trades: [BTC-USD, ETH-USD, ETH-BTC]
 
 
 # Where to store the data. Currently arctic, influx, elastic, and parquet are supported. More than one can be enabled
@@ -94,6 +98,7 @@ parquet:
 
 # arctic specific configuration options - the mongo URL
 arctic: mongodb://127.0.0.1
+wide_tables: true
 
 # Data batching window, in seconds
 storage_interval: 60
