@@ -1,9 +1,10 @@
 ## Changelog
 
-### 0.1.0
+### 0.1.0 (2019-08-21)
   * Feature: Elasticsearch support
   * Feature: Data passthrough support
   * Feature: Config for book data is more granular
+  * Feature: Data retention time for Redis data
 
 ### 0.0.8 (2019-07-06)
   * Feature: Trade Data backfill
