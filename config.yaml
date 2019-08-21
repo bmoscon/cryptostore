@@ -50,6 +50,7 @@ exchanges:
 
 # Where to store the data. Currently arctic, influx, elastic, and parquet are supported. More than one can be enabled
 storage: [arctic]
+wide_tables: true
 
 # Configurable passthrough for data - data will be sent in realtime (no aggregation in redis)
 pass_through:
