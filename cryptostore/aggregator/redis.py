@@ -7,6 +7,7 @@ associated with this software.
 import logging
 from collections import defaultdict
 import json
+import time
 
 from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK
 
@@ -19,8 +20,9 @@ LOG = logging.getLogger('cryptostore')
 
 
 class Redis(Cache):
-    def __init__(self, ip, port, del_after_read=True, flush=False):
+    def __init__(self, ip, port, del_after_read=True, flush=False, retention=None):
         self.del_after_read = del_after_read
+        self.retention = retention
         self.last_id = {}
         self.ids = defaultdict(list)
         self.conn = StorageEngines.redis.Redis(ip, port, decode_responses=True)
@@ -63,6 +65,12 @@ class Redis(Cache):
         key = f'{dtype}-{exchange}-{pair}'
 
         if self.del_after_read:
+            if self.retention:
+                removal_ts = f'{int((time.time() * 1000) - (self.retention * 1000))}-0'
+                self.ids[key] = [i[0] for i in self.conn.xrange(key, max=removal_ts)]
+        if self.ids[key]:
             self.conn.xdel(key, *self.ids[key])
-        LOG.info("%s: Removed through id %s", key, self.ids[key][-1])
+            LOG.info("%s: Removed %d entries through id %s", key, len(self.ids[key]), self.ids[key][-1])
+        else:
+            LOG.info("%s: Removed no Redis entries", key)
         self.ids[key] = []
