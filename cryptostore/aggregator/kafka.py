@@ -11,17 +11,18 @@ from cryptofeed.defines import L2_BOOK, L3_BOOK, TRADES
 
 from cryptostore.engines import StorageEngines
 from cryptostore.aggregator.cache import Cache
-from cryptostore.aggregator.util import book_flatten
+from cryptostore.aggregator.util import book_flatten, book_wide
 
 
 LOG = logging.getLogger('cryptostore')
 
 
 class Kafka(Cache):
-    def __init__(self, ip, port, flush=False):
+    def __init__(self, ip, port, flush=False, wide_tables=False):
         self.conn = {}
         self.ip = ip
         self.port = port
+        self.wide = wide_tables # Must implement it on the read method
         self.ids = {}
 
         if flush:

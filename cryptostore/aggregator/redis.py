@@ -10,7 +10,7 @@ import json
 
 from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK
 
-from cryptostore.aggregator.util import book_flatten
+from cryptostore.aggregator.util import book_flatten, book_wide
 from cryptostore.aggregator.cache import Cache
 from cryptostore.engines import StorageEngines
 
@@ -19,10 +19,11 @@ LOG = logging.getLogger('cryptostore')
 
 
 class Redis(Cache):
-    def __init__(self, ip, port, del_after_read=True, flush=False):
+    def __init__(self, ip, port, del_after_read=True, flush=False, wide_tables=False):
         self.del_after_read = del_after_read
         self.last_id = {}
         self.ids = defaultdict(list)
+        self.wide = wide_tables
         self.conn = StorageEngines.redis.Redis(ip, port, decode_responses=True)
         if flush:
             LOG.info('Flushing cache')
@@ -43,12 +44,15 @@ class Redis(Cache):
         for update_id, update in data[0][1]:
             if dtype in {L2_BOOK, L3_BOOK}:
                 update = json.loads(update['data'])
-                update = book_flatten(update, update['timestamp'], update['delta'])
-                for u in update:
-                    for k in ('size', 'amount', 'price', 'timestamp'):
-                        if k in u:
-                            u[k] = float(u[k])
-                ret.extend(update)
+                if dtype == L2_BOOK and self.wide:
+                    ret.append(update)
+                else:
+                    update = book_flatten(update, update['timestamp'], update['delta'])
+                    for u in update:
+                        for k in ('size', 'amount', 'price', 'timestamp'):
+                            if k in u:
+                                u[k] = float(u[k])
+                    ret.extend(update)
             if dtype == TRADES:
                 for k in ('size', 'amount', 'price', 'timestamp'):
                     if k in update:
@@ -57,6 +61,8 @@ class Redis(Cache):
             self.ids[key].append(update_id)
 
         self.last_id[key] = self.ids[key][-1]
+        if dtype == L2_BOOK and self.wide:
+            return book_wide(ret)
         return ret
 
     def delete(self, exchange, dtype, pair):

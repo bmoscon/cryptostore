@@ -40,11 +40,13 @@ class Aggregator(Process):
             cache = Redis(self.config.redis['ip'],
                           self.config.redis['port'],
                           del_after_read=self.config.redis['del_after_read'],
-                          flush=self.config.redis['start_flush'])
+                          flush=self.config.redis['start_flush'],
+                          wide_tables=self.config.wide_tables)
         elif self.config.cache == 'kafka':
             cache = Kafka(self.config.kafka['ip'],
                           self.config.kafka['port'],
-                          flush=self.config.kafka['start_flush'])
+                          flush=self.config.kafka['start_flush'],
+                          wide_tables=self.config.wide_tables)
 
         while True:
             start = time.time()
