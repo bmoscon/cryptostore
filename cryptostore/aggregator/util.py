@@ -35,11 +35,11 @@ def book_wide(data: list):
     ret = []
     od = OrderedDict({})
     for dic in data:
-        od.update({"timestamp": dic["timestamp"]})
-        for index, i in enumerate(zip(dic["ask"].items(), sorted(dic["bid"].items(), reverse=True))):
-            od.update({f"asks[{index}].price": float(f"{float(i[0][0])}")})
-            od.update({f"asks[{index}].size": float(f"{i[0][1]}")})
-            od.update({f"bids[{index}].price": float(f"{i[1][0]}")})
-            od.update({f"bids[{index}].size": float(f"{i[1][1]}")})
+        od.update({'timestamp': dic['timestamp']})
+        for index, i in enumerate(zip(dic['ask'].items(), sorted(dic['bid'].items(), reverse=True))):
+            od.update({f'asks[{index}].price': float(f'{i[0][0]}')})
+            od.update({f'asks[{index}].size': float(f'{i[0][1]}')})
+            od.update({f'bids[{index}].price': float(f'{i[1][0]}')})
+            od.update({f'bids[{index}].size': float(f'{i[1][1]}')})
         ret.append(od.copy())
     return ret
