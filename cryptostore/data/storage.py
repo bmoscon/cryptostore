@@ -13,6 +13,7 @@ from cryptostore.data.elastic import ElasticSearch
 
 class Storage(Store):
     def __init__(self, config):
+        self.config = config
         if isinstance(config.storage, list):
             self.s = [Storage.__init_helper(s, config) for s in config.storage]
         else:
@@ -35,9 +36,9 @@ class Storage(Store):
         for s in self.s:
             s.write(exchange, data_type, pair, timestamp)
 
-    def aggregate(self, data: list):
+    def aggregate(self, data: list, transform=lambda x: x):
         for s in self.s:
-            s.aggregate(data)
+            s.aggregate(transform(data))
 
     def get_start_date(self, exchange: str, data_type: str, pair: str) -> list:
         ret = []

@@ -35,23 +35,12 @@ redis:
 # Retries are the number of times the connection to the exchange will be retried before exiting. -1 is infinity
 
 exchanges:
-    BITMEX:
-        retries: -1
-        l2_book:
-            symbols: [XBTUSD]
-            book_depth: 10
-        trades: [XBTUSD]
     COINBASE:
-        retries: -1
-        l3_book:
-            symbols: [BTC-USD, ETH-USD]
-            book_delta: true
-            book_interval: 10000
-        trades: [BTC-USD, ETH-USD, ETH-BTC]
+        trades: [BTC-USD]
 
 
 # Where to store the data. Currently arctic, influx, elastic, and parquet are supported. More than one can be enabled
-storage: [arctic]
+storage: [arctic, influx]
 
 # Configurable passthrough for data - data will be sent in realtime (no aggregation in redis)
 pass_through:

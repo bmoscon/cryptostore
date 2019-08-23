@@ -21,6 +21,8 @@ class Arctic(Store):
 
     def write(self, exchange, data_type, pair, timestamp):
         chunk_size = None
+        if not self.data:
+            return
         df = pd.DataFrame(self.data)
         self.data = []
 

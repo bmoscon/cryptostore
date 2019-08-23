@@ -31,6 +31,8 @@ class InfluxDB(Store):
         self.data = data
 
     def write(self, exchange, data_type, pair, timestamp):
+        if not self.data:
+            return
         agg = []
         # influx cant handle duplicate data (?!) so we need to
         # incremement timestamps on data that have the same timestamp

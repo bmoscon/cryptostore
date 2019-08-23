@@ -9,6 +9,7 @@ import logging
 from pandas import Timestamp, Timedelta
 from threading import Thread
 import os
+import copy
 
 from cryptofeed.rest import Rest
 
@@ -37,22 +38,21 @@ class Backfill(Plugin):
 
                 while True:
                     end = storage.get_start_date(exchange, 'trades', pair)
-                    if not all(e == end[0] for e in end):
-                        raise InconsistentStorage("Stored data differs, cannot backfill")
-                    end = end[0]
-                    if end:
+
+                    if all(e for e in end):
                         break
                     time.sleep(10)
-                end = Timestamp(end, unit='s')
-                end -= Timedelta(microseconds=1)
-                start = Timestamp(start)
-                if end <= Timestamp(start):
+                ends = list(map(lambda x: Timestamp(x, unit='s') - Timedelta(microseconds=1), end))
+
+                if any(e <= Timestamp(start) for e in ends):
                     LOG.info("Data in storage is earlier than backfill start date for %s - %s", exchange, pair)
                     continue
 
-                LOG.info("Backfill - Starting for %s - %s for range %s - %s", exchange, pair, start, str(end))
+                LOG.info("Backfill - Starting for %s - %s for range %s - %s", exchange, pair, start, str(max(ends)))
 
                 # Backfill from end date to start date, 1 day at a time, in reverse order (from end -> start)
+                end = max(ends)
+                start = Timestamp(start)
                 while start < end:
                     seg_start = end.replace(hour=0, minute=0, second=0, microsecond=0, nanosecond=0)
                     if start > seg_start:
@@ -72,7 +72,24 @@ class Backfill(Plugin):
                         end = seg_start - Timedelta(nanoseconds=1)
                         continue
 
-                    storage.aggregate(trades)
+                    for trade in trades:
+                        trade['price'] = float(trade['price'])
+                        trade['amount'] = float(trade['amount'])
+
+                    def gen_pos():
+                        counter = 0
+                        while True:
+                            yield counter % len(ends)
+                            counter += 1
+
+                    pos = gen_pos()
+                    ends_float = [x.timestamp() for x in ends]
+
+                    def timestamp_filter(data):
+                        boundary = ends_float[next(pos)]
+                        return list(filter(lambda x: x['timestamp'] < boundary, copy.copy(data)))
+
+                    storage.aggregate(trades, transform=timestamp_filter)
                     storage.write(exchange, 'trades', pair, end.timestamp())
                     LOG.info("Backfill - Wrote %s to %s for %s - %s", seg_start, end, exchange, pair)
                     end = seg_start - Timedelta(nanoseconds=1)
