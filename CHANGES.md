@@ -1,5 +1,8 @@
 ## Changelog
 
+### 0.1.1
+  * Feature: Rework backfill to operate even when store's data differs
+
 ### 0.1.0 (2019-08-21)
   * Feature: Elasticsearch support
   * Feature: Data passthrough support
@@ -25,7 +28,7 @@
   * Feature: Install entry point script with setuptools
   * Bugfix: Incorreclty storing level/order size in book updates in Arctic
   * Bugfix: Optional dependenices no longer required to be installed
-  * Feature: Redis decoupled from aggregator, in preparation for the caching backend to be user selected 
+  * Feature: Redis decoupled from aggregator, in preparation for the caching backend to be user selected
 
 ### 0.0.4 (2019-05-04)
   * Bugfix: missing comma in setup.py
