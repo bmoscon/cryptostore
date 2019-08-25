@@ -4,6 +4,7 @@
 #
 # del_after_read: (redis only) toggles the removal of data from redis after it has been processed with cryptostore.
 # retention_time: (redis only) if data removal is enabled (via del_after_read) will allow retention of data in redis for N seconds.
+# socket: (redis only) allows redis connections via a unix domain socket
 # start_flush: toggles if redis/kafka should be flushed at the start. Primarily for debugging, it will flush ALL of redis/kafka
 cache: redis
 
@@ -15,6 +16,7 @@ kafka:
 redis:
     ip: '127.0.0.1'
     port: 6379
+    socket: null
     del_after_read: true
     retention_time: null
     start_flush: true

@@ -47,11 +47,14 @@ class Collector(Process):
 
         cache = self.config['cache']
         if cache == 'redis':
+            if self.config['redis']['ip']:
+                kwargs = {'ip': self.config['redis']['ip'], 'port': self.config['redis']['port'], 'numeric_type': float}
+            else:
+                kwargs = {'socket': self.config['redis']['socket'], 'numeric_type': float}
             from cryptofeed.backends.redis import TradeStream, BookStream, BookDeltaStream
             trade_cb = TradeStream
             book_cb = BookStream
             book_up = BookDeltaStream if not depth and delta else None
-            kwargs = {'host': self.config['redis']['ip'], 'port': self.config['redis']['port'], 'numeric_type': float}
         elif cache == 'kafka':
             from cryptofeed.backends.kafka import TradeKafka, BookKafka, BookDeltaKafka
             trade_cb = TradeKafka

@@ -37,8 +37,9 @@ class Aggregator(Process):
 
     async def loop(self):
         if self.config.cache == 'redis':
-            cache = Redis(self.config.redis['ip'],
-                          self.config.redis['port'],
+            cache = Redis(ip=self.config.redis['ip'],
+                          port=self.config.redis['port'],
+                          socket=self.config.redis.socket,
                           del_after_read=self.config.redis['del_after_read'],
                           flush=self.config.redis['start_flush'],
                           retention=self.config.redis.retention_time if 'retention_time' in self.config.redis else None)
