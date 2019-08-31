@@ -34,6 +34,8 @@ class Aggregator(Process):
             loop.run_forever()
         except KeyboardInterrupt:
             pass
+        except Exception:
+            LOG.error("Aggregator running on PID %d died due to exception", os.getpid(), exc_info=True)
 
     async def loop(self):
         if self.config.cache == 'redis':
@@ -49,32 +51,36 @@ class Aggregator(Process):
                           flush=self.config.kafka['start_flush'])
 
         while True:
-            start = time.time()
-            if 'exchanges' in self.config and self.config.exchanges:
-                for exchange in self.config.exchanges:
-                    for dtype in self.config.exchanges[exchange]:
-                        if dtype in {'retries'}:
-                            continue
-                        for pair in self.config.exchanges[exchange][dtype] if 'symbols' not in self.config.exchanges[exchange][dtype] else self.config.exchanges[exchange][dtype]['symbols']:
-                            store = Storage(self.config)
-                            LOG.info('Reading %s-%s-%s', exchange, dtype, pair)
-
-                            data = cache.read(exchange, dtype, pair)
-                            if len(data) == 0:
-                                LOG.info('No data for %s-%s-%s', exchange, dtype, pair)
+            try:
+                start = time.time()
+                if 'exchanges' in self.config and self.config.exchanges:
+                    for exchange in self.config.exchanges:
+                        for dtype in self.config.exchanges[exchange]:
+                            if dtype in {'retries'}:
                                 continue
+                            for pair in self.config.exchanges[exchange][dtype] if 'symbols' not in self.config.exchanges[exchange][dtype] else self.config.exchanges[exchange][dtype]['symbols']:
+                                store = Storage(self.config)
+                                LOG.info('Reading %s-%s-%s', exchange, dtype, pair)
 
-                            store.aggregate(data)
-                            store.write(exchange, dtype, pair, time.time())
+                                data = cache.read(exchange, dtype, pair)
+                                if len(data) == 0:
+                                    LOG.info('No data for %s-%s-%s', exchange, dtype, pair)
+                                    continue
 
-                            cache.delete(exchange, dtype, pair)
-                            LOG.info('Write Complete %s-%s-%s', exchange, dtype, pair)
+                                store.aggregate(data)
+                                store.write(exchange, dtype, pair, time.time())
 
-                total = time.time() - start
-                interval = self.config.storage_interval - total
-                if interval <= 0:
-                    LOG.warning("Storage operations currently take %.1f seconds, longer than the interval of %d", total, self.config.storage_interval)
-                    interval = 0.5
-                await asyncio.sleep(interval)
-            else:
-                await asyncio.sleep(30)
+                                cache.delete(exchange, dtype, pair)
+                                LOG.info('Write Complete %s-%s-%s', exchange, dtype, pair)
+                                assert(False)
+                    total = time.time() - start
+                    interval = self.config.storage_interval - total
+                    if interval <= 0:
+                        LOG.warning("Storage operations currently take %.1f seconds, longer than the interval of %d", total, self.config.storage_interval)
+                        interval = 0.5
+                    await asyncio.sleep(interval)
+                else:
+                    await asyncio.sleep(30)
+            except Exception:
+                LOG.error("Aggregator running on PID %d died due to exception", os.getpid(), exc_info=True)
+                raise
