@@ -1,7 +1,7 @@
 # Cryptostore
 
 [![License](https://img.shields.io/badge/license-XFree86-blue.svg)](LICENSE)
-![Python](https://img.shields.io/badge/Python-3.6+-green.svg)
+![Python](https://img.shields.io/badge/Python-3.7+-green.svg)
 [![PyPi](https://img.shields.io/badge/PyPi-cryptostore-brightgreen.svg)](https://pypi.python.org/pypi/cryptostore)
 
 
