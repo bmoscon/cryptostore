@@ -72,7 +72,6 @@ class Aggregator(Process):
 
                                 cache.delete(exchange, dtype, pair)
                                 LOG.info('Write Complete %s-%s-%s', exchange, dtype, pair)
-                                assert(False)
                     total = time.time() - start
                     interval = self.config.storage_interval - total
                     if interval <= 0:
