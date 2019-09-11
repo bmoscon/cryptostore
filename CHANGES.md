@@ -3,6 +3,7 @@
 ### 0.1.1
   * Feature: Rework backfill to operate even when store's data differs
   * Bugfix: Log exception/traceback when aggregator process dies
+  * Feature: Support for max book depth via `max_depth` parameter.
 
 ### 0.1.0 (2019-08-21)
   * Feature: Elasticsearch support
