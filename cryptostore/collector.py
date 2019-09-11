@@ -38,8 +38,8 @@ class Collector(Process):
                 window = value['book_delta_window']
             if 'book_delta' in value and value['book_delta']:
                 delta = True
-            elif 'book_depth' in value:
-                depth = value['book_depth']
+            if 'max_depth' in value:
+                depth = value['max_depth']
 
         for book_type in (L2_BOOK, L3_BOOK):
             if book_type in self.exchange_config:
@@ -54,22 +54,22 @@ class Collector(Process):
             from cryptofeed.backends.redis import TradeStream, BookStream, BookDeltaStream
             trade_cb = TradeStream
             book_cb = BookStream
-            book_up = BookDeltaStream if not depth and delta else None
+            book_up = BookDeltaStream if delta else None
         elif cache == 'kafka':
             from cryptofeed.backends.kafka import TradeKafka, BookKafka, BookDeltaKafka
             trade_cb = TradeKafka
             book_cb = BookKafka
-            book_up = BookDeltaKafka if not depth and delta else None
+            book_up = BookDeltaKafka if delta else None
             kwargs = {'host': self.config['kafka']['ip'], 'port': self.config['kafka']['port']}
 
         if TRADES in self.exchange_config:
             cb[TRADES] = [trade_cb(**kwargs)]
         if L2_BOOK in self.exchange_config:
-            cb[L2_BOOK] = [book_cb(key=L2_BOOK, depth=depth, **kwargs)]
+            cb[L2_BOOK] = [book_cb(key=L2_BOOK, **kwargs)]
             if book_up:
                 cb[BOOK_DELTA] = [book_up(key=L2_BOOK, **kwargs)]
         if L3_BOOK in self.exchange_config:
-            cb[L3_BOOK] = [book_cb(key=L3_BOOK, depth=depth, **kwargs)]
+            cb[L3_BOOK] = [book_cb(key=L3_BOOK, **kwargs)]
             if book_up:
                 cb[BOOK_DELTA] = [book_up(key=L3_BOOK, **kwargs)]
 
@@ -90,5 +90,5 @@ class Collector(Process):
                 if L3_BOOK in cb:
                     cb[L3_BOOK].append(BookZMQ(host=host, port=port, zmq_type=zmq.PUB))
 
-        fh.add_feed(self.exchange, book_interval=window, config=self.exchange_config, callbacks=cb)
+        fh.add_feed(self.exchange, max_depth=depth, book_interval=window, config=self.exchange_config, callbacks=cb)
         fh.run()

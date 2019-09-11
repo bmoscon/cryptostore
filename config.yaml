@@ -41,7 +41,8 @@ exchanges:
         retries: -1
         l2_book:
             symbols: [XBTUSD]
-            book_depth: 10
+            max_depth: 10
+            book_delta: true
         trades: [XBTUSD]
     COINBASE:
         retries: -1
