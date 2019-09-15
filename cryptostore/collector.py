@@ -9,7 +9,7 @@ from multiprocessing import Process
 import logging
 
 from cryptofeed import FeedHandler
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, BOOK_DELTA
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, BOOK_DELTA, TICKER
 
 
 LOG = logging.getLogger('cryptostore')
@@ -48,23 +48,27 @@ class Collector(Process):
                 self.exchange_config[callback_type] = self.exchange_config[callback_type]['symbols']
 
             if cache == 'redis':
-                if self.config['redis']['ip']:
-                    kwargs = {'ip': self.config['redis']['ip'], 'port': self.config['redis']['port'], 'numeric_type': float}
+                if 'ip' in self.config['redis'] and self.config['redis']['ip']:
+                    kwargs = {'host': self.config['redis']['ip'], 'port': self.config['redis']['port'], 'numeric_type': float}
                 else:
                     kwargs = {'socket': self.config['redis']['socket'], 'numeric_type': float}
-                from cryptofeed.backends.redis import TradeStream, BookStream, BookDeltaStream
+                from cryptofeed.backends.redis import TradeStream, BookStream, BookDeltaStream, TickerStream
                 trade_cb = TradeStream
                 book_cb = BookStream
                 book_up = BookDeltaStream if delta else None
+                ticker_cb = TickerStream
             elif cache == 'kafka':
-                from cryptofeed.backends.kafka import TradeKafka, BookKafka, BookDeltaKafka
+                from cryptofeed.backends.kafka import TradeKafka, BookKafka, BookDeltaKafka, TickerKafka
                 trade_cb = TradeKafka
                 book_cb = BookKafka
                 book_up = BookDeltaKafka if delta else None
+                ticker_cb = TickerKafka
                 kwargs = {'host': self.config['kafka']['ip'], 'port': self.config['kafka']['port']}
 
             if callback_type == TRADES:
                 cb[TRADES] = [trade_cb(**kwargs)]
+            elif callback_type == TICKER:
+                cb[TICKER] = [ticker_cb(**kwargs)]
             elif callback_type == L2_BOOK:
                 cb[L2_BOOK] = [book_cb(key=L2_BOOK, **kwargs)]
                 if book_up:

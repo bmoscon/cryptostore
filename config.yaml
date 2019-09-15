@@ -44,6 +44,7 @@ exchanges:
             max_depth: 10
             book_delta: true
         trades: [XBTUSD]
+        ticker: [XBTUSD]
     COINBASE:
         retries: -1
         l3_book:
@@ -51,6 +52,8 @@ exchanges:
             book_delta: true
             book_interval: 10000
         trades: [BTC-USD, ETH-USD, ETH-BTC]
+        ticker: [BTC-USD]
+
 
 # Where to store the data. Currently arctic, influx, elastic, and parquet are supported. More than one can be enabled
 storage: [arctic, influx]
