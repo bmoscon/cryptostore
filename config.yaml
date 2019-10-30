@@ -27,12 +27,10 @@ redis:
 # trades, l2_book, l3_book, funding, ticker (only trades, l2_book, l3_book currently supported by cryptostore).
 # Trading pairs for all exchanges (except BitMEX) follow the currency-quote format
 #
-# book_depth controls the size of the book to return. The top N levels will be returned, only when those N levels
+# max_depth controls the size of the book to return. The top N levels will be returned, only when those N levels
 # have changed.
 # book_delta enables book deltas (snapshot, then only deltas are delivered). Snapshops are delivered
 # every book_interval updates. book_interval defaults to 1000 if not specified
-# Cannot enable book deltas with book_depth (delta will be ignored if depth enabled).
-# Not all exchanges support deltas
 #
 # Retries are the number of times the connection to the exchange will be retried before exiting. -1 is infinity
 
