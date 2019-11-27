@@ -43,7 +43,10 @@ class InfluxDB(Store):
                 while ts in used_ts[pair]:
                     ts += 1
                 used_ts[pair].add(ts)
-                agg.append(f'{data_type}-{exchange},pair={pair} side="{entry["side"]}",id="{entry["id"]}",amount={entry["amount"]},price={entry["price"]},timestamp={entry["timestamp"]} {ts}')
+                if 'id' in entry:
+                    agg.append(f'{data_type}-{exchange},pair={pair} side="{entry["side"]}",id="{entry["id"]}",amount={entry["amount"]},price={entry["price"]},timestamp={entry["timestamp"]} {ts}')
+                else:
+                    agg.append(f'{data_type}-{exchange},pair={pair} side="{entry["side"]}",amount={entry["amount"]},price={entry["price"]},timestamp={entry["timestamp"]} {ts}')
         elif data_type == TICKER:
             for entry in self.data:
                 ts = int(Decimal(entry["timestamp"]) * 1000000000)

@@ -27,7 +27,8 @@ class Arctic(Store):
         self.data = []
 
         if data_type == TRADES:
-            df['id'] = df['id'].astype(str)
+            if 'id' in df:
+                df['id'] = df['id'].astype(str)
             df['size'] = df.amount
             df['date'] = pd.to_datetime(df['timestamp'], unit='s')
             df = df.drop(['pair', 'feed', 'amount'], axis=1)

@@ -32,7 +32,8 @@ redis:
 # book_delta enables book deltas (snapshot, then only deltas are delivered). Snapshops are delivered
 # every book_interval updates. book_interval defaults to 1000 if not specified
 #
-# Retries are the number of times the connection to the exchange will be retried before exiting. -1 is infinity
+# Retries are the number of times the connection to the exchange will be retried before exiting. -1 is infinity.
+# Using a retry of -1 with a bug in your config can lead to bans by exchanges
 
 exchanges:
     BITMEX:
