@@ -9,7 +9,7 @@ from collections import defaultdict
 import json
 import time
 
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING
 
 from cryptostore.aggregator.util import book_flatten
 from cryptostore.aggregator.cache import Cache
@@ -51,10 +51,17 @@ class Redis(Cache):
                         if k in u:
                             u[k] = float(u[k])
                 ret.extend(update)
-            if dtype in {TRADES, TICKER}:
+            elif dtype in {TRADES, TICKER}:
                 for k in ('size', 'amount', 'price', 'timestamp', 'bid', 'ask'):
                     if k in update:
                         update[k] = float(update[k])
+                ret.append(update)
+            elif dtype == FUNDING:
+                for k in update:
+                    try:
+                        update[k] = float(update[k])
+                    except:
+                        pass
                 ret.append(update)
             self.ids[key].append(update_id)
 

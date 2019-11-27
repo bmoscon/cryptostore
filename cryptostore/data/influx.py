@@ -7,7 +7,7 @@ associated with this software.
 from decimal import Decimal
 from collections import defaultdict
 
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING
 import requests
 
 from cryptostore.data.store import Store
@@ -64,6 +64,11 @@ class InfluxDB(Store):
             for entry in self.data:
                 agg.append(f'{data_type}-{exchange},pair={pair},delta={entry["delta"]} side="{entry["side"]}",id="{entry["order_id"]}",timestamp={entry["timestamp"]},price="{entry["price"]}",amount="{entry["size"]}" {ts}')
                 ts += 1
+        elif data_type == FUNDING:
+            for entry in self.data:
+                formatted = [f"{key}={value}" for key, value in entry.items() if isinstance(value, float)]
+                formatted = ','.join(formatted + [f'{key}="{value}"' for key, value in entry.items() if not isinstance(value, float)])
+                agg.append(f'{data_type}-{exchange},pair={pair} {formatted}')
 
         for c in chunk(agg, 100000):
             c = '\n'.join(c)

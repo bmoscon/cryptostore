@@ -5,7 +5,7 @@ Please see the LICENSE file for the terms and conditions
 associated with this software.
 '''
 import pandas as pd
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING
 
 from cryptostore.data.store import Store
 from cryptostore.engines import StorageEngines
@@ -40,6 +40,9 @@ class Arctic(Store):
         elif data_type in { L2_BOOK, L3_BOOK }:
             df['date'] = pd.to_datetime(df['timestamp'], unit='s')
             chunk_size = 'T'
+        elif data_type == FUNDING:
+            df['date'] = pd.to_datetime(df['timestamp'], unit='s')
+            chunk_size = 'D'
 
         df.set_index('date', inplace=True)
         df = df.drop(['timestamp'], axis=1)
