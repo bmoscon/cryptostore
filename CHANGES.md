@@ -4,6 +4,8 @@
   * Feature: Rework backfill to operate even when store's data differs
   * Bugfix: Log exception/traceback when aggregator process dies
   * Feature: Support for max book depth via `max_depth` parameter.
+  * Feature: Funding data support
+  * Bugfix: Kraken trades not storing correctly
 
 ### 0.1.0 (2019-08-21)
   * Feature: Elasticsearch support
