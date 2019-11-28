@@ -1,6 +1,6 @@
 ## Changelog
 
-### 0.1.1
+### 0.1.1 (2019-11-27)
   * Feature: Rework backfill to operate even when store's data differs
   * Bugfix: Log exception/traceback when aggregator process dies
   * Feature: Support for max book depth via `max_depth` parameter.
