@@ -6,6 +6,7 @@
   * Feature: Support for max book depth via `max_depth` parameter.
   * Feature: Funding data support
   * Bugfix: Kraken trades not storing correctly
+  * Bugfix: Book delta interval between snapshots not correctly read from config
 
 ### 0.1.0 (2019-08-21)
   * Feature: Elasticsearch support
