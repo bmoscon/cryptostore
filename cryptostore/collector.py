@@ -37,8 +37,8 @@ class Collector(Process):
             window = 1000
             delta = False
 
-            if 'book_delta_window' in value:
-                window = value['book_delta_window']
+            if 'book_interval' in value:
+                window = value['book_interval']
             if 'book_delta' in value and value['book_delta']:
                 delta = True
             if 'max_depth' in value:
