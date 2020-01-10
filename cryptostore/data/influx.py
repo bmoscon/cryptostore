@@ -36,13 +36,13 @@ class InfluxDB(Store):
         agg = []
         # influx cant handle duplicate data (?!) so we need to
         # incremement timestamps on data that have the same timestamp
-        used_ts = defaultdict(set)
+        used_ts = set()
         if data_type == TRADES:
             for entry in self.data:
                 ts = int(Decimal(entry["timestamp"]) * 1000000000)
-                while ts in used_ts[pair]:
+                while ts in used_ts:
                     ts += 1
-                used_ts[pair].add(ts)
+                used_ts.add(ts)
                 if 'id' in entry:
                     agg.append(f'{data_type}-{exchange},pair={pair} side="{entry["side"]}",id="{entry["id"]}",amount={entry["amount"]},price={entry["price"]},timestamp={entry["timestamp"]} {ts}')
                 else:
@@ -53,15 +53,20 @@ class InfluxDB(Store):
                 agg.append(f'{data_type}-{exchange},pair={pair} bid={entry["bid"]},ask={entry["ask"]},timestamp={entry["timestamp"]} {ts}')
 
         elif data_type == L2_BOOK:
-            if len(self.data):
-                ts = int(Decimal(self.data[0]["timestamp"]) * 1000000000)
             for entry in self.data:
+                ts = int(Decimal(entry["timestamp"]) * 1000000000)
+                while ts in used_ts:
+                    ts += 1
+                used_ts.add(ts)
+
                 agg.append(f'{data_type}-{exchange},pair={pair},delta={entry["delta"]} side="{entry["side"]}",timestamp={entry["timestamp"]},price={entry["price"]},amount={entry["size"]} {ts}')
-                ts += 1
         elif data_type == L3_BOOK:
-            if len(self.data):
-                ts = int(Decimal(self.data[0]["timestamp"]) * 1000000000)
             for entry in self.data:
+                ts = int(Decimal(entry["timestamp"]) * 1000000000)
+                while ts in used_ts:
+                    ts += 1
+                used_ts.add(ts)
+
                 agg.append(f'{data_type}-{exchange},pair={pair},delta={entry["delta"]} side="{entry["side"]}",id="{entry["order_id"]}",timestamp={entry["timestamp"]},price="{entry["price"]}",amount="{entry["size"]}" {ts}')
                 ts += 1
         elif data_type == FUNDING:
@@ -70,7 +75,9 @@ class InfluxDB(Store):
                 formatted = ','.join(formatted + [f'{key}="{value}"' for key, value in entry.items() if not isinstance(value, float)])
                 agg.append(f'{data_type}-{exchange},pair={pair} {formatted}')
 
-        for c in chunk(agg, 100000):
+        # https://v2.docs.influxdata.com/v2.0/write-data/best-practices/optimize-writes/
+        # Tuning docs indicate 5k is the ideal chunk size for batch writes
+        for c in chunk(agg, 5000):
             c = '\n'.join(c)
             r = requests.post(self.addr, data=c)
             r.raise_for_status()
