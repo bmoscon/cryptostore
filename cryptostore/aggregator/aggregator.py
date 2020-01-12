@@ -10,7 +10,8 @@ import time
 import logging
 import os
 
-from cryptostore.aggregator.redis import Redis
+from cryptostore.aggregator
+import Redis
 from cryptostore.aggregator.kafka import Kafka
 from cryptostore.data.storage import Storage
 from cryptostore.config import DynamicConfig
@@ -41,10 +42,10 @@ class Aggregator(Process):
         if self.config.cache == 'redis':
             cache = Redis(ip=self.config.redis['ip'],
                           port=self.config.redis['port'],
-                          socket=self.config.redis.socket,
+                          socket=self.config.redis.get('socket'),
                           del_after_read=self.config.redis['del_after_read'],
                           flush=self.config.redis['start_flush'],
-                          retention=self.config.redis.retention_time if 'retention_time' in self.config.redis else None)
+                          retention=self.config.redis.get('retention_time'))
         elif self.config.cache == 'kafka':
             cache = Kafka(self.config.kafka['ip'],
                           self.config.kafka['port'],
