@@ -10,8 +10,7 @@ import time
 import logging
 import os
 
-from cryptostore.aggregator
-import Redis
+from cryptostore.aggregator.redis import Redis
 from cryptostore.aggregator.kafka import Kafka
 from cryptostore.data.storage import Storage
 from cryptostore.config import DynamicConfig
