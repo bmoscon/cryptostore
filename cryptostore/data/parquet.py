@@ -28,7 +28,7 @@ class Parquet(Store):
         self.del_file = True
 
         if config:
-            self.del_file = False if 'del_file' in config and config['del_file'] == False else True
+            self.del_file = config.get('del_file', True)
 
             if 'GCS' in config:
                 self._write.append(google_cloud_write)

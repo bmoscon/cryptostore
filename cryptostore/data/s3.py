@@ -18,10 +18,11 @@ def aws_write(bucket, key, data, creds=(None, None), endpoint=None):
         client.upload_fileobj(fp, bucket, key)
 
 
-def aws_list(bucket, key, creds=(None, None), limit=None):
+def aws_list(bucket, key, creds=(None, None), limit=None, endpoint=None):
     client = StorageEngines.boto3.client('s3',
         aws_access_key_id=creds[0],
-        aws_secret_access_key=creds[1]
+        aws_secret_access_key=creds[1],
+        endpoint_url=endpoint
     )
 
     objs = client.list_objects_v2(Bucket=bucket, Prefix=key)
@@ -39,10 +40,11 @@ def aws_list(bucket, key, creds=(None, None), limit=None):
     return None
 
 
-def aws_read(bucket, key, file_name, creds=(None, None)):
+def aws_read(bucket, key, file_name, creds=(None, None), endpoint=None):
     client = StorageEngines.boto3.client('s3',
         aws_access_key_id=creds[0],
-        aws_secret_access_key=creds[1]
+        aws_secret_access_key=creds[1],
+        endpoint_url=None
     )
 
     client.download_file(bucket, key, file_name)
