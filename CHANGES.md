@@ -1,5 +1,10 @@
 ## Changelog
 
+### 0.1.2 (2020-02-11)
+  * Bugfix: Fixed elasticsearch timestamps
+  * Feature: Support for different S3 endpoints to allow writing to other providers
+  * Bugfix: Missing config value for redis socket
+  
 ### 0.1.1 (2019-11-27)
   * Feature: Rework backfill to operate even when store's data differs
   * Bugfix: Log exception/traceback when aggregator process dies
