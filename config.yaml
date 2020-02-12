@@ -87,6 +87,7 @@ parquet:
     S3:
         # If NULL boto will default to using ENV vars or credentials file
         # prefix: a prefix to append to the default data path
+        endpoint: null
         key_id: null
         secret: null
         bucket: null

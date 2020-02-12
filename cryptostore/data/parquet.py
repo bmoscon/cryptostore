@@ -43,7 +43,7 @@ class Parquet(Store):
                 self._list.append(aws_list)
                 self.bucket.append(config['S3']['bucket'])
                 self.prefix.append(config['S3']['prefix'])
-                self.kwargs.append({'creds': (config['S3']['key_id'], config['S3']['secret'])})
+                self.kwargs.append({'creds': (config['S3']['key_id'], config['S3']['secret']), 'endpoint': config['S3'].get('endpoint')})
 
     def aggregate(self, data):
         names = list(data[0].keys())

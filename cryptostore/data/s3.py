@@ -7,10 +7,11 @@ associated with this software.
 from cryptostore.engines import StorageEngines
 
 
-def aws_write(bucket, key, data, creds=(None, None)):
+def aws_write(bucket, key, data, creds=(None, None), endpoint=None):
     client = StorageEngines.boto3.client('s3',
         aws_access_key_id=creds[0],
-        aws_secret_access_key=creds[1]
+        aws_secret_access_key=creds[1],
+        endpoint_url=endpoint
     )
 
     with open(data, 'rb') as fp:
