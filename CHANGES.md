@@ -1,6 +1,9 @@
 ## Changelog
 
-### 0.1.2 (2020-02-11)
+### 0.2.1
+  * Feature: Open Interest support
+
+### 0.2.0 (2020-02-11)
   * Bugfix: Fixed elasticsearch timestamps
   * Feature: Support for different S3 endpoints to allow writing to other providers
   * Bugfix: Missing config value for redis socket
