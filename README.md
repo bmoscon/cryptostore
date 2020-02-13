@@ -50,6 +50,8 @@ With a pass through
 You can run Cryptostore in a docker container. A Dockerfile and a docker-compose.yml are provided. It uses the config in config-docker.yaml, and its set up to use redis and store the data into Arctic/MongoDB. The port is mapped to 37017 (as opposed to 27017) so when connecting to Arctic from outside the container make sure you specify the port. Additionally, a volume should be configured in the docker-compose so that the mongoDB data will persist across restarts.
 
 ### Planned features
+* [ ] More data types (eg. open interest)
+* [ ] Postgres support
 * [ ] Missing data detection and correction (for exchanges that support historical data, typically only trade data)
 * [ ] Storing data to MongoDB
 * [ ] Support for enabling computation and storage of diverse metrics in parallel with data collection (eg. configurable OHLCV)
