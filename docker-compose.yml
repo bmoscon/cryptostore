@@ -19,15 +19,3 @@ services:
     expose:
       - 6379
     command: ["redis-server", "--save", "''", "--appendonly", "no"]
-  mongo:
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "2000k"
-        max-file: "10"
-    container_name: mongo
-    image: mongo:4.0.9-xenial
-    ports:
-      - '37017:27017'
-    expose:
-      - 27017
