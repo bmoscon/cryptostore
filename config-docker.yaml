@@ -11,28 +11,24 @@ redis:
 
 exchanges:
     BITMEX:
+        retries: -1
         l2_book:
             symbols: [XBTUSD]
-            book_depth: 10
-        trades: [XBTUSD]
-    COINBASE:
-        l3_book:
-            symbols: [BTC-USD, ETH-USD]
             book_delta: true
-            book_interval: 10000
-        trades: [BTC-USD, ETH-USD, ETH-BTC]
+        trades: [XBTUSD]
+        ticker: [XBTUSD]
+        funding: [XBTUSD]
+        open_interest: [XBTUSD]
+        
+storage: [parquet]
 
-storage: [arctic]
-arctic: mongodb://mongo:27017
+parquet:
+    del_file: true
+    S3:
+        endpoint: null
+        key_id: null
+        secret: null
+        bucket: quantfolio-ai-data-collection
+        prefix: null
 
 storage_interval: 60
-
-plugins:
-  backfill:
-    module: [cryptostore.plugin.backfill, Backfill]
-    config: config.yaml
-
-backfill:
-    COINBASE:
-        BTC-USD:
-            start: '2017-01-01'
