@@ -3,10 +3,7 @@ FROM python:3.7.3-stretch
 COPY config-docker.yaml /config.yaml
 COPY setup.py /
 COPY cryptostore /cryptostore
-
-## Add any keys, config files, etc needed here
-# COPY access-key.json /
-
+COPY ~/.aws/credentials ~/.aws/config
 
 RUN apt install gcc git
 
@@ -17,9 +14,6 @@ RUN pip install --no-cache-dir redis
 RUN pip install --no-cache-dir aioredis
 RUN pip install --no-cache-dir arctic
 RUN pip install --no-cache-dir boto3
-
-## Add any extra dependencies you might have
-# eg RUN pip install --no-cache-dir boto3
 
 RUN pip install -e .
 
