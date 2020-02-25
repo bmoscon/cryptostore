@@ -55,11 +55,11 @@ plugins:
 backfill:
     COINBASE:
         BTC-USD:
-            start: '2020-02-26'
+            start: '2020-02-25'
         ETH-USD:
-            start: '2020-02-26'
+            start: '2020-02-25'
     BITMEX:
         XBTUSD:
-            start: '2020-02-26'
+            start: '2020-02-25'
         ETHUSD:
-            start: '2020-02-26'
+            start: '2020-02-25'
