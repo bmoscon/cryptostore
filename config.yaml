@@ -34,12 +34,12 @@ exchanges:
     BITMEX:
         retries: -1
         l2_book:
-            symbols: [XBTUSD, ETHUSD]
+            symbols: [XBTUSD, ETHUSD, XRPUSD]
             book_delta: true
-        trades: [XBTUSD, ETHUSD]
-        ticker: [XBTUSD, ETHUSD]
-        funding: [XBTUSD, ETHUSD]
-        open_interest: [XBTUSD, ETHUSD]
+        trades: [XBTUSD, ETHUSD, XRPUSD]
+        ticker: [XBTUSD, ETHUSD, XRPUSD]
+        funding: [XBTUSD, ETHUSD, XRPUSD]
+        open_interest: [XBTUSD, ETHUSD, XRPUSD]
     COINBASE:
         retries: -1
         l3_book:
