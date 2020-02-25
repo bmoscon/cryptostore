@@ -1,112 +1,44 @@
-# Cryptostore sample config file
+#Quantfolio Cryptostore Config - REDIS + S3 Parquet 
 
-# Redis or Kafka are required. They are used to batch updates from cryptofeed and the storage medium of choice
-#
-# del_after_read: (redis only) toggles the removal of data from redis after it has been processed with cryptostore.
-# retention_time: (redis only) if data removal is enabled (via del_after_read) will allow retention of data in redis for N seconds.
-# socket: (redis only) allows redis connections via a unix domain socket
-# start_flush: toggles if redis/kafka should be flushed at the start. Primarily for debugging, it will flush ALL of redis/kafka
 cache: redis
 
-kafka:
-    # ip/port are for the bootstrap server
-    ip: '127.0.0.1'
-    port: 9092
-    start_flush: true
 redis:
-    ip: '127.0.0.1'
+    ip: redisdb
     port: 6379
-    socket: null
     del_after_read: true
-    retention_time: null
     start_flush: true
-
-# Data sources and data types configured under exchanges. Exchange names follow the naming scheme in cryptofeed (they
-# must be capitalized) and only exchanges supported by cryptofeed are supported.
-# data types follow cryptofeed definitions, see defines.py in cryptofeed for more details, common ones are
-# trades, l2_book, l3_book, funding, ticker, and open_interest
-# Trading pairs for all exchanges (except BitMEX) follow the currency-quote format
-#
-# max_depth controls the size of the book to return. The top N levels will be returned, only when those N levels
-# have changed.
-# book_delta enables book deltas (snapshot, then only deltas are delivered). Snapshops are delivered
-# every book_interval updates. book_interval defaults to 1000 if not specified
-#
-# Retries are the number of times the connection to the exchange will be retried before exiting. -1 is infinity.
-# Using a retry of -1 with a bug in your config can lead to bans by exchanges
+    socket: null
 
 exchanges:
     BITMEX:
         retries: -1
         l2_book:
-            symbols: [XBTUSD]
-            max_depth: 10
+            symbols: [XBTUSD, ETHUSD]
             book_delta: true
-        trades: [XBTUSD]
-        ticker: [XBTUSD]
-        funding: [XBTUSD]
+        trades: [XBTUSD, ETHUSD]
+        ticker: [XBTUSD, ETHUSD]
+        funding: [XBTUSD, ETHUSD]
+        open_interest: [XBTUSD, ETHUSD]
     COINBASE:
         retries: -1
         l3_book:
             symbols: [BTC-USD, ETH-USD]
             book_delta: true
-            book_interval: 10000
         trades: [BTC-USD, ETH-USD, ETH-BTC]
-        ticker: [BTC-USD]
+        ticker: [BTC-USD, ETH-USD, ETH-BTC]
+ 
+storage: [parquet]
 
-
-# Where to store the data. Currently arctic, influx, elastic, and parquet are supported. More than one can be enabled
-storage: [arctic, influx]
-
-# Configurable passthrough for data - data will be sent in realtime (no aggregation in redis)
-pass_through:
-    type: zmq
-    host: '127.0.0.1'
-    port: 5678
-
-
-elastic:
-    host: 'http://127.0.0.1:9200'
-    user: null
-    token: null
-    shards: 10
-    replicas: 0
-    refresh_interval: '30s'
-
-influx:
-    host: 'http://127.0.0.1:8086'
-    db: example
-    create: true
-
-# Parquet specific options. Parquet will default to storing the data on disk unless these are specified
 parquet:
-    # if storing the data to an external source (like S3) toggle this to enable the removal of the local file after
-    # writing to external store
     del_file: true
-
     S3:
-        # endpoint allows you to override the write endpoint and write to other provicers that have the same API interface
-        # If key_id/secret are NULL boto will default to using ENV vars or credentials file
-        # prefix: a prefix to append to the default data path
         endpoint: null
         key_id: null
         secret: null
-        bucket: null
-        prefix: null
-    GCS:
-        # path to service account key, if null will default to using env vars or auth tokens
-        # on GCE node
-        # prefix: a prefix to append to the default data path
-        service_account: null
-        bucket: null
+        bucket: quantfolio-ai-data-collection
         prefix: null
 
-# arctic specific configuration options - the mongo URL
-arctic: mongodb://127.0.0.1
-
-# Data batching window, in seconds
 storage_interval: 60
-
 
 # Cryptostore Plugin Interface
 plugins:
@@ -123,4 +55,11 @@ plugins:
 backfill:
     COINBASE:
         BTC-USD:
-            start: '2017-01-01'
+            start: '2020-02-26'
+        ETH-USD:
+            start: '2020-02-26'
+    BITMEX:
+        XBTUSD:
+            start: '2020-02-26'
+        ETHUSD:
+            start: '2020-02-26'
