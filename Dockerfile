@@ -3,7 +3,6 @@ FROM python:3.7.3-stretch
 COPY config-docker.yaml /config.yaml
 COPY setup.py /
 COPY cryptostore /cryptostore
-COPY ~/.aws/credentials ~/.aws/config
 
 RUN apt install gcc git
 

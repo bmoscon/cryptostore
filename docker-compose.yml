@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.0"
 services:
   cryptostore:
     logging:
@@ -6,9 +6,7 @@ services:
       options:
         max-size: "2000k"
         max-file: "10"
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: 966108416930.dkr.ecr.us-east-1.amazonaws.com/ftx-perps:latest
   redisdb:
     logging:
       driver: "json-file"
