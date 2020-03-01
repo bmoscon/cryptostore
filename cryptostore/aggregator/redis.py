@@ -31,10 +31,13 @@ class Redis(Cache):
             self.conn.flushall()
 
 
-    def read(self, exchange, dtype, pair):
+    def read(self, exchange, dtype, pair, start=None, end=None):
         key = f'{dtype}-{exchange}-{pair}'
 
-        data = self.conn.xread({key: '0-0' if key not in self.last_id else self.last_id[key]})
+        if start and end:
+            data = self.conn.xrange(key, min=start, max=end)
+        else:
+            data = self.conn.xread({key: '0-0' if key not in self.last_id else self.last_id[key]})
 
         if len(data) == 0:
             return []

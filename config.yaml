@@ -54,7 +54,6 @@ exchanges:
         trades: [BTC-USD, ETH-USD, ETH-BTC]
         ticker: [BTC-USD]
 
-
 # Where to store the data. Currently arctic, influx, elastic, and parquet are supported. More than one can be enabled
 storage: [arctic, influx]
 
@@ -104,7 +103,9 @@ parquet:
 # arctic specific configuration options - the mongo URL
 arctic: mongodb://127.0.0.1
 
-# Data batching window, in seconds
+# Data batching window, in seconds, or optionally a time interval: M(inutely), H(ourly), D(aily).
+# These intervals will require that you have enough memory available to redis (and python) to hold this amount of data.
+# String intervals can be combined with numbers, eg 2H is 2 hours, 5M is 5 minutes, etc.
 storage_interval: 60
 
 
