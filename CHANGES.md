@@ -2,6 +2,7 @@
 
 ### 0.2.1
   * Feature: Open Interest support
+  * Example: Added example code for orderbook reconstruction from data in Arctic
 
 ### 0.2.0 (2020-02-11)
   * Bugfix: Fixed elasticsearch timestamps
