@@ -24,8 +24,8 @@ parquet:
     del_file: true
     S3:
         endpoint: null
-        key_id: null
-        secret: null
+        key_id: aws_key_id
+        secret: aws_secret
         bucket: quantfolio-ai-data-collection
         prefix: null
 

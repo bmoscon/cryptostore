@@ -14,6 +14,6 @@ services:
         max-size: "2000k"
         max-file: "10"
     image: redis:5.0.5
-    expose:
-      - 6379
+    ports:
+    - "6379:6379"
     command: ["redis-server", "--save", "''", "--appendonly", "no"]
