@@ -13,7 +13,7 @@
 on:
   push:
     branches:
-      - ftx-perps
+      - bitmex
 
 name: Deploy to Amazon ECS
 
@@ -41,7 +41,7 @@ jobs:
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: ftx-perps
+        ECR_REPOSITORY: cryptostore-bitmex
         IMAGE_TAG: latest
       run: |
         # Build a docker container and
