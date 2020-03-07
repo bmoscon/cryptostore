@@ -27,7 +27,7 @@
 on:
   push:
     branches:
-      - ftx-perps
+      - bitmex
 
 name: Deploy to Amazon ECS
 
