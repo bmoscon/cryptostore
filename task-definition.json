@@ -1,0 +1,40 @@
+{
+    "requiresCompatibilities": [
+        "EC2"
+    ],
+    "inferenceAccelerators": [],
+    "containerDefinitions": [
+        {
+            "name": "cryptostore-bitmex",
+            "image": "966108416930.dkr.ecr.us-east-2.amazonaws.com/cryptsotore:bitmex",
+            "memory": "6000",
+            "resourceRequirements": null,
+            "essential": true,
+            "portMappings": [],
+            "environment": null,
+            "secrets": null,
+            "mountPoints": null,
+            "volumesFrom": null,
+            "hostname": null,
+            "user": null,
+            "workingDirectory": null,
+            "extraHosts": null,
+            "logConfiguration": null,
+            "ulimits": null,
+            "dockerLabels": null,
+            "dependsOn": null,
+            "repositoryCredentials": {
+                "credentialsParameter": ""
+            }
+        }
+    ],
+    "volumes": [],
+    "networkMode": null,
+    "memory": "4 GB",
+    "cpu": "2 vCPU",
+    "placementConstraints": [],
+    "family": "cryptostore",
+    "taskRoleArn": "arn:aws:iam::966108416930:role/ecsTaskExecutionRole",
+    "executionRoleArn": "arn:aws:iam::966108416930:role/ecsTaskExecutionRole",
+    "tags": []
+}
