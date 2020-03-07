@@ -55,8 +55,8 @@ jobs:
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: my-ecr-repo
-        IMAGE_TAG: latest
+        ECR_REPOSITORY: cryptostore
+        IMAGE_TAG: bitmex
       run: |
         # Build a docker container and
         # push it to ECR so that it can
