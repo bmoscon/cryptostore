@@ -47,7 +47,7 @@
       "dockerLabels": null,
       "systemControls": null,
       "privileged": null,
-      "name": "bitmex"
+      "name": "cryptostore"
     }
   ],
   "placementConstraints": [],
