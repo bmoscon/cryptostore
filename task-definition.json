@@ -1,40 +1,84 @@
 {
-    "requiresCompatibilities": [
-        "EC2"
-    ],
-    "inferenceAccelerators": [],
-    "containerDefinitions": [
-        {
-            "name": "cryptostore",
-            "image": "966108416930.dkr.ecr.us-east-2.amazonaws.com/cryptsotore:bitmex",
-            "memory": "6000",
-            "resourceRequirements": null,
-            "essential": true,
-            "portMappings": [],
-            "environment": null,
-            "secrets": null,
-            "mountPoints": null,
-            "volumesFrom": null,
-            "hostname": null,
-            "user": null,
-            "workingDirectory": null,
-            "extraHosts": null,
-            "logConfiguration": null,
-            "ulimits": null,
-            "dockerLabels": null,
-            "dependsOn": null,
-            "repositoryCredentials": {
-                "credentialsParameter": ""
-            }
-        }
-    ],
-    "volumes": [],
-    "networkMode": null,
-    "memory": "4 GB",
-    "cpu": "2 vCPU",
-    "placementConstraints": [],
-    "family": "cryptostore",
-    "taskRoleArn": "arn:aws:iam::966108416930:role/ecsTaskExecutionRole",
-    "executionRoleArn": "arn:aws:iam::966108416930:role/ecsTaskExecutionRole",
-    "tags": []
+  "ipcMode": null,
+  "executionRoleArn": "arn:aws:iam::966108416930:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "dnsSearchDomains": null,
+      "logConfiguration": null,
+      "entryPoint": null,
+      "portMappings": [],
+      "command": null,
+      "linuxParameters": null,
+      "cpu": 0,
+      "environment": [],
+      "resourceRequirements": null,
+      "ulimits": null,
+      "dnsServers": null,
+      "mountPoints": [],
+      "workingDirectory": null,
+      "secrets": null,
+      "dockerSecurityOptions": null,
+      "memory": 3814,
+      "memoryReservation": null,
+      "volumesFrom": [],
+      "stopTimeout": null,
+      "image": "966108416930.dkr.ecr.us-east-2.amazonaws.com/cryptsotore:bitmex",
+      "startTimeout": null,
+      "firelensConfiguration": null,
+      "dependsOn": null,
+      "disableNetworking": null,
+      "interactive": null,
+      "healthCheck": null,
+      "essential": true,
+      "links": null,
+      "hostname": null,
+      "extraHosts": null,
+      "pseudoTerminal": null,
+      "user": null,
+      "readonlyRootFilesystem": null,
+      "dockerLabels": null,
+      "systemControls": null,
+      "privileged": null,
+      "name": "cryptostore"
+    }
+  ],
+  "placementConstraints": [],
+  "memory": "4096",
+  "taskRoleArn": "arn:aws:iam::966108416930:role/ecsTaskExecutionRole",
+  "compatibilities": [
+    "EC2"
+  ],
+  "taskDefinitionArn": "arn:aws:ecs:us-east-2:966108416930:task-definition/cryptostore:1",
+  "family": "cryptostore",
+  "requiresAttributes": [
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "com.amazonaws.ecs.capability.ecr-auth"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "com.amazonaws.ecs.capability.task-iam-role"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "ecs.capability.execution-role-ecr-pull"
+    }
+  ],
+  "pidMode": null,
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "networkMode": null,
+  "cpu": "2048",
+  "revision": 1,
+  "status": "ACTIVE",
+  "inferenceAccelerators": null,
+  "proxyConfiguration": null,
+  "volumes": []
 }
