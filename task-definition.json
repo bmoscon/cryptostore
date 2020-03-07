@@ -5,7 +5,7 @@
     "inferenceAccelerators": [],
     "containerDefinitions": [
         {
-            "name": "cryptostore-bitmex",
+            "name": "cryptostore",
             "image": "966108416930.dkr.ecr.us-east-2.amazonaws.com/cryptsotore:bitmex",
             "memory": "6000",
             "resourceRequirements": null,
