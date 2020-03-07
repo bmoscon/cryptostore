@@ -4,7 +4,15 @@
   "containerDefinitions": [
     {
       "dnsSearchDomains": null,
-      "logConfiguration": null,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "secretOptions": null,
+        "options": {
+          "awslogs-group": "/ecs/cryptostore-aws",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
       "entryPoint": null,
       "portMappings": [],
       "command": null,
@@ -22,7 +30,7 @@
       "memoryReservation": null,
       "volumesFrom": [],
       "stopTimeout": null,
-      "image": "966108416930.dkr.ecr.us-east-2.amazonaws.com/cryptsotore:bitmex",
+      "image": "966108416930.dkr.ecr.us-east-1.amazonaws.com/cryptostore-bitmex:latest",
       "startTimeout": null,
       "firelensConfiguration": null,
       "dependsOn": null,
@@ -39,23 +47,42 @@
       "dockerLabels": null,
       "systemControls": null,
       "privileged": null,
-      "name": "cryptostore"
+      "name": "bitmex"
     }
   ],
   "placementConstraints": [],
   "memory": "4096",
   "taskRoleArn": "arn:aws:iam::966108416930:role/ecsTaskExecutionRole",
   "compatibilities": [
-    "EC2"
+    "EC2",
+    "FARGATE"
   ],
-  "taskDefinitionArn": "arn:aws:ecs:us-east-2:966108416930:task-definition/cryptostore:1",
-  "family": "cryptostore",
+  "taskDefinitionArn": "arn:aws:ecs:us-east-1:966108416930:task-definition/cryptostore-aws:1",
+  "family": "cryptostore-aws",
   "requiresAttributes": [
     {
       "targetId": null,
       "targetType": null,
       "value": null,
+      "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "ecs.capability.execution-role-awslogs"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
       "name": "com.amazonaws.ecs.capability.ecr-auth"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
     },
     {
       "targetId": null,
@@ -68,13 +95,25 @@
       "targetType": null,
       "value": null,
       "name": "ecs.capability.execution-role-ecr-pull"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "ecs.capability.task-eni"
     }
   ],
   "pidMode": null,
   "requiresCompatibilities": [
-    "EC2"
+    "FARGATE"
   ],
-  "networkMode": null,
+  "networkMode": "awsvpc",
   "cpu": "2048",
   "revision": 1,
   "status": "ACTIVE",
