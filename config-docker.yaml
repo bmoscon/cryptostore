@@ -3,7 +3,7 @@
 cache: redis
 
 redis:
-    ip: redisdb
+    ip: cryptostore-redis.uq1sqt.0001.use1.cache.amazonaws.com
     port: 6379
     del_after_read: true
     start_flush: true
