@@ -45,7 +45,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-2
+        aws-region: us-east-1
 
     - name: Login to Amazon ECR
       id: login-ecr
@@ -77,6 +77,6 @@ jobs:
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: cryptostore
+        service: bitmex
         cluster: cryptostore
         wait-for-service-stability: true
