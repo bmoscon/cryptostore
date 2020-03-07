@@ -19,7 +19,7 @@ exchanges:
         ticker: [XBTUSD, ETHUSD]
         open_interest: [XBTUSD, ETHUSD]
         funding: [XBTUSD, ETHUSD]
-        
+
 storage: [parquet]
 
 parquet:
@@ -31,4 +31,4 @@ parquet:
         bucket: quantfolio-ai-data-collection
         prefix: null
 
-storage_interval: 60
+storage_interval: M
