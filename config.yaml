@@ -42,15 +42,16 @@ exchanges:
             symbols: [XBTUSD]
             max_depth: 10
             book_delta: true
+            book_interval: 100000
         trades: [XBTUSD]
         ticker: [XBTUSD]
         funding: [XBTUSD]
     COINBASE:
         retries: -1
         l3_book:
-            symbols: [BTC-USD, ETH-USD]
+            symbols: [BTC-USD]
             book_delta: true
-            book_interval: 10000
+            book_interval: 100000
         trades: [BTC-USD, ETH-USD, ETH-BTC]
         ticker: [BTC-USD]
 
