@@ -4,6 +4,7 @@
   * Feature: Open Interest support
   * Example: Added example code for orderbook reconstruction from data in Arctic
   * Feature: More granular control over data storage intervals
+  * Feature: Support receipt timestamps from cryptostore
 
 ### 0.2.0 (2020-02-11)
   * Bugfix: Fixed elasticsearch timestamps
