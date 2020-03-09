@@ -18,7 +18,11 @@ def receiver(port):
 
     s.bind(addr)
     while True:
-        data = s.recv_string(zmq.NOBLOCK)
+        # Try/Except can be omitted if zmq.NOBLOCK flag is removed
+        try:
+            data = s.recv_string(zmq.NOBLOCK)
+        except zmq.error.Again:
+            continue
         key, msg = data.split(" ", 1)
         print(key)
         print(json.loads(msg))
