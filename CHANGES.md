@@ -1,6 +1,6 @@
 ## Changelog
 
-### 0.2.1
+### 0.2.1 (2020-03-17)
   * Feature: Open Interest support
   * Example: Added example code for orderbook reconstruction from data in Arctic
   * Feature: More granular control over data storage intervals
