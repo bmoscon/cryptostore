@@ -34,9 +34,17 @@ redis:
 #
 # Retries are the number of times the connection to the exchange will be retried before exiting. -1 is infinity.
 # Using a retry of -1 with a bug in your config can lead to bans by exchanges
+#
+# Channel timeouts are channel specific and control how long a channel can go with no messages before declaring the connection
+# dead. Cryptofeed will restart the connection if no message is received in this time period. Default is 120 seconds. -1 means no timeout.
 
 exchanges:
     BITMEX:
+        channel_timeouts:
+            l2_book: 30
+            trades: 120
+            ticker: 120
+            funding: -1
         retries: -1
         l2_book:
             symbols: [XBTUSD]
