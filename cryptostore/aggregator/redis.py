@@ -31,10 +31,13 @@ class Redis(Cache):
             self.conn.flushall()
 
 
-    def read(self, exchange, dtype, pair):
+    def read(self, exchange, dtype, pair, start=None, end=None):
         key = f'{dtype}-{exchange}-{pair}'
 
-        data = self.conn.xread({key: '0-0' if key not in self.last_id else self.last_id[key]})
+        if start and end:
+            data = self.conn.xrange(key, min=start, max=end)
+        else:
+            data = self.conn.xread({key: '0-0' if key not in self.last_id else self.last_id[key]})
 
         if len(data) == 0:
             return []
@@ -45,14 +48,14 @@ class Redis(Cache):
         for update_id, update in data[0][1]:
             if dtype in {L2_BOOK, L3_BOOK}:
                 update = json.loads(update['data'])
-                update = book_flatten(update, update['timestamp'], update['delta'])
+                update = book_flatten(update, update['timestamp'], update['receipt_timestamp'], update['delta'])
                 for u in update:
-                    for k in ('size', 'amount', 'price', 'timestamp'):
+                    for k in ('size', 'amount', 'price', 'timestamp', 'receipt_timestamp'):
                         if k in u:
                             u[k] = float(u[k])
                 ret.extend(update)
             elif dtype in {TRADES, TICKER, OPEN_INTEREST}:
-                for k in ('size', 'amount', 'price', 'timestamp', 'bid', 'ask', 'open_interest'):
+                for k in ('size', 'amount', 'price', 'timestamp', 'receipt_timestamp', 'bid', 'ask', 'open_interest'):
                     if k in update:
                         update[k] = float(update[k])
                 ret.append(update)

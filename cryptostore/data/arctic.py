@@ -27,6 +27,8 @@ class Arctic(Store):
         self.data = []
 
         df['date'] = pd.to_datetime(df['timestamp'], unit='s')
+        df['receipt_timestamp'] = pd.to_datetime(df['receipt_timestamp'], unit='s')
+
         df = df.drop(['timestamp'], axis=1)
 
         if data_type == TRADES:
