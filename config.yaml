@@ -29,4 +29,4 @@ parquet:
         bucket: quantfolio-ai-data-collection
         prefix: null
 
-storage_interval: 60
+storage_interval: M
