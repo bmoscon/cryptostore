@@ -35,17 +35,17 @@ class Redis(Cache):
         key = f'{dtype}-{exchange}-{pair}'
 
         if start and end:
-            data = self.conn.xrange(key, min=start, max=end)
+            data = [[key, self.conn.xrange(key, min=start, max=end)]]
         else:
             data = self.conn.xread({key: '0-0' if key not in self.last_id else self.last_id[key]})
 
-        if len(data) == 0:
+        if len(data) == 0 or len(data[0][1]) == 0:
             return []
 
         LOG.info("%s: Read %d messages from Redis", key, len(data[0][1]))
         ret = []
 
-        for update_id, update in data:
+        for update_id, update in data[0][1]:
             if dtype in {L2_BOOK, L3_BOOK}:
                 update = json.loads(update['data'])
                 update = book_flatten(update, update['timestamp'], update['receipt_timestamp'], update['delta'])
