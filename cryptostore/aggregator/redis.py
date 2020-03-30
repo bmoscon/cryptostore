@@ -45,7 +45,7 @@ class Redis(Cache):
         LOG.info("%s: Read %d messages from Redis", key, len(data[0][1]))
         ret = []
 
-        for update_id, update in data[0][1]:
+        for update_id, update in data:
             if dtype in {L2_BOOK, L3_BOOK}:
                 update = json.loads(update['data'])
                 update = book_flatten(update, update['timestamp'], update['receipt_timestamp'], update['delta'])
