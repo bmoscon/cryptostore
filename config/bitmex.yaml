@@ -1,0 +1,10 @@
+exchanges:
+    BITMEX:
+        retries: -1
+        l2_book:
+            symbols: [XBTUSD, ETHUSD]
+            book_delta: true
+        trades: [XBTUSD, ETHUSD]
+        ticker: [XBTUSD, ETHUSD]
+        open_interest: [XBTUSD, ETHUSD]
+        funding: [XBTUSD, ETHUSD]
