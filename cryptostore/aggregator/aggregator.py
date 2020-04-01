@@ -59,6 +59,7 @@ class Aggregator(Process):
             if len(interval) > 1:
                 multiplier = int(interval[:-1])
                 interval = interval[-1]
+            base_interval = interval
             if interval in {'M', 'H', 'D'}:
                 time_partition = True
                 if interval == 'M':
@@ -76,7 +77,7 @@ class Aggregator(Process):
                     interval_start = aggregation_start
                     if end:
                         interval_start = end + timedelta(seconds=interval + 1)
-                    start, end = get_time_interval(interval_start, interval, multiplier=multiplier)
+                    start, end = get_time_interval(interval_start, base_interval, multiplier=multiplier)
                 if 'exchanges' in self.config and self.config.exchanges:
                     for exchange in self.config.exchanges:
                         for dtype in self.config.exchanges[exchange]:
