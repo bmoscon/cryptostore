@@ -77,7 +77,7 @@ jobs:
         cat config-docker.yml ${{matrix.active_exchanges}} > config.yaml
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . --build-arg exchange=${{matrix.active_exchanges}}
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_${{ matrix.active_exchanges }}
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:${{IMAGE_TAG}}_${{ matrix.active_exchanges }}"
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_${{ matrix.active_exchanges }}"
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
