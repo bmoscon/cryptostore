@@ -1,6 +1,6 @@
 FROM python:3.7.3-stretch
 
-COPY config-docker.yaml /config_final.yaml
+COPY config_final.yaml /config.yaml
 COPY setup.py /
 COPY cryptostore /cryptostore
 
