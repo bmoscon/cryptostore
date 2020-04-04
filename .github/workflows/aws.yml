@@ -74,7 +74,7 @@ jobs:
         # Build a docker container and
         # push it to ECR so that it can
         # be deployed to ECS.
-        cat config-docker.yml ${{matrix.active_exchanges}} > config.yaml
+        cat config-docker.yaml ${{matrix.active_exchanges}} > config_final.yaml
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_${{ matrix.active_exchanges }}
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_${{ matrix.active_exchanges }}"
