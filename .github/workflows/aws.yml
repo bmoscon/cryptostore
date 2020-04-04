@@ -68,16 +68,16 @@ jobs:
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: cryptostore
-        IMAGE_TAG: production
+        IMAGE_TAG: production_${{ matrix.active_exchanges }}
 
       run: |
         # Build a docker container and
         # push it to ECR so that it can
         # be deployed to ECS.
         cat config-docker.yaml config/${{ matrix.active_exchanges }}.yaml > config_final.yaml
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_${{ matrix.active_exchanges }} .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_${{ matrix.active_exchanges }}
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_${{ matrix.active_exchanges }}"
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
