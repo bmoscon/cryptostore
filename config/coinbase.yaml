@@ -1,10 +1,8 @@
 exchanges:
     COINBASE:
         retries: -1
-        l2_book:
+        l3_book:
             symbols: [BTC-USD, ETH-USD]
             book_delta: true
         trades: [BTC-USD, ETH-USD]
         ticker: [BTC-USD, ETH-USD]
-        open_interest: [BTC-USD, ETH-USD]
-        funding: [BTC-USD, ETH-USD]
