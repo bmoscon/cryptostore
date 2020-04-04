@@ -75,7 +75,7 @@ jobs:
         # push it to ECR so that it can
         # be deployed to ECS.
         cat config-docker.yml ${{matrix.active_exchanges}} > config.yaml
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . --build-arg exchange=${{matrix.active_exchanges}}
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_${{ matrix.active_exchanges }}
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_${{ matrix.active_exchanges }}"
 
