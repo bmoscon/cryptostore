@@ -2,9 +2,9 @@ exchanges:
     COINBASE:
         retries: -1
         l2_book:
-            symbols: [BTCUSD, ETHUSD]
+            symbols: [BTC-USD, ETH-USD]
             book_delta: true
-        trades: [BTCUSD, ETHUSD]
-        ticker: [BTCUSD, ETHUSD]
-        open_interest: [BTCUSD, ETHUSD]
-        funding: [BTCUSD, ETHUSD]
+        trades: [BTC-USD, ETH-USD]
+        ticker: [BTC-USD, ETH-USD]
+        open_interest: [BTC-USD, ETH-USD]
+        funding: [BTC-USD, ETH-USD]
