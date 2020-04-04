@@ -93,4 +93,4 @@ jobs:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
         service: ${{ matrix.active_exchanges }}
         cluster: cryptostore
-        wait-for-service-stability: false
+        wait-for-service-stability: true
