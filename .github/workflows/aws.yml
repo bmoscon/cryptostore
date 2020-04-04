@@ -43,7 +43,7 @@ jobs:
       - run : |
         echo ${{ matrix.active_exchanges }}
 
-  deploy:
+deploy:
     name: Deploy
     runs-on: ubuntu-latest
     strategy:
