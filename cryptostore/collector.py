@@ -28,6 +28,7 @@ class Collector(Process):
 
         cache = self.config['cache']
         retries = self.exchange_config.pop('retries', 30)
+        timeouts = self.exchange_config.pop('channel_timeouts', {})
         fh = FeedHandler(retries=retries)
 
 
@@ -36,6 +37,7 @@ class Collector(Process):
             depth = None
             window = 1000
             delta = False
+            timeout = timeouts.get(callback_type, 120)
 
             if 'book_interval' in value:
                 window = value['book_interval']
@@ -106,6 +108,6 @@ class Collector(Process):
                     if BOOK_DELTA in cb:
                         cb[BOOK_DELTA].append(BookDeltaZMQ(host=host, port=port))
 
-            fh.add_feed(self.exchange, max_depth=depth, book_interval=window, config={callback_type: self.exchange_config[callback_type]}, callbacks=cb)
+            fh.add_feed(self.exchange, timeout=timeout, max_depth=depth, book_interval=window, config={callback_type: self.exchange_config[callback_type]}, callbacks=cb)
 
         fh.run()
