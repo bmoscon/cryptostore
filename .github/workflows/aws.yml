@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        active_exchanges: ['BITMEX', 'COINBASE']
+        active_exchanges: ['bitmex', 'coinbase']
     steps:
       - name: Test
         run: echo ${{ matrix.active_exchanges }}
@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        active_exchanges: ['BITMEX', 'COINBASE']
+        active_exchanges: ['bitmex', 'coinbase']
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -74,7 +74,7 @@ jobs:
         # Build a docker container and
         # push it to ECR so that it can
         # be deployed to ECS.
-        cat config-docker.yaml config/${{matrix.active_exchanges}}.yaml > config_final.yaml
+        cat config-docker.yaml config/${{ matrix.active_exchanges }}.yaml > config_final.yaml
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_${{ matrix.active_exchanges }} .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_${{ matrix.active_exchanges }}
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_${{ matrix.active_exchanges }}"
