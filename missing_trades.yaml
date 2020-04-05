@@ -1,0 +1,9 @@
+# If configured, backfill will run in a separate process and
+# backfill trade data from earliest data (in storage) up to `start` (inclusive).
+backfill:
+    COINBASE:
+        BTC-USD:
+            start: '2017-01-01'
+
+# DO NOT MODIFY BELOW THIS LINE
+last_updated: null

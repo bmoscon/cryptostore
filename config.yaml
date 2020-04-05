@@ -121,17 +121,11 @@ storage_interval: 60
 
 # Cryptostore Plugin Interface
 plugins:
-    backfill:
+    # Missing Trades is a provided plugin that will use the REST apis for supported exchanges and
+    # fill in missing trade data
+    missing_trades:
         # The import path, and class name
-        # from cryptostore.plugin.backfill import Backfill
-        module: [cryptostore.plugin.backfill, Backfill]
+        # from cryptostore.plugin.trades import MissingTrades
+        module: [cryptostore.plugin.trades, MissingTrades]
         # Config path, config can be added to this file, or in a separate config
-        # backfill does not use a dynamic config, so its fine to put its config here
-        config: config.yaml
-
-# If configured, backfill will run in a separate process and
-# backfill trade data from earliest data (in storage) up to `start` (inclusive).
-backfill:
-    COINBASE:
-        BTC-USD:
-            start: '2017-01-01'
+        config: missing_trades.yaml
