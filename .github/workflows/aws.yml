@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        active_exchanges: ['bitmex', 'coinbase']
+        active_exchanges: ['binance', 'bitmex', 'coinbase']
     steps:
       - name: Test
         run: echo ${{ matrix.active_exchanges }}
@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        active_exchanges: ['bitmex', 'coinbase']
+        active_exchanges: ['binance', 'bitmex', 'coinbase']
     steps:
     - name: Checkout
       uses: actions/checkout@v2
