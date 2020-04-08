@@ -95,10 +95,10 @@ jobs:
 
     -name: Stop Old tasks
       id: stop-old-tasks
-        env:
-          CLUSTER: cryptostore
-        run: |
-          for i in $( ${{steps.list-tasks.outputs}} ) ; do
-              echo aws ecs stop-task --cluster $myClusterId --task $i --reason "Stopped by kill script during deploy"
-              # aws ecs stop-task --cluster $myClusterId --task $i --reason "Stopped by kill script"
-          done
+      env:
+        CLUSTER: cryptostore
+      run: |
+        for i in $( ${{steps.list-tasks.outputs}} ) ; do
+            echo aws ecs stop-task --cluster $myClusterId --task $i --reason "Stopped by kill script during deploy"
+            # aws ecs stop-task --cluster $myClusterId --task $i --reason "Stopped by kill script"
+        done
