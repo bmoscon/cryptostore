@@ -93,7 +93,7 @@ jobs:
         cluster: cryptostore
         wait-for-service-stability: true
 
-    -name: Stop Old tasks
+    -name: Stop Old Tasks
       id: stop-old-tasks
       env:
         CLUSTER: cryptostore
