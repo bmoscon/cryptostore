@@ -90,9 +90,9 @@ jobs:
     #     task-definition: task-definition.json
     #     container-name: cryptostore
     #     image: ${{ steps.build-image.outputs.image }}
-    
+
     - name: Cache Running Tasks
-      id: list-tasks-${{matrix.active_exchanges}}
+      id: list-tasks
       env:
         CLUSTER: cryptostore
       run: |
