@@ -32,16 +32,6 @@ on:
 name: Deploy to Amazon ECS
 
 jobs:
-  autodeploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        active_exchanges: ['binance', 'bitmex', 'coinbase']
-    steps:
-      - name: Test
-        run: echo ${{ matrix.active_exchanges }}
-
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
@@ -50,6 +40,7 @@ jobs:
         active_exchanges: ['binance', 'bitmex', 'coinbase']
     steps:
     - name: Checkout
+      id: checkout-source
       uses: actions/checkout@v2
 
     - name: Configure AWS credentials
