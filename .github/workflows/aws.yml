@@ -67,9 +67,41 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
+    # - name: Build, tag, and push image to Amazon ECR
+    #   id: build-image
+    #   env:
+    #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+    #     ECR_REPOSITORY: cryptostore
+    #     IMAGE_TAG: production_testing_${{ matrix.active_exchanges }}
+    #
+    #   run: |
+    #     # Build a docker container and
+    #     # push it to ECR so that it can
+    #     # be deployed to ECS.
+    #     cat config-docker.yaml config/${{ matrix.active_exchanges }}.yaml > config_final.yaml
+    #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+    #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+    #     echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+    #
+    # - name: Fill in the new image ID in the Amazon ECS task definition
+    #   id: task-def
+    #   uses: aws-actions/amazon-ecs-render-task-definition@v1
+    #   with:
+    #     task-definition: task-definition.json
+    #     container-name: cryptostore
+    #     image: ${{ steps.build-image.outputs.image }}
+    
     - name: Cache Running Tasks
       id: list-tasks-${{matrix.active_exchanges}}
       env:
         CLUSTER: cryptostore
       run: |
         list-tasks --cluster ${{matrix.active_exchanges}}
+
+    # - name: Deploy Amazon ECS task definition
+    #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+    #   with:
+    #     task-definition: ${{ steps.task-def.outputs.task-definition }}
+    #     service: ${{ matrix.active_exchanges }}
+    #     cluster: cryptostore
+    #     wait-for-service-stability: true
