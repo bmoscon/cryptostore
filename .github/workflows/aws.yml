@@ -59,7 +59,7 @@ jobs:
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: cryptostore
-        IMAGE_TAG: production_testing_${{ matrix.active_exchanges }}
+        IMAGE_TAG: production_${{ matrix.active_exchanges }}
 
       run: |
         # Build a docker container and
