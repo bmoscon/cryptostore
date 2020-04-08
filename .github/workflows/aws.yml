@@ -93,9 +93,12 @@ jobs:
         cluster: cryptostore
         wait-for-service-stability: true
 
-    -name: Stop Old Tasks
+    - name: Stop Old Tasks
       id: stop-old-tasks
       env:
         CLUSTER: cryptostore
       run: |
-        echo "running"
+        for i in $( ${{steps.list-tasks.outputs}} ) ; do
+            echo aws ecs stop-task --cluster $myClusterId --task $i --reason "Stopped by kill script during deploy"
+            # aws ecs stop-task --cluster $myClusterId --task $i --reason "Stopped by kill script"
+        done
