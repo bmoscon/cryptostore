@@ -96,7 +96,7 @@ jobs:
       env:
         CLUSTER: cryptostore
       run: |
-        list-tasks --cluster ${{matrix.active_exchanges}}
+        aws ecs list-tasks --cluster $CLUSTER
 
     # - name: Deploy Amazon ECS task definition
     #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
