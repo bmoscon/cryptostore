@@ -63,7 +63,8 @@ class Redis(Cache):
                 for k in update:
                     try:
                         update[k] = float(update[k])
-                    except:
+                    except ValueError:
+                        # ignore strings
                         pass
                 ret.append(update)
             self.ids[key].append(update_id)
