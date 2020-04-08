@@ -32,19 +32,6 @@ on:
 name: Deploy to Amazon ECS
 
 jobs:
-<<<<<<< HEAD
-  autodeploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        active_exchanges: ['binance', 'bitmex', 'coinbase']
-    steps:
-      - name: Test
-        run: echo ${{ matrix.active_exchanges }}
-
-=======
->>>>>>> aws debugging
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
