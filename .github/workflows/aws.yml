@@ -27,7 +27,7 @@
 on:
   push:
     branches:
-      - production-in-progress
+      - production
 
 name: Deploy to Amazon ECS
 
