@@ -7,7 +7,7 @@ associated with this software.
 from decimal import Decimal
 from collections import defaultdict
 
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING, OPEN_INTEREST
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING, OPEN_INTEREST, TRADES_SWAP, L2_BOOK_SWAP, TICKER_SWAP, TRADES_FUTURES, L2_BOOK_FUTURES, TICKER_FUTURES
 import requests
 
 from cryptostore.data.store import Store
@@ -37,7 +37,7 @@ class InfluxDB(Store):
         # influx cant handle duplicate data (?!) so we need to
         # incremement timestamps on data that have the same timestamp
         used_ts = set()
-        if data_type == TRADES:
+        if data_type in (TRADES, TRADES_SWAP, TRADES_FUTURES):
             for entry in self.data:
                 ts = int(Decimal(entry["timestamp"]) * 1000000000)
                 while ts in used_ts:
@@ -47,12 +47,12 @@ class InfluxDB(Store):
                     agg.append(f'{data_type}-{exchange},pair={pair},exchange={exchange} side="{entry["side"]}",id="{entry["id"]}",amount={entry["amount"]},price={entry["price"]},timestamp={entry["timestamp"]},receipt_timestamp={entry["receipt_timestamp"]} {ts}')
                 else:
                     agg.append(f'{data_type}-{exchange},pair={pair},exchange={exchange} side="{entry["side"]}",amount={entry["amount"]},price={entry["price"]},timestamp={entry["timestamp"]},receipt_timestamp={entry["receipt_timestamp"]} {ts}')
-        elif data_type == TICKER:
+        elif data_type in (TICKER, TICKER_SWAP, TICKER_FUTURES):
             for entry in self.data:
                 ts = int(Decimal(entry["timestamp"]) * 1000000000)
                 agg.append(f'{data_type}-{exchange},pair={pair},exchange={exchange} bid={entry["bid"]},ask={entry["ask"]},timestamp={entry["timestamp"]},receipt_timestamp={entry["receipt_timestamp"]} {ts}')
 
-        elif data_type == L2_BOOK:
+        elif data_type in (L2_BOOK, L2_BOOK_SWAP, L2_BOOK_FUTURES):
             for entry in self.data:
                 ts = int(Decimal(entry["timestamp"]) * 1000000000)
                 while ts in used_ts:

@@ -72,19 +72,19 @@ class Collector(Process):
                 kwargs = {'host': self.config['kafka']['ip'], 'port': self.config['kafka']['port']}
 
             if callback_type == TRADES:
-                cb[TRADES] = [trade_cb(**kwargs)]
+                cb[TRADES] = [trade_cb(key=TRADES, **kwargs)]
             elif callback_type == TRADES_SWAP:
-                cb[TRADES_SWAP] = [trade_cb(**kwargs)]
+                cb[TRADES_SWAP] = [trade_cb(key=TRADES_SWAP, **kwargs)]
             elif callback_type == TRADES_FUTURES:
-                cb[TRADES_FUTURES] = [trade_cb(**kwargs)]
+                cb[TRADES_FUTURES] = [trade_cb(key=TRADES_FUTURES, **kwargs)]
             elif callback_type == FUNDING:
                 cb[FUNDING] = [funding_cb(**kwargs)]
             elif callback_type == TICKER:
-                cb[TICKER] = [ticker_cb(**kwargs)]
+                cb[TICKER] = [ticker_cb(key=TICKER, **kwargs)]
             elif callback_type == TICKER_SWAP:
-                cb[TICKER_SWAP] = [ticker_cb(**kwargs)]
+                cb[TICKER_SWAP] = [ticker_cb(key=TICKER_SWAP, **kwargs)]
             elif callback_type == TICKER_FUTURES:
-                cb[TICKER_FUTURES] = [ticker_cb(**kwargs)]
+                cb[TICKER_FUTURES] = [ticker_cb(key=TICKER_FUTURES, **kwargs)]
             elif callback_type == L2_BOOK:
                 cb[L2_BOOK] = [book_cb(key=L2_BOOK, **kwargs)]
                 if book_up:

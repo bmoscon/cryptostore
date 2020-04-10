@@ -7,7 +7,7 @@ associated with this software.
 import json
 import logging
 
-from cryptofeed.defines import L2_BOOK, L3_BOOK, TRADES, TICKER, FUNDING, OPEN_INTEREST
+from cryptofeed.defines import L2_BOOK, L3_BOOK, TRADES, TICKER, FUNDING, OPEN_INTEREST, TRADES_SWAP, L2_BOOK_SWAP, TICKER_SWAP, TRADES_FUTURES, L2_BOOK_FUTURES, TICKER_FUTURES
 
 from cryptostore.engines import StorageEngines
 from cryptostore.aggregator.cache import Cache
@@ -56,10 +56,10 @@ class Kafka(Cache):
             self.ids[key] = message
             update = json.loads(message.value().decode('utf8'))
 
-            if dtype in {L2_BOOK, L3_BOOK}:
+            if dtype in {L2_BOOK, L3_BOOK, L2_BOOK_FUTURES, L2_BOOK_SWAP}:
                 update = book_flatten(update, update['timestamp'], update['delta'])
                 ret.extend(update)
-            if dtype in {TRADES, TICKER, FUNDING, OPEN_INTEREST}:
+            if dtype in {TRADES, TRADES_FUTURES, TRADES_SWAP, TICKER, TICKER_FUTURES, TICKER_SWAP, FUNDING, OPEN_INTEREST}:
                 ret.append(update)
         return ret
 

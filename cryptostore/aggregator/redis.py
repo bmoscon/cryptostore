@@ -9,7 +9,7 @@ from collections import defaultdict
 import json
 import time
 
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING, OPEN_INTEREST
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING, OPEN_INTEREST, TRADES_SWAP, L2_BOOK_SWAP, TICKER_SWAP, TRADES_FUTURES, L2_BOOK_FUTURES, TICKER_FUTURES
 
 from cryptostore.aggregator.util import book_flatten
 from cryptostore.aggregator.cache import Cache
@@ -46,7 +46,7 @@ class Redis(Cache):
         ret = []
 
         for update_id, update in data[0][1]:
-            if dtype in {L2_BOOK, L3_BOOK}:
+            if dtype in {L2_BOOK, L3_BOOK, L2_BOOK_FUTURES, L2_BOOK_SWAP}:
                 update = json.loads(update['data'])
                 update = book_flatten(update, update['timestamp'], update['receipt_timestamp'], update['delta'])
                 for u in update:
@@ -54,7 +54,7 @@ class Redis(Cache):
                         if k in u:
                             u[k] = float(u[k])
                 ret.extend(update)
-            elif dtype in {TRADES, TICKER, OPEN_INTEREST}:
+            elif dtype in {TRADES, TRADES_FUTURES, TRADES_SWAP, TICKER, TICKER_FUTURES, TICKER_SWAP, OPEN_INTEREST}:
                 for k in ('size', 'amount', 'price', 'timestamp', 'receipt_timestamp', 'bid', 'ask', 'open_interest'):
                     if k in update:
                         update[k] = float(update[k])
@@ -63,8 +63,7 @@ class Redis(Cache):
                 for k in update:
                     try:
                         update[k] = float(update[k])
-                    except ValueError:
-                        # ignore strings
+                    except:
                         pass
                 ret.append(update)
             self.ids[key].append(update_id)
