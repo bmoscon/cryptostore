@@ -66,7 +66,7 @@ class Parquet(Store):
 
         if self._write:
             for func, bucket, prefix, kwargs in zip(self._write, self.bucket, self.prefix, self.kwargs):
-                path = f'{exchange}/{data_type}/{pair}/{int(timestamp)}.parquet'
+                path = f'{exchange}/{data_type}/{pair}/{exchange}-{data_type}-{pair}-{int(timestamp)}.parquet'
                 if prefix:
                     path = f"{prefix}/{path}"
                 func(bucket, path, file_name, **kwargs)
