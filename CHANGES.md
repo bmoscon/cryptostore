@@ -2,6 +2,8 @@
 
 ### 0.3.0
   * Feature: Config options for controlling data channel timeouts
+  * Feature: Path option in config for local parquet storage
+  * Feature: Configurable filenames for parquet storage
 
 ### 0.2.1 (2020-03-17)
   * Feature: Open Interest support
