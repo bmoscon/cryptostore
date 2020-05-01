@@ -26,6 +26,8 @@ class Parquet(Store):
         self.prefix = []
         self.data = None
         self.del_file = True
+        self.file_name = config.get('file_format') if config else None
+        self.path = config.get('path') if config else None
 
         if config:
             self.del_file = config.get('del_file', True)
@@ -60,7 +62,27 @@ class Parquet(Store):
     def write(self, exchange, data_type, pair, timestamp):
         if not self.data:
             return
-        file_name = f'{exchange}-{data_type}-{pair}-{int(timestamp)}.parquet'
+        file_name = ''
+        if self.file_name:
+            for var in self.file_name:
+                if var == 'timestamp':
+                    file_name += f"{int(timestamp)}-"
+                elif var == 'data_type':
+                    file_name += f"{data_type}-"
+                elif var == "exchange":
+                    file_name += f"{exchange}-"
+                elif var == "pair":
+                    file_name += f"{pair}-"
+                else:
+                    print(var)
+                    raise ValueError("Invalid file format specified for parquet file")
+            file_name = file_name[:-1] + ".parquet"
+        else:
+            file_name = f'{exchange}-{data_type}-{pair}-{int(timestamp)}.parquet'
+
+        if self.path:
+            file_name = os.path.join(self.path, file_name)
+
         pq.write_table(self.data, file_name)
         self.data = None
 

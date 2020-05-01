@@ -92,6 +92,18 @@ parquet:
     # if storing the data to an external source (like S3) toggle this to enable the removal of the local file after
     # writing to external store
     del_file: true
+    # File name format, as a list of arguments. Default is <exchange>-<data_type>-<pair>-<timestamp>.parquet, which would be exchange, data_type, pair, timestamp
+    # Can specify any combination exchange, data_type, pair, and timestamp
+    # timestamp MUST be present.
+    # examples:
+    #    pair,timestamp
+    #    timestamp
+    #    timestamp,exchange
+    #    etc
+    file_format: [exchange, pair, data_type, timestamp]
+    # Path controls where the file is written (if not using S3/GC) If null, will write to CWD. Must be absolute path
+    path: null
+
 
     S3:
         # endpoint allows you to override the write endpoint and write to other provicers that have the same API interface
