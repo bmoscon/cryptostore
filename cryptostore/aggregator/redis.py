@@ -25,6 +25,8 @@ class Redis(Cache):
         self.retention = retention
         self.last_id = {}
         self.ids = defaultdict(list)
+        if ip and port and socket:
+            raise ValueError("Cannot specify ip/port and socket for Redis")
         self.conn = StorageEngines.redis.Redis(ip, port, unix_socket_path=socket, decode_responses=True)
         if flush:
             LOG.info('Flushing cache')
