@@ -90,7 +90,7 @@ class Collector(Process):
 
             if 'pass_through' in self.config:
                 if self.config['pass_through']['type'] == 'zmq':
-                    from cryptofeed.backends.zmq import TradeZMQ, BookDeltaZMQ, BookZMQ, FundingZMQ, OpenInterestZMQ
+                    from cryptofeed.backends.zmq import TradeZMQ, BookDeltaZMQ, BookZMQ, FundingZMQ, OpenInterestZMQ, TickerZMQ
                     import zmq
                     host = self.config['pass_through']['host']
                     port = self.config['pass_through']['port']
@@ -105,6 +105,8 @@ class Collector(Process):
                         cb[L3_BOOK].append(BookZMQ(host=host, port=port))
                     elif callback_type == OPEN_INTEREST:
                         cb[OPEN_INTEREST].append(OpenInterestZMQ(host=host, port=port))
+                    elif callback_type == TICKER:
+                        cb[TICKER].append(TickerZMQ(host=host, port=port))
                     if BOOK_DELTA in cb:
                         cb[BOOK_DELTA].append(BookDeltaZMQ(host=host, port=port))
 
