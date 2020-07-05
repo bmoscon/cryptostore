@@ -8,11 +8,6 @@
 # start_flush: toggles if redis/kafka should be flushed at the start. Primarily for debugging, it will flush ALL of redis/kafka
 cache: redis
 
-kafka:
-    # ip/port are for the bootstrap server
-    ip: '127.0.0.1'
-    port: 9092
-    start_flush: true
 redis:
     ip: '127.0.0.1'
     port: 6379
@@ -39,53 +34,9 @@ redis:
 # dead. Cryptofeed will restart the connection if no message is received in this time period. Default is 120 seconds. -1 means no timeout.
 
 exchanges:
-    BITMEX:
-        channel_timeouts:
-            l2_book: 30
-            trades: 120
-            ticker: 120
-            funding: -1
-        retries: -1
-        l2_book:
-            symbols: [XBTUSD]
-            max_depth: 10
-            book_delta: true
-            book_interval: 100000
-        trades: [XBTUSD]
-        ticker: [XBTUSD]
-        funding: [XBTUSD]
-    COINBASE:
-        retries: -1
-        l3_book:
-            symbols: [BTC-USD]
-            book_delta: true
-            book_interval: 100000
-        trades: [BTC-USD, ETH-USD, ETH-BTC]
-        ticker: [BTC-USD]
-
-# Where to store the data. Currently arctic, influx, elastic, and parquet are supported. More than one can be enabled
-storage: [arctic, influx]
-
-# Configurable passthrough for data - data will be sent in realtime (no aggregation in redis).
-# To disable, remove
-pass_through:
-    type: zmq
-    host: '127.0.0.1'
-    port: 5678
-
-
-elastic:
-    host: 'http://127.0.0.1:9200'
-    user: null
-    token: null
-    shards: 10
-    replicas: 0
-    refresh_interval: '30s'
-
-influx:
-    host: 'http://127.0.0.1:8086'
-    db: example
-    create: true
+    BINANCE:
+        retries: 4
+        trades: [BTC-USDT, ETH-USDT]
 
 # Parquet specific options. Parquet will default to storing the data on disk unless these are specified
 parquet:
@@ -102,28 +53,14 @@ parquet:
     #    etc
     file_format: [exchange, pair, data_type, timestamp]
     # Path controls where the file is written (if not using S3/GC) If null, will write to CWD. Must be absolute path
-    path: null
+    path: '/home/pierre/Documents/code/cs_draft/data_test'
 
+    GD:
+        # path to service account key (compulsory - absolute path)
+        # prefix: name of existing folder in Google Drive for which the service account has writer rights.
+        service_account: '/home/pierre/Documents/code/cs_draft/cryptostore-storage3.json'
+        prefix: 'Cryptostore'
 
-    S3:
-        # endpoint allows you to override the write endpoint and write to other provicers that have the same API interface
-        # If key_id/secret are NULL boto will default to using ENV vars or credentials file
-        # prefix: a prefix to append to the default data path
-        endpoint: null
-        key_id: null
-        secret: null
-        bucket: null
-        prefix: null
-    GCS:
-        # path to service account key, if null will default to using env vars or auth tokens
-        # on GCE node
-        # prefix: a prefix to append to the default data path
-        service_account: null
-        bucket: null
-        prefix: null
-
-# arctic specific configuration options - the mongo URL
-arctic: mongodb://127.0.0.1
 
 # Data batching window, in seconds, or optionally a time interval: M(inutely), H(ourly), D(aily).
 # These intervals will require that you have enough memory available to redis (and python) to hold this amount of data.
@@ -132,18 +69,18 @@ storage_interval: 60
 
 
 # Cryptostore Plugin Interface
-plugins:
-    backfill:
+#plugins:
+#    backfill:
         # The import path, and class name
         # from cryptostore.plugin.backfill import Backfill
-        module: [cryptostore.plugin.backfill, Backfill]
+#        module: [cryptostore.plugin.backfill, Backfill]
         # Config path, config can be added to this file, or in a separate config
         # backfill does not use a dynamic config, so its fine to put its config here
-        config: config.yaml
+#        config: config.yaml
 
 # If configured, backfill will run in a separate process and
 # backfill trade data from earliest data (in storage) up to `start` (inclusive).
-backfill:
-    COINBASE:
-        BTC-USD:
-            start: '2017-01-01'
+#backfill:
+#    COINBASE:
+#        BTC-USD:
+#            start: '2017-01-01'
