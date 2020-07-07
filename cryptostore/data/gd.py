@@ -145,8 +145,11 @@ def google_drive_write(bucket, path, file_name, creds):
     folder_id, folder_name = _get_folder_in_parent(drive, path)
     media = MediaFileUpload(file_name, resumable=True)
     file_metadata = {'name': path.split('/')[-1], 'parents': [folder_id]}
-    drive.files().create(body=file_metadata, media_body=media, fields='id')\
-                 .execute()
+    request = drive.files().create(body=file_metadata, media_body=media,
+                                   fields='id')
+    response = None
+    while response is None:
+        status, response = request.next_chunk(num_retries=4)
 
     return
 
@@ -226,6 +229,6 @@ def google_drive_read(bucket, key, file_name, creds):
     downloader = MediaIoBaseDownload(file, request)
     done = False
     while done is False:
-        status, done = downloader.next_chunk()
+        status, done = downloader.next_chunk(num_retries=4)
 
     return

@@ -38,11 +38,14 @@ exchanges:
         retries: 4
         trades: [BTC-USDT, ETH-USDT]
 
+# Where to store the data. Currently arctic, influx, elastic, and parquet are supported. More than one can be enabled
+storage: [parquet]
+
 # Parquet specific options. Parquet will default to storing the data on disk unless these are specified
 parquet:
     # if storing the data to an external source (like S3) toggle this to enable the removal of the local file after
     # writing to external store
-    del_file: true
+    del_file: false
     # File name format, as a list of arguments. Default is <exchange>-<data_type>-<pair>-<timestamp>.parquet, which would be exchange, data_type, pair, timestamp
     # Can specify any combination exchange, data_type, pair, and timestamp
     # timestamp MUST be present.
@@ -53,34 +56,17 @@ parquet:
     #    etc
     file_format: [exchange, pair, data_type, timestamp]
     # Path controls where the file is written (if not using S3/GC) If null, will write to CWD. Must be absolute path
-    path: '/home/pierre/Documents/code/cs_draft/data_test'
-
+    path: '/home/pierre/Documents/code/cryptostore_data'
     GD:
-        # path to service account key (compulsory - absolute path)
-        # prefix: name of existing folder in Google Drive for which the service account has writer rights.
+        # path to service account key, if null will default to using env vars or auth tokens
+        # on GCE node
+        # prefix: a prefix to append to the default data path
         service_account: '/home/pierre/Documents/code/cs_draft/cryptostore-storage3.json'
         prefix: 'Cryptostore'
-
 
 # Data batching window, in seconds, or optionally a time interval: M(inutely), H(ourly), D(aily).
 # These intervals will require that you have enough memory available to redis (and python) to hold this amount of data.
 # String intervals can be combined with numbers, eg 2H is 2 hours, 5M is 5 minutes, etc.
-storage_interval: 60
+storage_interval: 10
 
 
-# Cryptostore Plugin Interface
-#plugins:
-#    backfill:
-        # The import path, and class name
-        # from cryptostore.plugin.backfill import Backfill
-#        module: [cryptostore.plugin.backfill, Backfill]
-        # Config path, config can be added to this file, or in a separate config
-        # backfill does not use a dynamic config, so its fine to put its config here
-#        config: config.yaml
-
-# If configured, backfill will run in a separate process and
-# backfill trade data from earliest data (in storage) up to `start` (inclusive).
-#backfill:
-#    COINBASE:
-#        BTC-USD:
-#            start: '2017-01-01'

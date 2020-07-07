@@ -52,6 +52,7 @@ class Parquet(Store):
                 self._read.append(google_drive_read)
                 self._list.append(google_drive_list)
                 self.prefix.append(config['GD']['prefix'])
+                self.bucket.append(None)
                 self.kwargs.append({'creds': config['GD']['service_account']})
 
 
@@ -95,6 +96,10 @@ class Parquet(Store):
         self.data = None
 
         if self._write:
+            print(self._write)
+            print(self.bucket)
+            print(self.prefix)
+            print(self.kwargs)
             for func, bucket, prefix, kwargs in zip(self._write, self.bucket, self.prefix, self.kwargs):
                 path = f'{exchange}/{data_type}/{pair}/{exchange}-{data_type}-{pair}-{int(timestamp)}.parquet'
                 if prefix:
