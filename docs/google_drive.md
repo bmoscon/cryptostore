@@ -10,8 +10,8 @@ Finally, a python script is also provided here below to list and remove all file
 ### Requirements
 
 Google Drive connector relies on:
-  * [Google API python client v3](https://github.com/googleapis/google-api-python-client) : [API reference](https://developers.google.com/drive/api/v3/reference)
   * [Google OAuth 2.0](https://github.com/googleapis/google-api-python-client/blob/master/docs/oauth.md): [user guide](https://google-auth.readthedocs.io/en/latest/user-guide.html)
+  * [Google API python client v3](https://github.com/googleapis/google-api-python-client) : [API reference](https://developers.google.com/drive/api/v3/reference)
 
 Please, make sure to install required librairies.
 ```python
