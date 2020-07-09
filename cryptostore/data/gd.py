@@ -9,6 +9,7 @@ associated with this software.
 
 from io import FileIO
 from typing import Tuple
+import google.auth
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
@@ -30,8 +31,13 @@ def _get_drive(creds):
 
     """
 
-    creds = service_account.Credentials.from_service_account_file(creds)\
+    if creds::
+        creds = service_account.Credentials.from_service_account_file(creds)\
                         .with_scopes(['https://www.googleapis.com/auth/drive'])
+    else:
+        # use environment variable GOOGLE_APPLICATION_CREDENTIALS
+        creds, project = google.auth.default(
+                              scopes=['https://www.googleapis.com/auth/drive'])        
 
     return build('drive', 'v3', credentials=creds)
 
