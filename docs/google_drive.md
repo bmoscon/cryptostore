@@ -102,7 +102,7 @@ Following code makes this possible (I could not make working provided examples i
 ```python
 # Initialization step of a would-be Google Drive connector object
 # to be run at the start of Cryptostore.
-# this line is currently in `_get_drive()` function.
+# This line is currently in `_get_drive()` function.
 drive = discovery.build('drive', 'v3', credentials=scoped_credentials)
 
 # During runtime, creation of a new `http` object, to be used when
