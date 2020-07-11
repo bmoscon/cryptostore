@@ -27,7 +27,7 @@ pip install --upgrade google-api-python-client
    * Store the obtained key (_service-account-name-xxxx.json_ file) somewhere on your local hard drive. You will need to refer to this file in your configuration.
    * Note: it is not required to give this service account any role and permission if you follow the 2nd step proposed here below.
 
- * Second, once you've got your service account created, copy its email address you can see in this same page through which you created its key. You have to know that this service account you will use to authenticate Cryptostore's Google Drive connector will upload data in a space by default you have not access to. Storage space will however be taken from your own (parent) account. A workaround to be able to check and access manually through standard Google Drive interface data stored is to create a folder in your Google Drive, and share it with this service account by using its email address. When sharing, give editor's rights to the service account so that it can upload files.
+ * Second, once you've got your service account created, copy its email address you can see in this same page through which you created its key. You have to know that this service account you will use to authenticate Cryptostore's Google Drive connector will upload data in a space by default you have not access to. Storage space will however be taken from your own (parent) account. A workaround to be able to check and access manually this data through standard Google Drive interface is to share a folder in your Google Drive with this service account by using its email address. When sharing, give editor rights to the service account so that it can upload files.
 
 ### Last configuration steps
 
@@ -54,7 +54,7 @@ Now that you have created both a service account and have its key stored on your
 ### Listing and removing all files uploaded by the service account.
 
 The service account you have created is now sharing uploaded files with you through a shared folder.
-However, if you delete these files manually, they will still exsit for your service account, and will still take storage space from your quota.
+However, if you delete these files manually, they will still exist for your service account, and will still take storage space from your quota.
 
 To list these files and remove them for the service account, here is a script. It will connect to your space using service account credentials. Make sure to initialize correctly `service_account` and `prefix` variables located at the beginning of your script.
 
@@ -89,4 +89,29 @@ for item in items:
 ```
 
 If hundreds of files have to be trashed, re-run this script several times, as the number of files retrieved with the `list()` method is limited.
+
+### A note regarding thread safety (implementation detail).
+
+Stated in this [Google documentation page](https://github.com/googleapis/google-api-python-client/blob/master/docs/thread_safety.md#thread-safety), "_The google-api-python-client library is built on top of the httplib2 library, which is not thread-safe. Therefore, if you are running as a multi-threaded application, each thread that you are making requests from must have its own instance of httplib2.Http()._".
+
+Because of current implementation in Cryptostore, this workaround is not required. A new service object (named `drive` in the code) is created each time a file is uploaded.
+If ever this part of the code is refactored, and the `drive` object is eventually initialized only once at the start of Cryptostore, then it might be wise to follow recommendations from above-mentionned Google ressource.
+
+Following code makes this possible (I could not make working provided examples in Google ressource).
+
+```python
+# Initialization step of a would-be Google Drive connector object
+# to be run at the start of Cryptostore.
+# this line is currently in `_get_drive()` function.
+drive = discovery.build('drive', 'v3', credentials=scoped_credentials)
+
+# During runtime, creation of a new `http` object, to be used when
+# executing an http command.
+from googleapiclient import _auth
+new_http = _auth.authorized_http(scoped_credentials)
+# Example of such a command: listing files.
+results = drive.files().list(pageSize=10, fields="nextPageToken, files(id, name)")\
+                       .execute(http=new_http)
+
+```
 
