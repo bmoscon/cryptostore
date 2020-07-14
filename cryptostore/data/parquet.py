@@ -46,8 +46,7 @@ class Parquet(Store):
                 self._list.append(aws_list)
                 self.bucket.append(config['S3']['bucket'])
                 self.prefix.append(config['S3']['prefix'])
-                self.kwargs.append({'creds': (config['S3']['key_id'], config['S3']['secret']),
-                                    'endpoint': config['S3'].get('endpoint')})
+                self.kwargs.append({'creds': (config['S3']['key_id'], config['S3']['secret']), 'endpoint': config['S3'].get('endpoint')})
             if 'GD' in config:
                 self._write.append(google_drive_write)
                 self.prefix.append(config['GD']['prefix'])
@@ -132,8 +131,7 @@ class Parquet(Store):
                 raise InconsistentStorage("Stored data differs, cannot backfill")
 
         if files:
-            return float(pq.read_table(files[0], columns=['timestamp'])
-                           .to_pandas().timestamp[0])
+            return float(pq.read_table(files[0], columns=['timestamp']).to_pandas().timestamp[0])
         else:
             tmp = f'{exchange}-{pair}-temp.parquet'
             self._read[0](self.bucket[0], objs[0][0], tmp, **self.kwargs[0])
