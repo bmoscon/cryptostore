@@ -1,19 +1,11 @@
 # Cryptostore sample config file
 
-# Redis or Kafka are required. They are used to batch updates from cryptofeed
-# and the storage medium of choice.
+# Redis or Kafka are required. They are used to batch updates from cryptofeed and the storage medium of choice
 #
-# del_after_read (redis only):
-#     Toggles the removal of data from redis after it has been processed with
-#     cryptostore.
-# retention_time (redis only):
-#     If data removal is enabled (via del_after_read), will allow retention of
-#     data in redis for N seconds.
-# socket (redis only):
-#     Allows redis connections via a unix domain socket.
-# start_flush:
-#     Toggles if redis/kafka should be flushed at the start. Primarily for
-#     debugging, it will flush ALL of redis/kafka.
+# del_after_read: (redis only) toggles the removal of data from redis after it has been processed with cryptostore.
+# retention_time: (redis only) if data removal is enabled (via del_after_read) will allow retention of data in redis for N seconds.
+# socket: (redis only) allows redis connections via a unix domain socket
+# start_flush: toggles if redis/kafka should be flushed at the start. Primarily for debugging, it will flush ALL of redis/kafka
 cache: redis
 
 kafka:
@@ -29,40 +21,23 @@ redis:
     retention_time: null
     start_flush: true
 
-# Exchanges
-# Data sources and data types are configured under exchanges. Exchange names
-# follow the naming scheme in Cryptofeed (they must be capitalized) and only
-# exchanges supported by Cryptofeed are supported.
+# Data sources and data types configured under exchanges. Exchange names follow the naming scheme in cryptofeed (they
+# must be capitalized) and only exchanges supported by cryptofeed are supported.
+# data types follow cryptofeed definitions, see defines.py in cryptofeed for more details, common ones are
+# trades, l2_book, l3_book, funding, ticker, and open_interest
+# Trading pairs for all exchanges (except BitMEX) follow the currency-quote format
 #
-# `retries` are the number of times the connection to the exchange will be
-# retried before exiting. -1 is infinity.
-# Using a retry of -1 with a bug in your config can lead to bans by exchanges.
+# max_depth controls the size of the book to return. The top N levels will be returned, only when those N levels
+# have changed.
+# book_delta enables book deltas (snapshot, then only deltas are delivered). Snapshops are delivered
+# every book_interval updates. book_interval defaults to 1000 if not specified
 #
-# `channel_timeouts` (one channel per exchange and data type) are channel
-# specific and control how long a channel can go with no messages before
-# declaring the connection dead. Cryptofeed will restart the connection if no
-# message is received in this time period. Default is 120 seconds. -1 means no
-# timeout.
+# Retries are the number of times the connection to the exchange will be retried before exiting. -1 is infinity.
+# Using a retry of -1 with a bug in your config can lead to bans by exchanges
 #
-#
-# Trading pairs
-# Trading pairs for all exchanges (except BitMEX) follow the currency-quote
-# format.
-#
-#
-# Data types
-# Data types follow Cryptofeed definitions, see `defines.py` in Cryptofeed for
-# more details. Common ones are trades, l2_book, l3_book, funding, ticker
-# and open_interest.
-#
-#
-# Order books
-# `max_depth` controls the size of the book to return. The top N levels will be
-# returned, only when those N levels have changed.
-#
-# `book_delta` enables book deltas (snapshot, then only deltas are delivered).
-# Snapshops are delivered every `book_interval` updates. `book_interval`
-# defaults to 1000 if not specified.
+# Channel timeouts are channel specific and control how long a channel can go with no messages before declaring the connection
+# dead. Cryptofeed will restart the connection if no message is received in this time period. Default is 120 seconds. -1 means no timeout.
+
 exchanges:
     BITMEX:
         channel_timeouts:
@@ -88,16 +63,16 @@ exchanges:
         trades: [BTC-USD, ETH-USD, ETH-BTC]
         ticker: [BTC-USD]
 
-# Where to store the data. Currently arctic, influx, elastic, and parquet are
-# supported. More than one can be enabled.
+# Where to store the data. Currently arctic, influx, elastic, and parquet are supported. More than one can be enabled
 storage: [arctic, influx]
 
-# Configurable passthrough for data. Data will be sent in realtime (no
-# aggregation in redis). To disable, remove.
+# Configurable passthrough for data - data will be sent in realtime (no aggregation in redis).
+# To disable, remove
 pass_through:
     type: zmq
     host: '127.0.0.1'
     port: 5678
+
 
 elastic:
     host: 'http://127.0.0.1:9200'
@@ -112,47 +87,37 @@ influx:
     db: example
     create: true
 
-# Parquet specific options. Parquet will default to storing the data on disk
-# unless these are specified.
+# Parquet specific options. Parquet will default to storing the data on disk unless these are specified
 parquet:
-    # If storing the data to an external source (like S3), toggle this to
-    # enable the removal of the local file after writing to external store.
+    # if storing the data to an external source (like S3) toggle this to enable the removal of the local file after
+    # writing to external store
     del_file: true
-    # File name format, as a list of arguments. Default is
-    # <exchange>-<data_type>-<pair>-<timestamp>.parquet, which would be
-    # exchange, data_type, pair, timestamp.
-    # Can specify any combination exchange, data_type, pair, and timestamp.
-    # Timestamp MUST be present.
+    # File name format, as a list of arguments. Default is <exchange>-<data_type>-<pair>-<timestamp>.parquet, which would be exchange, data_type, pair, timestamp
+    # Can specify any combination exchange, data_type, pair, and timestamp
+    # timestamp MUST be present.
     # examples:
     #    pair,timestamp
     #    timestamp
     #    timestamp,exchange
     #    etc
-    # This file naming is only used for files stored on local hard drive.
-    # When uploaded to external storage, file name is imposed to be:
-    # {exchange}-{data_type}-{pair}-{timestamp}.parquet
-    # Timestamp is timestamp of writing the file on the local hard drive.
     file_format: [exchange, pair, data_type, timestamp]
-    # `path` controls where files are written on local hard drive. If null,
-    # it will write to CWD. Must be absolute path. If provided, this folder has
-    # to exist, it will not be created.
+    # Path controls where the file is written (if not using S3/GC) If null, will write to CWD. Must be absolute path
     path: null
 
+
     S3:
-        # `endpoint` allows you to override the write endpoint and write to
-        # other providers that have the same API interface.
-        # If `key_id`/`secret` are NULL, `boto` will default to using ENV vars
-        # or credentials file
-        # `prefix` is a prefix to append to the default data path.
+        # endpoint allows you to override the write endpoint and write to other provicers that have the same API interface
+        # If key_id/secret are NULL boto will default to using ENV vars or credentials file
+        # prefix: a prefix to append to the default data path
         endpoint: null
         key_id: null
         secret: null
         bucket: null
         prefix: null
     GCS:
-        # `service_account` is the path to service account key file. If null,
-        # will default to using ENV vars or auth tokens on GCE node.
-        # `prefix` is a prefix to append to the default data path.
+        # path to service account key, if null will default to using env vars or auth tokens
+        # on GCE node
+        # prefix: a prefix to append to the default data path
         service_account: null
         bucket: null
         prefix: null
@@ -165,30 +130,27 @@ parquet:
         service_account: null
         prefix: null
 
-# Arctic specific configuration options, the mongo URL
+# arctic specific configuration options - the mongo URL
 arctic: mongodb://127.0.0.1
 
-# Data batching window, in seconds, or optionally a time interval: M(inutely),
-# H(ourly), D(aily). These intervals will require that you have enough memory
-# available to redis (and python) to hold this amount of data.
-# String intervals can be combined with numbers, eg 2H is 2 hours, 5M is
-# 5 minutes, etc.
+# Data batching window, in seconds, or optionally a time interval: M(inutely), H(ourly), D(aily).
+# These intervals will require that you have enough memory available to redis (and python) to hold this amount of data.
+# String intervals can be combined with numbers, eg 2H is 2 hours, 5M is 5 minutes, etc.
 storage_interval: 60
 
 
 # Cryptostore Plugin Interface
 plugins:
     backfill:
-        # The import path, and class name.
+        # The import path, and class name
         # from cryptostore.plugin.backfill import Backfill
         module: [cryptostore.plugin.backfill, Backfill]
-        # Config path, config can be added to this file, or in a separate
-        # config. Backfill does not use a dynamic config, so its fine to put
-        # its config here.
+        # Config path, config can be added to this file, or in a separate config
+        # backfill does not use a dynamic config, so its fine to put its config here
         config: config.yaml
 
-# If configured, backfill will run in a separate process and backfill trade
-# data from earliest data (in storage) up to `start` (inclusive).
+# If configured, backfill will run in a separate process and
+# backfill trade data from earliest data (in storage) up to `start` (inclusive).
 backfill:
     COINBASE:
         BTC-USD:

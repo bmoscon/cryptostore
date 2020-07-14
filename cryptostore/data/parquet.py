@@ -11,8 +11,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from cryptostore.data.store import Store
-from cryptostore.data.gc import google_cloud_write, google_cloud_read,\
-                                google_cloud_list
+from cryptostore.data.gc import google_cloud_write, google_cloud_read, google_cloud_list
 from cryptostore.data.s3 import aws_write, aws_read, aws_list
 from cryptostore.data.gd import google_drive_write
 from cryptostore.exceptions import InconsistentStorage
@@ -85,12 +84,10 @@ class Parquet(Store):
                     file_name += f"{pair}-"
                 else:
                     print(var)
-                    raise ValueError("Invalid file format specified for \
-                                     parquet file")
+                    raise ValueError("Invalid file format specified for parquet file")
             file_name = file_name[:-1] + ".parquet"
         else:
-            file_name = f'{exchange}-{data_type}-{pair}-{int(timestamp)}\
-.parquet'
+            file_name = f'{exchange}-{data_type}-{pair}-{int(timestamp)}.parquet'
 
         if self.path:
             file_name = os.path.join(self.path, file_name)
@@ -101,8 +98,7 @@ class Parquet(Store):
         if self._write:
             for func, bucket, prefix, kwargs in \
                        zip(self._write, self.bucket, self.prefix, self.kwargs):
-                path = f'{exchange}/{data_type}/{pair}/{exchange}-{data_type}-\
-                       {pair}-{int(timestamp)}.parquet'
+                path = f'{exchange}/{data_type}/{pair}/{exchange}-{data_type}-{pair}-{int(timestamp)}.parquet'
                 if prefix:
                     path = f"{prefix}/{path}"
                 func(bucket, path, file_name, **kwargs)
@@ -137,8 +133,7 @@ class Parquet(Store):
 
         for entry in objs:
             if entry[0] != start:
-                raise InconsistentStorage("Stored data differs,\
-                                          cannot backfill")
+                raise InconsistentStorage("Stored data differs, cannot backfill")
 
         if files:
             return float(pq.read_table(files[0], columns=['timestamp'])
