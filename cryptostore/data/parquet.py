@@ -46,8 +46,7 @@ class Parquet(Store):
                 self._list.append(aws_list)
                 self.bucket.append(config['S3']['bucket'])
                 self.prefix.append(config['S3']['prefix'])
-                self.kwargs.append({'creds': (config['S3']['key_id'],
-                                              config['S3']['secret']),
+                self.kwargs.append({'creds': (config['S3']['key_id'], config['S3']['secret']),
                                     'endpoint': config['S3'].get('endpoint')})
             if 'GD' in config:
                 self._write.append(google_drive_write)
@@ -96,8 +95,7 @@ class Parquet(Store):
         self.data = None
 
         if self._write:
-            for func, bucket, prefix, kwargs in \
-                       zip(self._write, self.bucket, self.prefix, self.kwargs):
+            for func, bucket, prefix, kwargs in zip(self._write, self.bucket, self.prefix, self.kwargs):
                 path = f'{exchange}/{data_type}/{pair}/{exchange}-{data_type}-{pair}-{int(timestamp)}.parquet'
                 if prefix:
                     path = f"{prefix}/{path}"
@@ -105,8 +103,7 @@ class Parquet(Store):
             if self.del_file:
                 os.remove(file_name)
 
-    def get_start_date(self, exchange: str, data_type: str, pair: str)\
-            -> float:
+    def get_start_date(self, exchange: str, data_type: str, pair: str) -> float:
         objs = []
         files = []
 
@@ -115,8 +112,7 @@ class Parquet(Store):
             files = glob.glob(file_pattern)
 
         if self._read:
-            for func, bucket, prefix, kwargs in zip(self._list, self.bucket,
-                                                    self.prefix, self.kwargs):
+            for func, bucket, prefix, kwargs in zip(self._list, self.bucket, self.prefix, self.kwargs):
                 path = f'{exchange}/{data_type}/{pair}/'
                 if prefix:
                     path = f"{prefix}/{path}"
@@ -141,7 +137,6 @@ class Parquet(Store):
         else:
             tmp = f'{exchange}-{pair}-temp.parquet'
             self._read[0](self.bucket[0], objs[0][0], tmp, **self.kwargs[0])
-            start = float(pq.read_table(tmp, columns=['timestamp'])
-                            .to_pandas().timestamp[0])
+            start = float(pq.read_table(tmp, columns=['timestamp']).to_pandas().timestamp[0])
             os.remove(tmp)
             return start
