@@ -121,6 +121,14 @@ parquet:
         service_account: null
         bucket: null
         prefix: null
+    GD:
+        # Google Drive connector.
+        # `service_account` is the path to service account key file. If null,
+        # will default to using ENV var.
+        # `prefix` is the folder name where to store files. This folder has to
+        # exist, it will not be created.
+        service_account: null
+        prefix: null
 
 # arctic specific configuration options - the mongo URL
 arctic: mongodb://127.0.0.1
