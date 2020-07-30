@@ -13,12 +13,15 @@ import pyarrow.parquet as pq
 from cryptostore.data.store import Store
 from cryptostore.data.gc import google_cloud_write, google_cloud_read, google_cloud_list
 from cryptostore.data.s3 import aws_write, aws_read, aws_list
-from cryptostore.data.gd import google_drive_write
+from cryptostore.data.gd import GDriveConnector
 from cryptostore.exceptions import InconsistentStorage
 
 
 class Parquet(Store):
-    def __init__(self, config=None):
+
+    default_path = lambda self, exchange, data_type, pair: f'{exchange}/{data_type}/{pair}'
+
+    def __init__(self, exchanges, config=None):
         self._write = []
         self._read = []
         self._list = []
@@ -48,10 +51,11 @@ class Parquet(Store):
                 self.prefix.append(config['S3']['prefix'])
                 self.kwargs.append({'creds': (config['S3']['key_id'], config['S3']['secret']), 'endpoint': config['S3'].get('endpoint')})
             if 'GD' in config:
-                self._write.append(google_drive_write)
-                self.prefix.append(config['GD']['prefix'])
+                g_drive = GDriveConnector(config['GD']['service_account'], exchanges, config['GD']['prefix'], self.default_path)
+                self._write.append(g_drive.write)
+                self.prefix.append(None)
                 self.bucket.append(None)
-                self.kwargs.append({'creds': config['GD']['service_account']})
+                self.kwargs.append({'dummy': 'Dummy'})
 
 
     def aggregate(self, data):
@@ -95,7 +99,7 @@ class Parquet(Store):
 
         if self._write:
             for func, bucket, prefix, kwargs in zip(self._write, self.bucket, self.prefix, self.kwargs):
-                path = f'{exchange}/{data_type}/{pair}/{exchange}-{data_type}-{pair}-{int(timestamp)}.parquet'
+                path = self.default_path(exchange, data_type, pair) + f'/{exchange}-{data_type}-{pair}-{int(timestamp)}.parquet'
                 if prefix:
                     path = f"{prefix}/{path}"
                 func(bucket, path, file_name, **kwargs)

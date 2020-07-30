@@ -79,13 +79,13 @@ class Aggregator(Process):
                         interval_start = end + timedelta(seconds=interval + 1)
                     start, end = get_time_interval(interval_start, base_interval, multiplier=multiplier)
                 if 'exchanges' in self.config and self.config.exchanges:
+                    store = Storage(self.config)
                     for exchange in self.config.exchanges:
                         for dtype in self.config.exchanges[exchange]:
                             # Skip over the retries arg in the config if present.
                             if dtype in {'retries', 'channel_timeouts'}:
                                 continue
                             for pair in self.config.exchanges[exchange][dtype] if 'symbols' not in self.config.exchanges[exchange][dtype] else self.config.exchanges[exchange][dtype]['symbols']:
-                                store = Storage(self.config)
                                 LOG.info('Reading %s-%s-%s', exchange, dtype, pair)
                                 data = cache.read(exchange, dtype, pair, start=start, end=end)
                                 if len(data) == 0:
