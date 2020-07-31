@@ -56,19 +56,14 @@ class GDriveConnector:
         files = self.drive.files()
         # Retrieve candidates for child and parent folders in Google Drive.
         # `pageSize` is by default to 100 and is limited to 1000.
-        # Use of `list_next()` appears buggy, using `nextPageToken` instead.
-        # https://github.com/googleapis/google-api-python-client/issues/989
         g_drive_folders = []
-        page_token = None
-        while True:
-            res = files.list(q="mimeType = 'application/vnd.google-apps.folder' and trashed = false",
-                             pageSize=800, pageToken=page_token,
-                             fields='nextPageToken, files(id, name, parents)')\
-                       .execute()
+        request = files.list(q="mimeType = 'application/vnd.google-apps.folder' and trashed = false",
+                             pageSize=800,
+                             fields='nextPageToken, files(id, name, parents)')
+        while request is not None:
+            res = request.execute()
             g_drive_folders.extend(res.get('files', []))
-            page_token = res.get('nextPageToken', None)
-            if page_token is None:
-                break
+            request = files.list_next(request, res)
 
         # Retrieve parent folder ID (prefix).
         p_folders = [folder['id'] for folder in g_drive_folders if folder['name'] == prefix]
