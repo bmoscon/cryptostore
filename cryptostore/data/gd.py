@@ -4,18 +4,13 @@ Copyright (C) 2018-2020  Bryant Moscon - bmoscon@gmail.com
 Please see the LICENSE file for the terms and conditions
 associated with this software.
 '''
-# Removed as not used
-# from cryptostore.engines import StorageEngines
-
 from typing import Tuple
-import google.auth
-from google.oauth2 import service_account
-import googleapiclient.discovery as gad
-import googleapiclient.http as gah
+
+from cryptostore.engines import StorageEngines
 from cryptostore.exceptions import InconsistentStorage
 
 
-def _get_drive(creds: str = None) -> gad.Resource:
+def _get_drive(creds: str = None):
     """
     Return `drive` service with required credentials and required scope to
     perform list/read/write operations in Google Drive.
@@ -25,21 +20,24 @@ def _get_drive(creds: str = None) -> gad.Resource:
             Path to credential file.
 
     Returns
-        drive (gad.Resource):
+        drive (googleapiclient.discovery.Resource):
             google Drive service loaded with 'scoped' credentials.
 
     """
+    oauth2 = StorageEngines['google.oauth2']
+    auth = StorageEngines['google.auth']
+    gad = StorageEngines['googleapiclient.discovery']
 
     if creds:
-        creds = service_account.Credentials.from_service_account_file(creds).with_scopes(['https://www.googleapis.com/auth/drive'])
+        creds = google.service_account.Credentials.from_service_account_file(creds).with_scopes(['https://www.googleapis.com/auth/drive'])
     else:
         # use environment variable GOOGLE_APPLICATION_CREDENTIALS
-        creds, project = google.auth.default(scopes=['https://www.googleapis.com/auth/drive'])
+        creds, project = auth.default(scopes=['https://www.googleapis.com/auth/drive'])
 
     return gad.build('drive', 'v3', credentials=creds)
 
 
-def _get_folder_in_parent(drive: gad.Resource, path: str) -> Tuple[str, str]:
+def _get_folder_in_parent(drive, path: str) -> Tuple[str, str]:
     """
     Retrieve folder ID from given name and parent folder name.
     If not existing, it is created.
@@ -59,7 +57,6 @@ def _get_folder_in_parent(drive: gad.Resource, path: str) -> Tuple[str, str]:
             not existing.
 
     """
-
     # Retrieve parent folder (prefix), and child folder.
     path_struct = path.split('/')
     folder_name = '-'.join(path_struct[1:4])
@@ -137,6 +134,7 @@ def google_drive_write(bucket: str, path: str, file_name: str, creds: str):
             Path to credential file.
 
     """
+    gah = StorageEngines['import googleapiclient.http']
 
     # Retrieve folder ID to be used to write the file into, and upload.
     # If not existing, folder will be created.
