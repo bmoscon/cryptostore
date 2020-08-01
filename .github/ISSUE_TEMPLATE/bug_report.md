@@ -12,10 +12,10 @@ A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+* Provide config (at least as much as is relevant)
+* redis or kafka?
+* What behavior did you see?
+* Provide any tracebacks if applicable
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
