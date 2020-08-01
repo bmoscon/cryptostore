@@ -109,7 +109,7 @@ parquet:
     S3:
         # endpoint allows you to override the write endpoint and write to other provicers that have the same API interface
         # If key_id/secret are NULL boto will default to using ENV vars or credentials file
-        # prefix: a prefix to append to the default data path. The path must exist
+        # prefix: a prefix to append to the default data path.
         endpoint: null
         key_id: null
         secret: null
