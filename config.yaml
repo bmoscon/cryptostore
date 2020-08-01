@@ -101,14 +101,15 @@ parquet:
     #    timestamp,exchange
     #    etc
     file_format: [exchange, pair, data_type, timestamp]
-    # Path controls where the file is written (if not using S3/GC) If null, will write to CWD. Must be absolute path
+    # Path controls where the file is written (if not using S3/GC) If null, will write to CWD. Must be absolute path. The path must also exist, Cryptostore will not
+    # create the path. 
     path: null
 
 
     S3:
         # endpoint allows you to override the write endpoint and write to other provicers that have the same API interface
         # If key_id/secret are NULL boto will default to using ENV vars or credentials file
-        # prefix: a prefix to append to the default data path
+        # prefix: a prefix to append to the default data path. The path must exist
         endpoint: null
         key_id: null
         secret: null
