@@ -4,16 +4,12 @@ Copyright (C) 2018-2020  Bryant Moscon - bmoscon@gmail.com
 Please see the LICENSE file for the terms and conditions
 associated with this software.
 '''
-# Removed as not used
-# from cryptostore.engines import StorageEngines
+
+
 
 from typing import Tuple, Callable
-import httplib2
-import google.auth
-from google.oauth2 import service_account
-import googleapiclient.discovery as gad
-import googleapiclient.http as gah
-from googleapiclient import _auth
+
+from cryptostore.engines import StorageEngines
 from cryptostore.exceptions import InconsistentStorage
 
 
@@ -41,17 +37,23 @@ class GDriveConnector:
 
         """
 
+        httplib2 = StorageEngines['httplib2']
+
         # Initialize a drive service, with an authorized caching-enabled
         # `http` object.
         if creds:
-            self.creds = service_account.Credentials.from_service_account_file(creds)\
+            google = StorageEngines['google.oauth2.service_account']
+            self.creds = google.oauth2.service_account.Credentials.from_service_account_file(creds)\
                                         .with_scopes(['https://www.googleapis.com/auth/drive'])
         else:
             # Use environment variable GOOGLE_APPLICATION_CREDENTIALS
+            google = StorageEngines['google.auth']
             self.creds, project = google.auth.default(scopes=['https://www.googleapis.com/auth/drive'])
-        auth_http = _auth.authorized_http(self.creds)
+        googleapiclient = StorageEngines['googleapiclient._auth']
+        auth_http = googleapiclient._auth.authorized_http(self.creds)
         auth_http.cache = httplib2.FileCache(self.cache_path)
-        self.drive = gad.build('drive', 'v3', http=auth_http)
+        googleapiclient = StorageEngines['googleapiclient.discovery']
+        self.drive = googleapiclient.discovery.build('drive', 'v3', http=auth_http)
 
         files = self.drive.files()
         # Retrieve candidates for child and parent folders in Google Drive.
@@ -138,17 +140,21 @@ accessible folder.".format(prefix))
 
         """
 
+        httplib2 = StorageEngines['httplib2']
+
         # Retrieve folder ID to be used to write the file into.
         # Get folder name first.
         folder_name = '-'.join(path.split('/')[0:3])
         folder_id = self.folders[folder_name]
         # Upload (caching the authorized `http` object used to run
         # `next_chunk()`)
-        media = gah.MediaFileUpload(file_name, resumable=True)
+        googleapiclient = StorageEngines['googleapiclient.http']
+        media = googleapiclient.http.MediaFileUpload(file_name, resumable=True)
         file_metadata = {'name': path.split('/')[-1], 'parents': [folder_id]}
         request = self.drive.files().create(body=file_metadata,
                                             media_body=media, fields='id')
-        auth_http = _auth.authorized_http(self.creds)
+        googleapiclient = StorageEngines['googleapiclient._auth']
+        auth_http = googleapiclient._auth.authorized_http(self.creds)
         auth_http.cache = httplib2.FileCache(self.cache_path)
         response = None
         while response is None:
