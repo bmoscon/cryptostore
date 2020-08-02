@@ -26,7 +26,7 @@ class PluginController:
                 self.cfg = Config(file_name)
 
     def start(self):
-        if 'plugins' in self.cfg:
+        if self.cfg and 'plugins' in self.cfg:
             if self.cfg and isinstance(self.cfg.plugins, dict):
                 for _, plugin in self.cfg.plugins.items():
                     module = plugin.module

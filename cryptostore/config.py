@@ -46,10 +46,7 @@ class Config:
 class DynamicConfig(Config):
     def __init__(self, file_name=None, reload_interval=10, callback=None):
         if file_name is None:
-            if 'CRYPTOSTORE_CONFIG' in os.environ:
-                file_name = os.environ['CRYPTOSTORE_CONFIG']
-            else:
-                file_name = os.path.join(os.getcwd(), 'config.yaml')
+            file_name = os.path.join(os.getcwd(), 'config.yaml')
         if not os.path.isfile(file_name):
             raise FileNotFoundError(f"Config file {file_name} not found")
 

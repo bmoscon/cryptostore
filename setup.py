@@ -38,7 +38,7 @@ setup(
         "cryptofeed>=1.3.1",
         "pyyaml",
         "pyarrow",
-        "aiohttp"
+        "aiohttp==3.6.2"
     ],
     extras_require={
         'redis': ['redis', 'aioredis'],
@@ -46,7 +46,8 @@ setup(
         'arctic': ['arctic'],
         'gcs': ['google-cloud-storage'],
         'aws': ['boto3'],
-        'zmq': ['pyzmq']
+        'zmq': ['pyzmq'],
+        "drive": ["google-auth", "google-api-python-client"]
     },
     entry_points = {
         'console_scripts': ['cryptostore=cryptostore.bin.cryptostore:main'],
