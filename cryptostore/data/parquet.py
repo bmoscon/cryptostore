@@ -32,6 +32,15 @@ class Parquet(Store):
         self.del_file = True
         self.file_name = config.get('file_format') if config else None
         self.path = config.get('path') if config else None
+        if config and 'compression' in config:
+            self.comp_codec = config['compression']['codec']
+            if 'level' in config['compression']:
+                self.comp_level = config['compression']['level']
+            else:
+                self.comp_level = None
+        else:
+            self.comp_codec = None
+            self.comp_level = None
 
         if config:
             self.del_file = config.get('del_file', True)
@@ -94,7 +103,7 @@ class Parquet(Store):
         if self.path:
             file_name = os.path.join(self.path, file_name)
 
-        pq.write_table(self.data, file_name)
+        pq.write_table(self.data, file_name, compression=self.comp_codec, compression_level=self.comp_level)
         self.data = None
 
         if self._write:
