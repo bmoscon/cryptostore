@@ -1,7 +1,7 @@
 # Google Drive connector
 
 This connector uploads parquet files to a Google Drive folder.
-This documentation page introduces some prerequesites, and the way to setup:
+This documentation page introduces some prerequisites, and the way to setup:
   * a service account and to allow its access to your Google Drive storage space.
   * how to setup Cryptostore configuration file.
 
