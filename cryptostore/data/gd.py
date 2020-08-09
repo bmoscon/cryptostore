@@ -4,148 +4,155 @@ Copyright (C) 2018-2020  Bryant Moscon - bmoscon@gmail.com
 Please see the LICENSE file for the terms and conditions
 associated with this software.
 '''
-from typing import Tuple
+from typing import Tuple, Callable
 
 from cryptostore.engines import StorageEngines
 from cryptostore.exceptions import InconsistentStorage
 
 
-def _get_drive(creds: str = None):
-    """
-    Return `drive` service with required credentials and required scope to
-    perform list/read/write operations in Google Drive.
+class GDriveConnector:
 
-    Parameters
-        creds (str):
-            Path to credential file.
+    cache_path = '.cache'
 
-    Returns
-        drive (googleapiclient.discovery.Resource):
-            google Drive service loaded with 'scoped' credentials.
+    def __init__(self, creds: str, exchanges: dict, prefix: str,
+                 path: Callable[[str, str, str], str]):
+        """
+        Initialize a `drive` service, and create the list of folders' IDs,
+        either retrieving them if already existing, or creating them if not
+        existing.
 
-    """
-    oauth2 = StorageEngines['google.oauth2']
-    auth = StorageEngines['google.auth']
-    gad = StorageEngines['googleapiclient.discovery']
+        Parameters:
+            creds (str):
+                Path to credential file.
+            exchanges (dict):
+                List of exchanges with related data types and pairs that are
+                retrieved by cryptostore.
+            prefix (str):
+                Base folder into which storing recorded data.
+            path (Callable[[str, str, str], str]):
+                Function from which deriving folders' name.
 
-    if creds:
-        creds = google.service_account.Credentials.from_service_account_file(creds).with_scopes(['https://www.googleapis.com/auth/drive'])
-    else:
-        # use environment variable GOOGLE_APPLICATION_CREDENTIALS
-        creds, project = auth.default(scopes=['https://www.googleapis.com/auth/drive'])
+        """
 
-    return gad.build('drive', 'v3', credentials=creds)
+        httplib2 = StorageEngines['httplib2']
 
+        # Initialize a drive service, with an authorized caching-enabled
+        # `http` object.
+        if creds:
+            google = StorageEngines['google.oauth2.service_account']
+            self.creds = google.oauth2.service_account.Credentials.from_service_account_file(creds)\
+                                        .with_scopes(['https://www.googleapis.com/auth/drive'])
+        else:
+            # Use environment variable GOOGLE_APPLICATION_CREDENTIALS
+            google = StorageEngines['google.auth']
+            self.creds, project = google.auth.default(scopes=['https://www.googleapis.com/auth/drive'])
+        googleapiclient = StorageEngines['googleapiclient._auth']
+        auth_http = googleapiclient._auth.authorized_http(self.creds)
+        auth_http.cache = httplib2.FileCache(self.cache_path)
+        googleapiclient = StorageEngines['googleapiclient.discovery']
+        self.drive = googleapiclient.discovery.build('drive', 'v3', http=auth_http)
 
-def _get_folder_in_parent(drive, path: str) -> Tuple[str, str]:
-    """
-    Retrieve folder ID from given name and parent folder name.
-    If not existing, it is created.
+        files = self.drive.files()
+        # Retrieve candidates for child and parent folders in Google Drive.
+        # `pageSize` is by default to 100 and is limited to 1000.
+        g_drive_folders = []
+        request = files.list(q="mimeType = 'application/vnd.google-apps.folder' and trashed = false",
+                             pageSize=800,
+                             fields='nextPageToken, files(id, name, parents)')
+        while request is not None:
+            res = request.execute()
+            g_drive_folders.extend(res.get('files', []))
+            request = files.list_next(request, res)
 
-    Parameters:
-        drive (gad.Resource):
-            Service with which interacting with Google Drive.
-        path (str):
-            path = '{prefix}/{exchange}/{data_type}/{pair}/
-                        {exchange}-{data_type}-{pair}-{int(timestamp)}.parquet'
-            String from which is retrieved `prefix` (parent folder) and name of
-            child folder '{exchange}-{data_type}-{pair}'.
-
-    Returns:
-        folder_id, folder_name (Tuple[str, str]):
-            Id of child folder '{exchange}-{data_type}-{pair}'. Create it if
-            not existing.
-
-    """
-    # Retrieve parent folder (prefix), and child folder.
-    path_struct = path.split('/')
-    folder_name = '-'.join(path_struct[1:4])
-    if len(path_struct) > 5:
-        # If larger than 5, it means prefix is more than a single folder.
-        # This case is not supported.
-        raise InconsistentStorage("Prefix {!s} appears to be a path. Only a single folder name is accepted.".format(folder_name))
-
-    parent_name = path_struct[0]
-    # Retrieve candidates for child and parent folders.
-    res = drive.files().list(q="(name = '" + parent_name + "' or name = '"
-                                           + folder_name + "') and mimeType = 'application/vnd.google-apps.folder' and trashed = false",
-                             pageSize=20,
-                             fields='files(id, name, parents)').execute()
-    folders = res.get('files', [])
-
-    # Manage parent folder.
-    p_folders = [(folder['id'], folder['name']) for folder in folders
-                 if folder['name'] == parent_name]
-    if len(p_folders) > 1:
-        # If more than 2 folders with the same name, throw an error. We do not
-        # know which one is the right one to record data.
-        raise InconsistentStorage("At least 2 parent folders identified with \
+        # Retrieve parent folder ID (prefix).
+        p_folders = [folder['id'] for folder in g_drive_folders if folder['name'] == prefix]
+        if len(p_folders) > 1:
+            # If more than 2 folders with the same name, throw an error. We do not
+            # know which one is the right one to record data.
+            raise InconsistentStorage("At least 2 parent folders identified with \
 name {!s}. Please, make sure to provide a prefix corresponding to a unique \
-folder name in your Google Drive space.".format(parent_name))
-    elif not p_folders:
-        # If parent folder is not found, ask the user to create one.
-        raise InconsistentStorage("No existing folder found with name {!s}. \
+folder name in your Google Drive space.".format(prefix))
+        elif not p_folders:
+            # If parent folder is not found, ask the user to create one.
+            raise InconsistentStorage("No existing folder found with name {!s}. \
 Please, make sure to provide a prefix corresponding to an existing and \
-accessible folder.".format(parent_name))
-    else:
-        p_folder_id = p_folders[0][0]
+accessible folder.".format(prefix))
+        else:
+            p_folder_id = p_folders[0]
 
-    # Manage child folder.
-    c_folders = [(folder['id'], folder['name']) for folder in folders
-                 if ((folder['name'] == folder_name) and ('parents' in folder)
-                     and (p_folder_id in folder['parents']))]
-    if len(c_folders) > 1:
-        # If more than 2 folders with the same name, throw an error. We do not
-        # know which one is the right one to record data.
-        raise InconsistentStorage("At least 2 folders identified with name {!s}. Please, clean content of parent folder.".format(folder_name))
-    elif not c_folders:
-        # If folder not found, create it.
-        folder_metadata = {'name': folder_name,
-                           'mimeType': 'application/vnd.google-apps.folder',
-                           'parents': [p_folder_id]}
-        folder = drive.files().create(body=folder_metadata, fields='id')\
-                              .execute()
+        # Manage child folders. Build list of folders' name.
+        c_folders = []
+        for exchange in exchanges:
+            for dtype in exchanges[exchange]:
+                # Skip over the retries arg in the config if present.
+                if dtype in {'retries', 'channel_timeouts'}:
+                    continue
+                for pair in exchanges[exchange][dtype] if 'symbols' not in exchanges[exchange][dtype] else exchanges[exchange][dtype]['symbols']:
+                    c_folders.append('-'.join(path(exchange, dtype, pair).split('/')))
+        # Retrieve ID for existing ones.
+        existing_childs = [(folder['name'], folder['id']) for folder in g_drive_folders
+                           if ((folder['name'] in c_folders) and ('parents' in folder)
+                           and (p_folder_id in folder['parents']))]
+        # If duplicates in folder names, throw an exception.
+        existing_as_dict = dict(existing_childs)
+        n = len(existing_childs) - len(existing_as_dict)
+        if n != 0:
+            raise InconsistentStorage("{!s} existing folder(s) share(s) same name with another. Please, clean content of {!s} folder.".format(n, prefix))
+        # Get missing ones and create corresponding child folders in batch.
+        missing_childs = list(set(c_folders) - set(existing_as_dict))
+        # Number of calls in batch is limited to 1000.
+        call_limit = 800
+        missing_in_chunks = [missing_childs[x:x+call_limit] for x in range(0, len(missing_childs), call_limit)]
+        # Setup & operate requests in batch.
+        def _callback(request_id, response, exception, keep=existing_as_dict):
+            keep[response['name']] = response['id']
+            return
+        for sub_list in missing_in_chunks:
+            batch = self.drive.new_batch_http_request(_callback)
+            for folder in sub_list:
+                folder_metadata = {'name': folder,
+                                   'mimeType': 'application/vnd.google-apps.folder',
+                                   'parents': [p_folder_id]}
+                batch.add(files.create(body=folder_metadata, fields='id, name'))
+            batch.execute()
+        self.folders = existing_as_dict
 
-        return folder.get('id'), folder_name
-    else:
-        # Single folder found.
 
-        return folders[0]['id'], folder_name
+    def write(self, bucket: str, path: str, file_name: str, **kwargs):
+        """
+        Upload file to Google Drive. File is stored in a parent folder which
+        name is that of 'path', replacing '/' with '-'. Folder name is
+        generated in `__init__`.
 
-
-def google_drive_write(bucket: str, path: str, file_name: str, creds: str):
-    """
-    Upload file to Google Drive.
-    File is stored in a parent folder which name is that of 'path' without the
-    '/'.
-
-    Parameters
-        bucket:
-            Unused parameter.
-        path (str):
-            path = '{prefix}/{exchange}/{data_type}/{pair}/
+        Parameters:
+            bucket:
+                Unused parameter.
+            path (str):
+                path = '{exchange}/{data_type}/{pair}/
                         {exchange}-{data_type}-{pair}-{int(timestamp)}.parquet'
-            String from which is derived folder name into which is written the
-            file, as well as the root folder that will contain all these
-            folders.
-        file_name (str):
-            File name preceded by path on local disk.
-        creds (str):
-            Path to credential file.
+                String from which is derived folder name into which is written
+                the file.
+            file_name (str):
+                File name preceded by path on local disk.
 
-    """
-    gah = StorageEngines['import googleapiclient.http']
+        """
 
-    # Retrieve folder ID to be used to write the file into, and upload.
-    # If not existing, folder will be created.
-    drive = _get_drive(creds)
-    folder_id, folder_name = _get_folder_in_parent(drive, path)
-    media = gah.MediaFileUpload(file_name, resumable=True)
-    file_metadata = {'name': path.split('/')[-1], 'parents': [folder_id]}
-    request = drive.files().create(body=file_metadata, media_body=media,
-                                   fields='id')
-    response = None
-    while response is None:
-        status, response = request.next_chunk(num_retries=4)
+        httplib2 = StorageEngines['httplib2']
 
-    return
+        # Retrieve folder ID to be used to write the file into.
+        # Get folder name first.
+        folder_name = '-'.join(path.split('/')[0:3])
+        folder_id = self.folders[folder_name]
+        # Upload (caching the authorized `http` object used to run
+        # `next_chunk()`)
+        googleapiclient = StorageEngines['googleapiclient.http']
+        media = googleapiclient.http.MediaFileUpload(file_name, resumable=True)
+        file_metadata = {'name': path.split('/')[-1], 'parents': [folder_id]}
+        request = self.drive.files().create(body=file_metadata,
+                                            media_body=media, fields='id')
+        googleapiclient = StorageEngines['googleapiclient._auth']
+        auth_http = googleapiclient._auth.authorized_http(self.creds)
+        auth_http.cache = httplib2.FileCache(self.cache_path)
+        response = None
+        while response is None:
+            status, response = request.next_chunk(num_retries=4, http=auth_http)
