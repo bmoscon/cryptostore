@@ -156,5 +156,3 @@ accessible folder.".format(prefix))
         response = None
         while response is None:
             status, response = request.next_chunk(num_retries=4, http=auth_http)
-
-        return
