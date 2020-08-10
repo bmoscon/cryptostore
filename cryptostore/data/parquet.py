@@ -32,15 +32,12 @@ class Parquet(Store):
         self.del_file = True
         self.file_name = config.get('file_format') if config else None
         self.path = config.get('path') if config else None
+        self.comp_codec = None
+        self.comp_level = None
         if config and 'compression' in config:
             self.comp_codec = config['compression']['codec']
             if 'level' in config['compression']:
                 self.comp_level = config['compression']['level']
-            else:
-                self.comp_level = None
-        else:
-            self.comp_codec = None
-            self.comp_level = None
 
         if config:
             self.del_file = config.get('del_file', True)
