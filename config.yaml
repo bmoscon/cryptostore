@@ -151,19 +151,23 @@ arctic: mongodb://127.0.0.1
 storage_interval: 60
 
 
+# 
+# The backfill plugin is deprecated and unsupported. A new one is being developed and will be released in the coming weeks.
+#
+
 # Cryptostore Plugin Interface
-plugins:
-    backfill:
+#plugins:
+#    backfill:
         # The import path, and class name
         # from cryptostore.plugin.backfill import Backfill
-        module: [cryptostore.plugin.backfill, Backfill]
+#        module: [cryptostore.plugin.backfill, Backfill]
         # Config path, config can be added to this file, or in a separate config
         # backfill does not use a dynamic config, so its fine to put its config here
-        config: config.yaml
+#        config: config.yaml
 
 # If configured, backfill will run in a separate process and
 # backfill trade data from earliest data (in storage) up to `start` (inclusive).
-backfill:
-    COINBASE:
-        BTC-USD:
-            start: '2017-01-01'
+#backfill:
+#    COINBASE:
+#        BTC-USD:
+#            start: '2017-01-01'
