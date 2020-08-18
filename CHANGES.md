@@ -1,6 +1,6 @@
 ## Changelog
 
-### 0.3.0
+### 0.3.0 (2020-08-18)
   * Feature: Config options for controlling data channel timeouts
   * Feature: Path option in config for local parquet storage
   * Feature: Configurable filenames for parquet storage
