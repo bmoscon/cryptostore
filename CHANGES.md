@@ -6,6 +6,7 @@
   * Feature: Configurable filenames for parquet storage
   * Bugfix: Ticker missing from ZMQ pass through
   * Feature: Store data to Google Drive
+  * Bugfix: Kafka now supports the time interval for storage intervals (feature added in 0.2.1)
 
 ### 0.2.1 (2020-03-17)
   * Feature: Open Interest support
