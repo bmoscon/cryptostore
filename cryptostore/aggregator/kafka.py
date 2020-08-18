@@ -47,20 +47,43 @@ class Kafka(Cache):
             self.conn[key].subscribe([key])
         return self.conn[key]
 
-    def read(self, exchange, dtype, pair):
+    def read(self, exchange, dtype, pair, start=None, end=None):
+        kafka = StorageEngines.confluent_kafka
         key = f'{dtype}-{exchange}-{pair}'
-        data = self._conn(key).consume(1000000, timeout=0.5)
+
+        if start and end:
+            start_offset = self._conn(key).offsets_for_times([kafka.TopicPartition(key, 0, start)])[0]
+            stop_offset = self._conn(key).offsets_for_times([kafka.TopicPartition(key, 0, end)])[0]
+            if start_offset.offset == -1:
+                return []
+
+            self._conn(key).assign([start_offset])
+            offset_diff = stop_offset.offset - start_offset.offset
+            if offset_diff <= 0:
+                return []
+
+            data = self._conn(key).consume(offset_diff)
+            self._conn(key).unassign()
+        else:
+            data = self._conn(key).consume(1000000, timeout=0.5)
+
         LOG.info("%s: Read %d messages from Kafka", key, len(data))
         ret = []
+
         for message in data:
             self.ids[key] = message
-            update = json.loads(message.value().decode('utf8'))
-
+            msg = message.value().decode('utf8')
+            try:
+                update = json.loads(msg)
+            except:
+                if 'Subscribed topic not available' in msg:
+                    return ret
             if dtype in {L2_BOOK, L3_BOOK}:
                 update = book_flatten(update, update['timestamp'], update['delta'])
                 ret.extend(update)
             if dtype in {TRADES, TICKER, FUNDING, OPEN_INTEREST}:
                 ret.append(update)
+
         return ret
 
     def delete(self, exchange, dtype, pair):

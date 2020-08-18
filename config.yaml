@@ -109,7 +109,7 @@ parquet:
         codec: 'BROTLI'
         level: 6
     # Path controls where the file is written (if not using S3/GC) If null, will write to CWD. Must be absolute path. The path must also exist, Cryptostore will not
-    # create the path. 
+    # create the path.
     path: null
 
 
@@ -144,6 +144,10 @@ arctic: mongodb://127.0.0.1
 # Data batching window, in seconds, or optionally a time interval: M(inutely), H(ourly), D(aily).
 # These intervals will require that you have enough memory available to redis (and python) to hold this amount of data.
 # String intervals can be combined with numbers, eg 2H is 2 hours, 5M is 5 minutes, etc.
+# Note that if a time interval is selected and kafka is used, the timestamps used to aggregate the data
+# for the time intervals from from Kafka's internal timestamp offsets - these will differ from the exchange
+# provided timestamps - it may be anywhere from 0.001 ms to seconds depending on your kafka cluster and
+# other hardware and setup configurations.
 storage_interval: 60
 
 

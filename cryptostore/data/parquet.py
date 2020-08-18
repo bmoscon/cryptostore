@@ -91,7 +91,6 @@ class Parquet(Store):
                 elif var == "pair":
                     file_name += f"{pair}-"
                 else:
-                    print(var)
                     raise ValueError("Invalid file format specified for parquet file")
             file_name = file_name[:-1] + ".parquet"
         else:
