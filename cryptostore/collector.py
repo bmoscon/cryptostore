@@ -9,7 +9,7 @@ from multiprocessing import Process
 import logging
 
 from cryptofeed import FeedHandler
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, BOOK_DELTA, TICKER, FUNDING, OPEN_INTEREST
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, BOOK_DELTA, TICKER, FUNDING, OPEN_INTEREST, TRADES_SWAP, L2_BOOK_SWAP, TICKER_SWAP, TRADES_FUTURES, L2_BOOK_FUTURES, TICKER_FUTURES
 
 
 LOG = logging.getLogger('cryptostore')
@@ -46,7 +46,7 @@ class Collector(Process):
             if 'max_depth' in value:
                 depth = value['max_depth']
 
-            if callback_type in (L2_BOOK, L3_BOOK):
+            if callback_type in (L2_BOOK, L3_BOOK, L2_BOOK_SWAP, L2_BOOK_FUTURES):
                 self.exchange_config[callback_type] = self.exchange_config[callback_type]['symbols']
 
             if cache == 'redis':
@@ -72,15 +72,31 @@ class Collector(Process):
                 kwargs = {'host': self.config['kafka']['ip'], 'port': self.config['kafka']['port']}
 
             if callback_type == TRADES:
-                cb[TRADES] = [trade_cb(**kwargs)]
+                cb[TRADES] = [trade_cb(key=TRADES, **kwargs)]
+            elif callback_type == TRADES_SWAP:
+                cb[TRADES_SWAP] = [trade_cb(key=TRADES_SWAP, **kwargs)]
+            elif callback_type == TRADES_FUTURES:
+                cb[TRADES_FUTURES] = [trade_cb(key=TRADES_FUTURES, **kwargs)]
             elif callback_type == FUNDING:
                 cb[FUNDING] = [funding_cb(**kwargs)]
             elif callback_type == TICKER:
-                cb[TICKER] = [ticker_cb(**kwargs)]
+                cb[TICKER] = [ticker_cb(key=TICKER, **kwargs)]
+            elif callback_type == TICKER_SWAP:
+                cb[TICKER_SWAP] = [ticker_cb(key=TICKER_SWAP, **kwargs)]
+            elif callback_type == TICKER_FUTURES:
+                cb[TICKER_FUTURES] = [ticker_cb(key=TICKER_FUTURES, **kwargs)]
             elif callback_type == L2_BOOK:
                 cb[L2_BOOK] = [book_cb(key=L2_BOOK, **kwargs)]
                 if book_up:
                     cb[BOOK_DELTA] = [book_up(key=L2_BOOK, **kwargs)]
+            elif callback_type == L2_BOOK_SWAP:
+                cb[L2_BOOK_SWAP] = [book_cb(key=L2_BOOK_SWAP, **kwargs)]
+                if book_up:
+                    cb[BOOK_DELTA] = [book_up(key=L2_BOOK_SWAP, **kwargs)]
+            elif callback_type == L2_BOOK_FUTURES:
+                cb[L2_BOOK_FUTURES] = [book_cb(key=L2_BOOK_FUTURES, **kwargs)]
+                if book_up:
+                    cb[BOOK_DELTA] = [book_up(key=L2_BOOK_FUTURES, **kwargs)]
             elif callback_type == L3_BOOK:
                 cb[L3_BOOK] = [book_cb(key=L3_BOOK, **kwargs)]
                 if book_up:
@@ -97,10 +113,18 @@ class Collector(Process):
 
                     if callback_type == TRADES:
                         cb[TRADES].append(TradeZMQ(host=host, port=port))
+                    elif callback_type == TRADES_SWAP:
+                        cb[TRADES_SWAP].append(TradeZMQ(host=host, port=port))
+                    elif callback_type == TRADES_FUTURES:
+                        cb[TRADES_FUTURES].append(TradeZMQ(host=host, port=port))
                     elif callback_type == FUNDING:
                         cb[FUNDING].append(FundingZMQ(host=host, port=port))
                     elif callback_type == L2_BOOK:
                         cb[L2_BOOK].append(BookZMQ(host=host, port=port))
+                    elif callback_type == L2_BOOK_SWAP:
+                        cb[L2_BOOK_SWAP].append(BookZMQ(host=host, port=port))
+                    elif callback_type == L2_BOOK_FUTURES:
+                        cb[L2_BOOK_FUTURES].append(BookZMQ(host=host, port=port))
                     elif callback_type == L3_BOOK:
                         cb[L3_BOOK].append(BookZMQ(host=host, port=port))
                     elif callback_type == OPEN_INTEREST:

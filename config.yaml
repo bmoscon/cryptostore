@@ -62,6 +62,20 @@ exchanges:
             book_interval: 100000
         trades: [BTC-USD, ETH-USD, ETH-BTC]
         ticker: [BTC-USD]
+    OKEX:
+        retries: -1
+        l2_book_swap:
+            symbols: [BTC-USD-SWAP]
+            book_delta: true
+            book_interval: 100
+        trades_swap: [BTC-USD-SWAP]
+        ticker_swap: [BTC-USD-SWAP]
+        l2_book_futures:
+            symbols: [BTC-USD-200626]
+            book_delta: true
+            book_interval: 100
+        trades_futures: [BTC-USD-200626]
+        ticker_futures: [BTC-USD-200626]
 
 # Where to store the data. Currently arctic, influx, elastic, and parquet are supported. More than one can be enabled
 storage: [arctic, influx]
