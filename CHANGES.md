@@ -1,5 +1,8 @@
 ## Changelog
 
+### 0.3.1
+  * Feature: Influxdb 1.x authentication support
+
 ### 0.3.0 (2020-08-18)
   * Feature: Config options for controlling data channel timeouts
   * Feature: Path option in config for local parquet storage
