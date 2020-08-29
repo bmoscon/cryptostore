@@ -22,8 +22,8 @@ class InfluxDB(Store):
         self.data = None
         self.host = config.host
         self.db = config.db
-        self.username = config.username if "username" in config.keys() else None
-        self.password = config.password if "password" in config.keys() else None
+        self.username = config.username if "username" in config else None
+        self.password = config.password if "password" in config else None
         self.addr = f"{config.host}/write?db={config.db}&u={self.username}&p={self.password}"
         if 'create' in config and config.create:
             r = requests.post(f'{config.host}/query?u={self.username}&p={self.password}', data={'q': f'CREATE DATABASE {config.db}'})
