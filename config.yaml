@@ -86,6 +86,8 @@ influx:
     host: 'http://127.0.0.1:8086'
     db: example
     create: true
+    username: None
+    password: None
 
 # Parquet specific options. Parquet will default to storing the data on disk unless these are specified
 parquet:

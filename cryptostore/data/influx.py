@@ -22,9 +22,11 @@ class InfluxDB(Store):
         self.data = None
         self.host = config.host
         self.db = config.db
-        self.addr = f"{config.host}/write?db={config.db}"
+        self.username = config.username if "username" in config else None
+        self.password = config.password if "password" in config else None
+        self.addr = f"{config.host}/write?db={config.db}&u={self.username}&p={self.password}"
         if 'create' in config and config.create:
-            r = requests.post(f'{config.host}/query', data={'q': f'CREATE DATABASE {config.db}'})
+            r = requests.post(f'{config.host}/query?u={self.username}&p={self.password}', data={'q': f'CREATE DATABASE {config.db}'})
             r.raise_for_status()
 
     def aggregate(self, data):
@@ -89,7 +91,7 @@ class InfluxDB(Store):
 
     def get_start_date(self, exchange: str, data_type: str, pair: str) -> float:
         try:
-            r = requests.get(f"{self.host}/query?db={self.db}", params={'q': f'SELECT first(timestamp) from "{data_type}-{exchange}" where pair=\'{pair}\''})
+            r = requests.get(f"{self.host}/query?db={self.db}&u={self.username}&p={self.password}", params={'q': f'SELECT first(timestamp) from "{data_type}-{exchange}" where pair=\'{pair}\''})
             return r.json()['results'][0]['series'][0]['values'][0][1]
         except Exception:
             return None
