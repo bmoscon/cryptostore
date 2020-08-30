@@ -83,18 +83,10 @@ class Parquet(Store):
 
 
     def write(self, exchange, data_type, pair, timestamp):
-        """
-        Parameters:
-            counter (int):
-                Write a new file when is 0. Append existing file if different than 0.
-                `counter` is updated only if `self.is_first` is `True`.
-
-        """
         if not self.data:
             return
         file_name = ''
         timestamp = str(int(timestamp))
-
         if self.file_name:
             for var in self.file_name:
                 if var == 'timestamp':
