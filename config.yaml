@@ -89,9 +89,13 @@ influx:
 
 # Parquet specific options. Parquet will default to storing the data on disk unless these are specified
 parquet:
-    # if storing the data to an external source (like S3) toggle this to enable the removal of the local file after
+    # If storing the data to an external source (like S3) toggle this to enable the removal of the local file after
     # writing to external store
     del_file: true
+    # Append X times a parquet file before creating a new one to store data.
+    # This feature allows dumping frequently data from Redis, while writing less frequently new parquet files.
+    # Beware that a parquet file not properly closed cannot be read back. Closing is made at the last appending iteration.
+    append_counter: 4
     # File name format, as a list of arguments. Default is <exchange>-<data_type>-<pair>-<timestamp>.parquet, which would be exchange, data_type, pair, timestamp
     # Can specify any combination exchange, data_type, pair, and timestamp
     # timestamp MUST be present.
