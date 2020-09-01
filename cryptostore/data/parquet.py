@@ -60,7 +60,8 @@ class Parquet(Store):
                 self.prefix.append(config['S3']['prefix'])
                 self.kwargs.append({'creds': (config['S3']['key_id'], config['S3']['secret']), 'endpoint': config['S3'].get('endpoint')})
             if 'GD' in config:
-                g_drive = GDriveConnector(config['GD']['service_account'], exchanges, config['GD']['prefix'], self.default_path)
+                folder_name_sep = config['GD']['folder_name_sep'] if 'folder_name_sep' in config['GD'] else '-'
+                g_drive = GDriveConnector(config['GD']['service_account'], exchanges, config['GD']['prefix'], folder_name_sep, self.default_path)
                 self._write.append(g_drive.write)
                 self.prefix.append(None)
                 self.bucket.append(None)

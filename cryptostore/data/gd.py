@@ -14,7 +14,7 @@ class GDriveConnector:
 
     cache_path = '.cache'
 
-    def __init__(self, creds: str, exchanges: dict, prefix: str,
+    def __init__(self, creds: str, exchanges: dict, prefix: str, folder_name_sep: str,
                  path: Callable[[str, str, str], str]):
         """
         Initialize a `drive` service, and create the list of folders' IDs,
@@ -29,6 +29,9 @@ class GDriveConnector:
                 retrieved by cryptostore.
             prefix (str):
                 Base folder into which storing recorded data.
+            folder_name_sep (str):
+                Separator to be used between `exchange`, `data_type` and `pair`
+                in Google Drive folder name.
             path (Callable[[str, str, str], str]):
                 Function from which deriving folders' name.
 
@@ -36,6 +39,7 @@ class GDriveConnector:
 
         httplib2 = StorageEngines['httplib2']
 
+        self.folder_name_sep = folder_name_sep
         # Initialize a drive service, with an authorized caching-enabled
         # `http` object.
         if creds:
@@ -88,7 +92,7 @@ accessible folder.".format(prefix))
                 if dtype in {'retries', 'channel_timeouts'}:
                     continue
                 for pair in exchanges[exchange][dtype] if 'symbols' not in exchanges[exchange][dtype] else exchanges[exchange][dtype]['symbols']:
-                    c_folders.append('.'.join(path(exchange, dtype, pair).split('/')))
+                    c_folders.append(folder_name_sep.join(path(exchange, dtype, pair).split('/')))
         # Retrieve ID for existing ones.
         existing_childs = [(folder['name'], folder['id']) for folder in g_drive_folders
                            if ((folder['name'] in c_folders) and ('parents' in folder)
@@ -121,8 +125,8 @@ accessible folder.".format(prefix))
     def write(self, bucket: str, path: str, file_name: str, **kwargs):
         """
         Upload file to Google Drive. File is stored in a parent folder which
-        name is that of 'path', replacing '/' with '.'. Folder name is
-        generated in `__init__`.
+        name is that of 'path', replacing '/' with `self.folder_name_sep`.
+        Folder name is generated in `__init__`.
 
         Parameters:
             bucket:
@@ -141,7 +145,7 @@ accessible folder.".format(prefix))
 
         # Retrieve folder ID to be used to write the file into.
         # Get folder name first.
-        folder_name = '.'.join(path.split('/')[0:3])
+        folder_name = self.folder_name_sep.join(path.split('/')[0:3])
         folder_id = self.folders[folder_name]
         # Upload (caching the authorized `http` object used to run
         # `next_chunk()`)
