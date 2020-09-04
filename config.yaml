@@ -139,6 +139,8 @@ parquet:
         # exist, it will not be created.
         service_account: null
         prefix: null
+        # Separator between `exchange`, `data_type`, and `pair` in Google Drive folder name.
+        folder_name_sep: '.'
 
 # arctic specific configuration options - the mongo URL
 arctic: mongodb://127.0.0.1
