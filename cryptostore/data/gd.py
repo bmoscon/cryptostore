@@ -141,6 +141,7 @@ accessible folder.".format(prefix))
 
         """
 
+        socket = StorageEngines['socket']
         httplib2 = StorageEngines['httplib2']
 
         # Retrieve folder ID to be used to write the file into.
@@ -155,6 +156,8 @@ accessible folder.".format(prefix))
         request = self.drive.files().create(body=file_metadata,
                                             media_body=media, fields='id')
         googleapiclient = StorageEngines['googleapiclient._auth']
+        # Set timeout to 10 minutes for upload of big chunks (is used when creating the `http` object)
+        socket.setdefaulttimeout(600)
         auth_http = googleapiclient._auth.authorized_http(self.creds)
         auth_http.cache = httplib2.FileCache(self.cache_path)
         response = None
