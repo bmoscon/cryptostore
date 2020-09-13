@@ -66,9 +66,16 @@ class Parquet(Store):
 
 
     def aggregate(self, data):
-        names = list(data[0].keys())
+        if isinstance(data[0], dict):
+            # Case `data` is a list or tuple of dict.
+            names = list(data[0].keys())
+        else:
+            # Case `data` is a tuple with tuple of keys of dict as 1st parameter,
+            # and generator of dicts as 2nd paramter.
+            names = data[0]
+            data = data[1]
+           
         cols = {name: [] for name in names}
-
         for entry in data:
             for key in entry:
                 val = entry[key]
