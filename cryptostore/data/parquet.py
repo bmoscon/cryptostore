@@ -68,7 +68,7 @@ class Parquet(Store):
     def aggregate(self, data):
         if isinstance(data[0], dict):
             # Case `data` is a list or tuple of dict.
-            names = list(data[0].keys())
+            names = list(data[0])
         else:
             # Case `data` is a tuple with tuple of keys of dict as 1st parameter,
             # and generator of dicts as 2nd paramter.
