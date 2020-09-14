@@ -5,6 +5,7 @@ Please see the LICENSE file for the terms and conditions
 associated with this software.
 '''
 from typing import Tuple, Callable
+import socket
 
 from cryptostore.engines import StorageEngines
 from cryptostore.exceptions import InconsistentStorage
@@ -141,7 +142,6 @@ accessible folder.".format(prefix))
 
         """
 
-        socket = StorageEngines['socket']
         httplib2 = StorageEngines['httplib2']
 
         # Retrieve folder ID to be used to write the file into.
