@@ -5,6 +5,7 @@ Please see the LICENSE file for the terms and conditions
 associated with this software.
 '''
 from typing import Tuple, Callable
+import socket
 
 from cryptostore.engines import StorageEngines
 from cryptostore.exceptions import InconsistentStorage
@@ -155,6 +156,8 @@ accessible folder.".format(prefix))
         request = self.drive.files().create(body=file_metadata,
                                             media_body=media, fields='id')
         googleapiclient = StorageEngines['googleapiclient._auth']
+        # Set timeout to 10 minutes for upload of big chunks (is used when creating the `http` object)
+        socket.setdefaulttimeout(600)
         auth_http = googleapiclient._auth.authorized_http(self.creds)
         auth_http.cache = httplib2.FileCache(self.cache_path)
         response = None
