@@ -67,13 +67,16 @@ class Parquet(Store):
 
     def aggregate(self, data):
         names = list(data[0].keys())
+        names = [name for name in names if name not in ('feed', 'pair')]
         cols = {name: [] for name in names}
 
         for entry in data:
-            for key in entry:
+            for key in names:
                 val = entry[key]
                 cols[key].append(val)
-        arrays = [pa.array(cols[col]) for col in cols]
+
+        arrays = [pa.array(cols[col], pa.string()).dictionary_encode() if col == 'side'
+                  else pa.array(cols[col]) for col in cols]
         table = pa.Table.from_arrays(arrays, names=names)
         self.data = table
 
