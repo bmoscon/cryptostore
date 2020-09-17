@@ -103,7 +103,7 @@ parquet:
     file_format: [exchange, pair, data_type, timestamp]
     # A compression codec (and level if relevant) can be defined to compress data when writing parquet file.
     # Compression is managed by use of `pyarrow.parquet.write_table()` interface.
-    # Compression codecs (and levels in parenthesis) are: NONE, SNAPPY, GZIP (1 to 9), BROTLI (1 to 11), LZ4 (1 is forced) & ZSTD (1 to 22).
+    # Compression codecs (and levels in parentheses) are: NONE, SNAPPY, GZIP (1 to 9), BROTLI (1 to 11), LZ4 (1 is forced) & ZSTD (1 to 22).
     # You can remove these keywords if you don't want to compress the data. As a proposal, BROTLI appears especially efficient.
     compression:
         codec: 'BROTLI'
