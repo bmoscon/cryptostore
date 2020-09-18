@@ -12,17 +12,17 @@ from cryptostore.data.elastic import ElasticSearch
 
 
 class Storage(Store):
-    def __init__(self, config):
+    def __init__(self, config, **kwargs):
         self.config = config
         if isinstance(config.storage, list):
-            self.s = [Storage.__init_helper(s, config) for s in config.storage]
+            self.s = [Storage.__init_helper(s, config, **kwargs) for s in config.storage]
         else:
-            self.s = [Storage.__init_helper(config.storage, config)]
+            self.s = [Storage.__init_helper(config.storage, config, **kwargs)]
 
     @staticmethod
-    def __init_helper(store, config):
+    def __init_helper(store, config, **kwargs):
         if store == 'parquet':
-            return Parquet(config.exchanges, config.parquet if 'parquet' in config else None)
+            return Parquet(config.exchanges, config.parquet if 'parquet' in config else None, **kwargs)
         elif store == 'arctic':
             return Arctic(config.arctic)
         elif store == 'influx':
