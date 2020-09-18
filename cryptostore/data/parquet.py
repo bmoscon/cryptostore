@@ -21,7 +21,7 @@ class Parquet(Store):
 
     default_path = lambda self, exchange, data_type, pair: f'{exchange}/{data_type}/{pair}'
 
-    def __init__(self, exchanges, buffer, config=None):
+    def __init__(self, exchanges, config=None, parquet_buffer=None):
         self._write = []
         self._read = []
         self._list = []
@@ -34,7 +34,7 @@ class Parquet(Store):
         self.path = None
         self.comp_codec = None
         self.comp_level = None
-        self.buffer = buffer
+        self.buffer = parquet_buffer
         if config:
             self.file_name = config.get('file_format')
             self.path = config.get('path')

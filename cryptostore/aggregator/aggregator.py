@@ -80,7 +80,7 @@ class Aggregator(Process):
                         interval_start = end + timedelta(seconds=interval + 1)
                     start, end = get_time_interval(interval_start, base_interval, multiplier=multiplier)
                 if 'exchanges' in self.config and self.config.exchanges:
-                    store = Storage(self.config, parquet_buffer)
+                    store = Storage(self.config, parquet_buffer=parquet_buffer)
                     for exchange in self.config.exchanges:
                         for dtype in self.config.exchanges[exchange]:
                             # Skip over the retries arg in the config if present.
