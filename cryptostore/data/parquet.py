@@ -78,7 +78,10 @@ class Parquet(Store):
             for key in entry:
                 val = entry[key]
                 cols[key].append(val)
-        arrays = [pa.array(cols[col]) for col in cols]
+
+        to_dict = ('feed', 'pair', 'side')
+        arrays = [pa.array(cols[col], pa.string()).dictionary_encode() if col in to_dict
+                  else pa.array(cols[col]) for col in cols]
         table = pa.Table.from_arrays(arrays, names=names)
         self.data = table
 
