@@ -70,7 +70,7 @@ class Parquet(Store):
         cols = {name: [] for name in names}
 
         for entry in data:
-            for key in names:
+            for key in entry:
                 val = entry[key]
                 cols[key].append(val)
 
