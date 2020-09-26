@@ -5,6 +5,7 @@
   * Bugfix: Extend timeout of Google Drive connection
   * Feature: Parquet file compression
   * Feature: Parquet file content optimization
+  * Feature: Option to enable parquet file appending
 
 ### 0.3.0 (2020-08-18)
   * Feature: Config options for controlling data channel timeouts
