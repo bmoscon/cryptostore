@@ -6,3 +6,7 @@ associated with this software.
 '''
 class InconsistentStorage(Exception):
     pass
+
+
+class EngineWriteError(Exception):
+    pass

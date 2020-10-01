@@ -6,11 +6,16 @@ associated with this software.
 '''
 from decimal import Decimal
 from collections import defaultdict
+import logging
 
 from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING, OPEN_INTEREST
 import requests
 
+from cryptostore.exceptions import EngineWriteError
 from cryptostore.data.store import Store
+
+
+LOG = logging.getLogger('cryptostore')
 
 
 def chunk(iterable, length):
@@ -86,7 +91,10 @@ class InfluxDB(Store):
         for c in chunk(agg, 5000):
             c = '\n'.join(c)
             r = requests.post(self.addr, data=c)
-            r.raise_for_status()
+            # per influx docs, returns 204 on success
+            if r.status_code != 204:
+                LOG.error("Influx: Failed to write data to %s - %d:%s", self.addr, r.status_code, r.reason)
+                raise EngineWriteError
         self.data = None
 
     def get_start_date(self, exchange: str, data_type: str, pair: str) -> float:

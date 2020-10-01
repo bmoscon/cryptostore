@@ -16,6 +16,7 @@ from cryptostore.aggregator.redis import Redis
 from cryptostore.aggregator.kafka import Kafka
 from cryptostore.data.storage import Storage
 from cryptostore.config import DynamicConfig
+from cryptostore.exceptions import EngineWriteError
 
 
 LOG = logging.getLogger('cryptostore')
@@ -94,7 +95,23 @@ class Aggregator(Process):
                                     continue
 
                                 store.aggregate(data)
-                                store.write(exchange, dtype, pair, time.time())
+
+                                retries = 0
+                                while True:
+                                    if retries > 5:
+                                        LOG.error("Failed to write after 5 reties")
+                                        raise EngineWriteError
+
+                                    try:
+                                        # retrying this is ok, provided every
+                                        # engine clears its internal buffer after writing successfully.
+                                        store.write(exchange, dtype, pair, time.time())
+                                    except EngineWriteError:
+                                        retries += 1
+                                        await asyncio.sleep(30)
+                                        continue
+                                    else:
+                                        break
 
                                 cache.delete(exchange, dtype, pair)
                                 LOG.info('Write Complete %s-%s-%s', exchange, dtype, pair)
