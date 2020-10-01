@@ -67,6 +67,10 @@ exchanges:
 
 # Where to store the data. Currently arctic, influx, elastic, and parquet are supported. More than one can be enabled
 storage: [arctic, influx]
+# These two values configure how many times to retry a write (before dying)
+# and how long to wait between attempts to write after a failure is encountered.
+storage_retries: 5
+storage_retry_wait: 30
 
 # Configurable passthrough for data - data will be sent in realtime (no aggregation in redis).
 # To disable, remove
