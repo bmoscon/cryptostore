@@ -13,7 +13,7 @@ exchanges:
     BITMEX:
         l2_book:
             symbols: [XBTUSD]
-            book_depth: 10
+            max_depth: 10
         trades: [XBTUSD]
     COINBASE:
         l3_book:
@@ -26,6 +26,8 @@ storage: [arctic]
 arctic: mongodb://mongo:27017
 
 storage_interval: 60
+storage_retries: 5
+storage_retry_wait: 30
 
 plugins:
   backfill:
