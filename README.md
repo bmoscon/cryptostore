@@ -17,7 +17,7 @@ Cryptostore currently requires either Kafka or Redis to be installed. The extra 
 
 Once installed with pip, an executable is placed on the path, so you can simply run `cryptostore` to start the collector. It requires a `config.yaml` file. If its not in the current working directory, you can specify the path to the config with the `--config` option.
 
-An example [config](config.yaml), with documentation inline is provided in the root of the repository. The config file is monitored by cryptostore, so you can change the options in the file and it will apply them without the need to reload the service (this is experimental. If you encounter issues with it, please raise an issue).
+An example [config](config.yaml), with documentation inline is provided in the root of the repository. The config file is monitored by cryptostore, so you can change the options in the file and it will apply them without the need to reload the service. This only applies to changes made to data within the `exchanges` block. Other changes will be ignored.
 
 
 ### Storing data
@@ -30,11 +30,6 @@ Stores data to:
   * Google Cloud Storage
   * Amazon S3
   * [Google Drive](/docs/google_drive.md)
-
-
-### Backfilling Trade Data
-
-Cryptstore can backfill trade data - but be aware not all exchanges support historical trade data, and some only provide a limited amount. Backfill fills from the earliest date in data storage until the start date specified in the config. Backfill is restartable.
 
 
 ### Running with other consumers
