@@ -20,6 +20,10 @@ services:
       - 6379
     command: ["redis-server", "--save", "''", "--appendonly", "no"]
   mongo:
+    deploy:
+      resources:
+        limits:
+          memory: 2G
     logging:
       driver: "json-file"
       options:
@@ -31,3 +35,4 @@ services:
       - '37017:27017'
     expose:
       - 27017
+    command: ["mongod", "--wiredTigerCacheSizeGB", "0.25"]
