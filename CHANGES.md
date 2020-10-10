@@ -7,6 +7,7 @@
   * Feature: Parquet file content optimization
   * Feature: Option to enable parquet file appending
   * Feature: Retry writes to storage engines (rather than dying).
+  * Feature: Support for snapshot_interval
 
 ### 0.3.0 (2020-08-18)
   * Feature: Config options for controlling data channel timeouts
