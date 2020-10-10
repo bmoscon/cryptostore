@@ -39,6 +39,10 @@ redis:
 #
 # Channel timeouts are channel specific and control how long a channel can go with no messages before declaring the connection
 # dead. Cryptofeed will restart the connection if no message is received in this time period. Default is 120 seconds. -1 means no timeout.
+#
+# snapshot_interval controls how often to deliver snapshots on NON delta feeds. Book updates between the snapshots are discarded.
+# In other words, enabling snapshot_interval and setting it to a value (say 1000) will cause every 1000th book update to be stored (the full book). Other
+# updates will be dropped. Can also set up book_depth with snapshot_interval enabled.
 
 exchanges:
     BITMEX:

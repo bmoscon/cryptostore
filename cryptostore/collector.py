@@ -38,6 +38,7 @@ class Collector(Process):
             window = 1000
             delta = False
             timeout = timeouts.get(callback_type, 120)
+            snap_interval = False
 
             if 'book_interval' in value:
                 window = value['book_interval']
@@ -45,6 +46,8 @@ class Collector(Process):
                 delta = True
             if 'max_depth' in value:
                 depth = value['max_depth']
+            if 'snapshot_interval' in value:
+                snap_interval = value['snapshot_interval']
 
             if callback_type in (L2_BOOK, L3_BOOK):
                 self.exchange_config[callback_type] = self.exchange_config[callback_type]['symbols']
@@ -110,6 +113,6 @@ class Collector(Process):
                     if BOOK_DELTA in cb:
                         cb[BOOK_DELTA].append(BookDeltaZMQ(host=host, port=port))
 
-            fh.add_feed(self.exchange, timeout=timeout, max_depth=depth, book_interval=window, config={callback_type: self.exchange_config[callback_type]}, callbacks=cb)
+            fh.add_feed(self.exchange, timeout=timeout, max_depth=depth, snapshot_interval=snap_interval, book_interval=window, config={callback_type: self.exchange_config[callback_type]}, callbacks=cb)
 
         fh.run()
