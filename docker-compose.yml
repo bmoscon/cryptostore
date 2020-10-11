@@ -15,7 +15,7 @@ services:
       options:
         max-size: "2000k"
         max-file: "10"
-    image: redis:5.0.5
+    image: redis:6.0.8
     expose:
       - 6379
     command: ["redis-server", "--save", "''", "--appendonly", "no"]
@@ -26,7 +26,7 @@ services:
         max-size: "2000k"
         max-file: "10"
     container_name: mongo
-    image: mongo:4.0.9-xenial
+    image: mongo:4.4.1-bionic
     ports:
       - '37017:27017'
     expose:
