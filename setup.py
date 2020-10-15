@@ -38,7 +38,7 @@ setup(
         "cryptofeed>=1.3.1",
         "pyyaml",
         "pyarrow",
-        "aiohttp==3.6.2"
+        "aiohttp==3.6.3"
     ],
     extras_require={
         'redis': ['redis', 'aioredis'],
