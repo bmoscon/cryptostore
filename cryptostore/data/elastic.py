@@ -36,7 +36,14 @@ class ElasticSearch(Store):
                         }
 
     def aggregate(self, data):
-        self.data = data
+        if isinstance(data[0], dict):
+            # Case `data` is a list or tuple of dict.
+            self.data = data
+        else:
+            # Case `data` is a tuple with tuple of keys of dict as 1st parameter,
+            # and generator of dicts as 2nd paramter.
+            # Data is transformed back into a list of dict
+            self.data = list(data[1])
 
     def write(self, exchange, data_type, pair, timestamp):
         if requests.head(f"{self.host}/{data_type}").status_code != 200:
