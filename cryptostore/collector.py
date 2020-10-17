@@ -9,8 +9,7 @@ from multiprocessing import Process
 import logging
 
 from cryptofeed import FeedHandler
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, BOOK_DELTA, TICKER, FUNDING, OPEN_INTEREST, LIQUIDATIONS
-
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, BOOK_DELTA, TICKER, FUNDING, OPEN_INTEREST, LIQUIDATIONS, PROFILE
 
 LOG = logging.getLogger('cryptostore')
 
@@ -57,7 +56,7 @@ class Collector(Process):
                     kwargs = {'host': self.config['redis']['ip'], 'port': self.config['redis']['port'], 'numeric_type': float}
                 else:
                     kwargs = {'socket': self.config['redis']['socket'], 'numeric_type': float}
-                from cryptofeed.backends.redis import TradeStream, BookStream, BookDeltaStream, TickerStream, FundingStream, OpenInterestStream, LiquidationsStream
+                from cryptofeed.backends.redis import TradeStream, BookStream, BookDeltaStream, TickerStream, FundingStream, OpenInterestStream, LiquidationsStream, ProfileStream
                 trade_cb = TradeStream
                 book_cb = BookStream
                 book_up = BookDeltaStream if delta else None
@@ -65,8 +64,9 @@ class Collector(Process):
                 funding_cb = FundingStream
                 oi_cb = OpenInterestStream
                 liq_cb = LiquidationsStream
+                profile_cb = ProfileStream
             elif cache == 'kafka':
-                from cryptofeed.backends.kafka import TradeKafka, BookKafka, BookDeltaKafka, TickerKafka, FundingKafka, OpenInterestKafka, LiquidationsKafka
+                from cryptofeed.backends.kafka import TradeKafka, BookKafka, BookDeltaKafka, TickerKafka, FundingKafka, OpenInterestKafka, LiquidationsKafka, ProfileKafka
                 trade_cb = TradeKafka
                 book_cb = BookKafka
                 book_up = BookDeltaKafka if delta else None
@@ -74,6 +74,7 @@ class Collector(Process):
                 funding_cb = FundingKafka
                 oi_cb = OpenInterestKafka
                 liq_cb = LiquidationsKafka
+                profile_cb = ProfileKafka
                 kwargs = {'host': self.config['kafka']['ip'], 'port': self.config['kafka']['port']}
 
             if callback_type == TRADES:
@@ -94,10 +95,12 @@ class Collector(Process):
                     cb[BOOK_DELTA] = [book_up(key=L3_BOOK, **kwargs)]
             elif callback_type == OPEN_INTEREST:
                 cb[OPEN_INTEREST] = [oi_cb(**kwargs)]
+            elif callback_type == PROFILE:
+                cb[PROFILE] = [profile_cb(**kwargs)]
 
             if 'pass_through' in self.config:
                 if self.config['pass_through']['type'] == 'zmq':
-                    from cryptofeed.backends.zmq import TradeZMQ, BookDeltaZMQ, BookZMQ, FundingZMQ, OpenInterestZMQ, TickerZMQ, LiquidationsZMQ
+                    from cryptofeed.backends.zmq import TradeZMQ, BookDeltaZMQ, BookZMQ, FundingZMQ, OpenInterestZMQ, TickerZMQ, LiquidationsZMQ, ProfileZMQ
                     import zmq
                     host = self.config['pass_through']['host']
                     port = self.config['pass_through']['port']
@@ -116,6 +119,8 @@ class Collector(Process):
                         cb[OPEN_INTEREST].append(OpenInterestZMQ(host=host, port=port))
                     elif callback_type == TICKER:
                         cb[TICKER].append(TickerZMQ(host=host, port=port))
+                    elif callback_type == PROFILE:
+                        cb[PROFILE].append(ProfileZMQ(host=host, port=port))
                     if BOOK_DELTA in cb:
                         cb[BOOK_DELTA].append(BookDeltaZMQ(host=host, port=port))
 
