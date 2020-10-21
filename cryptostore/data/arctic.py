@@ -13,7 +13,7 @@ from cryptostore.engines import StorageEngines
 
 class Arctic(Store):
     def __init__(self, connection: str):
-        self.data = []
+        self.data = pd.DataFrame()
         self.con = StorageEngines.arctic.Arctic(connection)
 
     def aggregate(self, data):
@@ -27,8 +27,7 @@ class Arctic(Store):
             self.data = pd.DataFrame(data[1], columns=data[0])
 
     def write(self, exchange, data_type, pair, timestamp):
-        chunk_size = None
-        if not self.data:
+        if self.data.empty:
             return
 
         df = self.data
@@ -36,6 +35,7 @@ class Arctic(Store):
         df['receipt_timestamp'] = pd.to_datetime(df['receipt_timestamp'], unit='s')
         df = df.drop(['timestamp'], axis=1)
 
+        chunk_size = None
         if data_type == TRADES:
             if 'id' in df:
                 df['id'] = df['id'].astype(str)
