@@ -58,6 +58,8 @@ class Arctic(Store):
         df.index = df.index.tz_localize(None)
         if exchange not in self.con.list_libraries():
             self.con.initialize_library(exchange, lib_type=StorageEngines.arctic.CHUNK_STORE)
+            # set the quota of each arctic library to unlimited
+            self.con.set_quota(exchange, 0)
         self.con[exchange].append(f"{data_type}-{pair}", df, upsert=True, chunk_size=chunk_size)
 
     def get_start_date(self, exchange: str, data_type: str, pair: str) -> float:
