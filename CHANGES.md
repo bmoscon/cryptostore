@@ -8,6 +8,7 @@
   * Feature: Option to enable parquet file appending
   * Feature: Retry writes to storage engines (rather than dying).
   * Feature: Support for snapshot_interval
+  * Feature: Parquet files can be stored in directories per day
   * Bugfix: Set arctic storage quota to unlimited (rather than 10G)
   * Bugfix: Regression in arctic storage backend
 

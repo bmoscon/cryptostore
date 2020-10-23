@@ -119,7 +119,7 @@ class Parquet(Store):
 
         f_name_tips = tuple(file_name.split(timestamp))
 
-        if self.prefix_date:
+        if self.path and self.prefix_date:
             date = str(datetime.date.fromtimestamp(int(timestamp)))
             local_path = os.path.join(self.path, date)
         else:
