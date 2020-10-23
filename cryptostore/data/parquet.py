@@ -6,6 +6,7 @@ associated with this software.
 '''
 import os
 import glob
+import datetime
 
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -32,12 +33,14 @@ class Parquet(Store):
         self.del_file = True
         self.file_name = None
         self.path = None
+        self.prefix_date = False
         self.comp_codec = None
         self.comp_level = None
         self.buffer = parquet_buffer
         if config:
             self.file_name = config.get('file_format')
             self.path = config.get('path')
+            self.prefix_date = config.get('prefix_date', False)
             self.del_file = config.get('del_file', True)
             # Compression
             if 'compression' in config:
@@ -116,11 +119,18 @@ class Parquet(Store):
 
         f_name_tips = tuple(file_name.split(timestamp))
 
+        if self.prefix_date:
+            date = str(datetime.date.fromtimestamp(int(timestamp)))
+            local_path = os.path.join(self.path, date)
+        else:
+            local_path = self.path
+
         # Write parquet file and manage `counter`.
         if f_name_tips not in self.buffer:
             # Case 'create new parquet file'.
             if self.path:
-                file_name = os.path.join(self.path, file_name)
+                os.makedirs(local_path, mode=0o755, exist_ok=True)
+                file_name = os.path.join(local_path, file_name)
             writer = pq.ParquetWriter(file_name, self.data.schema, compression=self.comp_codec, compression_level=self.comp_level)
             writer.write_table(table=self.data)
             self.buffer[f_name_tips] = {'counter': 0, 'writer': writer, 'timestamp': timestamp}
@@ -139,11 +149,14 @@ class Parquet(Store):
                 timestamp = self.buffer[f_name_tips]['timestamp']
                 file_name = f_name_tips[0] + timestamp + f_name_tips[1]
                 if self.path:
-                    file_name = os.path.join(self.path, file_name)
+                    file_name = os.path.join(local_path, file_name)
                 for func, bucket, prefix, kwargs in zip(self._write, self.bucket, self.prefix, self.kwargs):
                     path = self.default_path(exchange, data_type, pair) + f'/{exchange}-{data_type}-{pair}-{timestamp}.parquet'
                     if prefix:
                         path = f"{prefix}/{path}"
+                    elif self.prefix_date:
+                        date = str(datetime.date.fromtimestamp(int(timestamp)))
+                        path = f"{date}/{path}"
                     func(bucket, path, file_name, **kwargs)
                 if self.del_file:
                     os.remove(file_name)
