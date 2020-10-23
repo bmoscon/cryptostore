@@ -106,6 +106,15 @@ class Aggregator(Process):
                                         # retrying this is ok, provided every
                                         # engine clears its internal buffer after writing successfully.
                                         store.write(exchange, dtype, pair, time.time())
+                                    except OSError as e:
+                                        if e.errno == 112: # Host is down
+                                            LOG.warning('Could not write %s-%s-%s. %s', exchange, dtype, pair, e)
+                                            retries += 1
+                                            await asyncio.sleep(self.config.storage_retry_wait)
+                                            continue
+                                        else:
+                                            raise
+
                                     except EngineWriteError:
                                         retries += 1
                                         await asyncio.sleep(self.config.storage_retry_wait)

@@ -125,10 +125,11 @@ parquet:
     compression:
         codec: 'BROTLI'
         level: 6
-    # Path controls where the file is written (if not using S3/GC) If null, will write to CWD. Must be absolute path. The path must also exist, Cryptostore will not
-    # create the path.
+    # Path controls where the file is written (if not using S3/GC) If null, will write to CWD. Must be absolute path.
     path: null
-
+    # Automatically groups all paquet files in a folder YYYY-MM-DD both on the local filesystem, as well as on the cloud storage engine.
+    # Setting prefix on the cloud storage engine will override this setting.
+    prefix_date: false
 
     S3:
         # endpoint allows you to override the write endpoint and write to other provicers that have the same API interface
