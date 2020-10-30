@@ -12,6 +12,7 @@
   * Bugfix: Set arctic storage quota to unlimited (rather than 10G)
   * Bugfix: Regression in arctic storage backend
   * Feature: Opened parquet files (when appended) are suffixed with '.tmp'
+  * Feature: Support for Coingecko aggregated data per coin, to be used with a new data channel 'profile'
 
 ### 0.3.0 (2020-08-18)
   * Feature: Config options for controlling data channel timeouts
