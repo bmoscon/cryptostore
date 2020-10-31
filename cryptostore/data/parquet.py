@@ -128,6 +128,7 @@ class Parquet(Store):
         # Write parquet file and manage `counter`.
         if f_name_tips not in self.buffer:
             # Case 'create new parquet file'.
+            file_name += '.tmp' if self.append_counter else ''
             if self.path:
                 os.makedirs(local_path, mode=0o755, exist_ok=True)
                 file_name = os.path.join(local_path, file_name)
@@ -145,21 +146,26 @@ class Parquet(Store):
         # If `append_counter` is reached, close parquet file and reset `counter`.
         if self.buffer[f_name_tips]['counter'] == self.append_counter:
             writer.close()
-            if self._write:
+            if self._write or self.append_counter:
                 timestamp = self.buffer[f_name_tips]['timestamp']
                 file_name = f_name_tips[0] + timestamp + f_name_tips[1]
                 if self.path:
                     file_name = os.path.join(local_path, file_name)
-                for func, bucket, prefix, kwargs in zip(self._write, self.bucket, self.prefix, self.kwargs):
-                    path = self.default_path(exchange, data_type, pair) + f'/{exchange}-{data_type}-{pair}-{timestamp}.parquet'
-                    if prefix:
-                        path = f"{prefix}/{path}"
-                    elif self.prefix_date:
-                        date = str(datetime.date.fromtimestamp(int(timestamp)))
-                        path = f"{date}/{path}"
-                    func(bucket, path, file_name, **kwargs)
-                if self.del_file:
-                    os.remove(file_name)
+                if self.append_counter:
+                    # Remove '.tmp' suffix
+                    os.rename(file_name + '.tmp', file_name)
+                if self._write:
+                    # Upload in cloud storage (GCS, S3 or GD)
+                    for func, bucket, prefix, kwargs in zip(self._write, self.bucket, self.prefix, self.kwargs):
+                        path = self.default_path(exchange, data_type, pair) + f'/{exchange}-{data_type}-{pair}-{timestamp}.parquet'
+                        if prefix:
+                            path = f"{prefix}/{path}"
+                        elif self.prefix_date:
+                            date = str(datetime.date.fromtimestamp(int(timestamp)))
+                            path = f"{date}/{path}"
+                        func(bucket, path, file_name, **kwargs)
+                    if self.del_file:
+                        os.remove(file_name)
             # Reset counter
             del self.buffer[f_name_tips]
 
