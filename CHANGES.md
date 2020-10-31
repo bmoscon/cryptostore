@@ -11,6 +11,7 @@
   * Feature: Parquet files can be stored in directories per day
   * Bugfix: Set arctic storage quota to unlimited (rather than 10G)
   * Bugfix: Regression in arctic storage backend
+  * Feature: Opened parquet files (when appended) are suffixed with '.tmp'
 
 ### 0.3.0 (2020-08-18)
   * Feature: Config options for controlling data channel timeouts
