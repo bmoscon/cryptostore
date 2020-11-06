@@ -125,7 +125,7 @@ class Parquet(Store):
         else:
             local_path = self.path
 
-        save_path = os.path.join(local_path, "temp") if self.append_counter else local_path
+        save_path = os.path.join(self.path, "temp") if self.append_counter else local_path
         if self.append_counter:
             os.makedirs(save_path, mode=0o755, exist_ok=True)
 
