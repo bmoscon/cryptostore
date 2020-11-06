@@ -124,18 +124,20 @@ class Parquet(Store):
             local_path = os.path.join(self.path, date)
         else:
             local_path = self.path
-
+       
         save_path = os.path.join(self.path, "temp") if self.append_counter else local_path
-        if self.append_counter:
-            os.makedirs(save_path, mode=0o755, exist_ok=True)
 
         # Write parquet file and manage `counter`.
         if f_name_tips not in self.buffer:
             # Case 'create new parquet file'.
             file_name += '.tmp' if self.append_counter else ''
+
             if self.path:
+                if self.append_counter:
+                    os.makedirs(save_path, mode=0o755, exist_ok=True)
                 os.makedirs(local_path, mode=0o755, exist_ok=True)
                 save_path = os.path.join(save_path, file_name)
+            
             writer = pq.ParquetWriter(save_path, self.data.schema, compression=self.comp_codec, compression_level=self.comp_level)
             writer.write_table(table=self.data)
             self.buffer[f_name_tips] = {'counter': 0, 'writer': writer, 'timestamp': timestamp}
@@ -157,7 +159,7 @@ class Parquet(Store):
                     final_path = os.path.join(local_path, file_name)
                 if self.append_counter:
                     # Remove '.tmp' suffix
-                    os.rename(save_path, final_path)
+                    os.rename(os.path.join(save_path, file_name + ".tmp"), final_path)
                 if self._write:
                     # Upload in cloud storage (GCS, S3 or GD)
                     for func, bucket, prefix, kwargs in zip(self._write, self.bucket, self.prefix, self.kwargs):
