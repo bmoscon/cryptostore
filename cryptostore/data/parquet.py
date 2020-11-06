@@ -145,18 +145,19 @@ class Parquet(Store):
 
         # If `append_counter` is reached, close parquet file and reset `counter`.
         if self.buffer[f_name_tips]['counter'] == self.append_counter:
+            # File name with path
+            file_name = writer.file_handle.name
             writer.close()
-            if self._write or self.append_counter:
+            if self.append_counter:
+                # Remove '.tmp' suffix
+                file_name = file_name[:-4]
+                os.rename(file_name + '.tmp', file_name)
+            if self._write:
                 timestamp = self.buffer[f_name_tips]['timestamp']
-                file_name = f_name_tips[0] + timestamp + f_name_tips[1]
-                if self.path:
-                    file_name = os.path.join(local_path, file_name)
-                if self.append_counter:
-                    # Remove '.tmp' suffix
-                    os.rename(file_name + '.tmp', file_name)
                 if self._write:
                     # Upload in cloud storage (GCS, S3 or GD)
                     for func, bucket, prefix, kwargs in zip(self._write, self.bucket, self.prefix, self.kwargs):
+                        # Path for cloud storage.
                         path = self.default_path(exchange, data_type, pair) + f'/{exchange}-{data_type}-{pair}-{timestamp}.parquet'
                         if prefix:
                             path = f"{prefix}/{path}"
