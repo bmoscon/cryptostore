@@ -125,14 +125,18 @@ class Parquet(Store):
         else:
             local_path = self.path
 
+        save_path = os.path.join(local_path, "temp") if self.append_counter else local_path
+        if self.append_counter:
+            os.makedirs(save_path, mode=0o755, exist_ok=True)
+
         # Write parquet file and manage `counter`.
         if f_name_tips not in self.buffer:
             # Case 'create new parquet file'.
             file_name += '.tmp' if self.append_counter else ''
             if self.path:
                 os.makedirs(local_path, mode=0o755, exist_ok=True)
-                file_name = os.path.join(local_path, file_name)
-            writer = pq.ParquetWriter(file_name, self.data.schema, compression=self.comp_codec, compression_level=self.comp_level)
+                save_path = os.path.join(save_path, file_name)
+            writer = pq.ParquetWriter(save_path, self.data.schema, compression=self.comp_codec, compression_level=self.comp_level)
             writer.write_table(table=self.data)
             self.buffer[f_name_tips] = {'counter': 0, 'writer': writer, 'timestamp': timestamp}
         else:
@@ -150,10 +154,10 @@ class Parquet(Store):
                 timestamp = self.buffer[f_name_tips]['timestamp']
                 file_name = f_name_tips[0] + timestamp + f_name_tips[1]
                 if self.path:
-                    file_name = os.path.join(local_path, file_name)
+                    final_path = os.path.join(local_path, file_name)
                 if self.append_counter:
                     # Remove '.tmp' suffix
-                    os.rename(file_name + '.tmp', file_name)
+                    os.rename(save_path, final_path)
                 if self._write:
                     # Upload in cloud storage (GCS, S3 or GD)
                     for func, bucket, prefix, kwargs in zip(self._write, self.bucket, self.prefix, self.kwargs):
@@ -163,9 +167,9 @@ class Parquet(Store):
                         elif self.prefix_date:
                             date = str(datetime.date.fromtimestamp(int(timestamp)))
                             path = f"{date}/{path}"
-                        func(bucket, path, file_name, **kwargs)
+                        func(bucket, path, final_path, **kwargs)
                     if self.del_file:
-                        os.remove(file_name)
+                        os.remove(final_path)
             # Reset counter
             del self.buffer[f_name_tips]
 
