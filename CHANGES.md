@@ -1,6 +1,8 @@
 ## Changelog
 
 ### 0.3.1
+  * Bugfix: Aggregating parquet files at the end of time no longer causes file not found error. 
+  * Feature: Temporary parquet files are now gathering in a seperate folder
   * Feature: Influxdb 1.x authentication support
   * Bugfix: Extend timeout of Google Drive connection
   * Feature: Parquet file compression
