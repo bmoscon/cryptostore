@@ -133,9 +133,7 @@ class Parquet(Store):
             file_name += '.tmp' if self.append_counter else ''
 
             if self.path:
-                if self.append_counter:
-                    os.makedirs(save_path, mode=0o755, exist_ok=True)
-                os.makedirs(local_path, mode=0o755, exist_ok=True)
+                os.makedirs(save_path, mode=0o755, exist_ok=True)
                 save_path = os.path.join(save_path, file_name)
             
             writer = pq.ParquetWriter(save_path, self.data.schema, compression=self.comp_codec, compression_level=self.comp_level)
@@ -156,8 +154,7 @@ class Parquet(Store):
                 timestamp = self.buffer[f_name_tips]['timestamp']
                 file_name = f_name_tips[0] + timestamp + f_name_tips[1]
                 if self.path:
-                    if not os.path.exists(local_path):
-                        os.makedirs(local_path, mode=0o755, exist_ok=True)
+                    os.makedirs(local_path, mode=0o755, exist_ok=True)
                     final_path = os.path.join(local_path, file_name)
                 if self.append_counter:
                     # Remove '.tmp' suffix
