@@ -156,6 +156,8 @@ class Parquet(Store):
                 timestamp = self.buffer[f_name_tips]['timestamp']
                 file_name = f_name_tips[0] + timestamp + f_name_tips[1]
                 if self.path:
+                    if not os.path.exists(local_path):
+                        os.makedirs(local_path, mode=0o755, exist_ok=True)
                     final_path = os.path.join(local_path, file_name)
                 if self.append_counter:
                     # Remove '.tmp' suffix
