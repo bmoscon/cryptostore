@@ -7,12 +7,10 @@ associated with this software.
 import json
 import logging
 
-from cryptofeed.defines import L2_BOOK, L3_BOOK, TRADES, TICKER, FUNDING, OPEN_INTEREST, PROFILE
-
+from cryptofeed.defines import L2_BOOK, L3_BOOK, TRADES, TICKER, FUNDING, OPEN_INTEREST, PROFILE, TRANSACTIONS
 from cryptostore.engines import StorageEngines
 from cryptostore.aggregator.cache import Cache
 from cryptostore.aggregator.util import book_flatten
-
 
 LOG = logging.getLogger('cryptostore')
 
@@ -81,7 +79,7 @@ class Kafka(Cache):
             if dtype in {L2_BOOK, L3_BOOK}:
                 update = book_flatten(update, update['timestamp'], update['delta'])
                 ret.extend(update)
-            if dtype in {TRADES, TICKER, FUNDING, OPEN_INTEREST, PROFILE}:
+            if dtype in {TRADES, TICKER, FUNDING, OPEN_INTEREST, PROFILE, TRANSACTIONS}:
                 ret.append(update)
 
         return ret
@@ -91,3 +89,4 @@ class Kafka(Cache):
         LOG.info("%s: Committing offset %d", key, self.ids[key].offset())
         self._conn(key).commit(message=self.ids[key])
         self.ids[key] = None
+

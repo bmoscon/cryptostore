@@ -89,7 +89,11 @@ class Parquet(Store):
                 val = entry[key]
                 cols[key].append(val)
 
-        to_dict = ('feed', 'pair', 'side')
+        # Items related to 'transactions' data:
+        # 'blockchain', 'transaction_type',
+        # 'to_owner_type', 'from_owner_type', 'to_owner', 'from_owner'
+        to_dict = ('feed', 'pair', 'side', 'blockchain', 'transaction_type',
+                   'to_owner_type', 'from_owner_type', 'to_owner', 'from_owner')
         arrays = [pa.array(cols[col], pa.string()).dictionary_encode() if col in to_dict
                   else pa.array(cols[col]) for col in cols]
         table = pa.Table.from_arrays(arrays, names=names)

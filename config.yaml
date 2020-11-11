@@ -72,6 +72,10 @@ exchanges:
         retries: -1
         # Base currencies can only be USD, BTC or ETH for Coingecko
         profile: [BTC-USD, ETH-BTC, LINK-ETH]   
+    WHALE_ALERT:
+        retries: -1
+        # Only a coin is defined to retrieve related transactions
+        transactions: [BTC, ETH, TRX] 
 
 # Where to store the data. Currently arctic, influx, elastic, and parquet are supported. More than one can be enabled
 storage: [arctic, influx]

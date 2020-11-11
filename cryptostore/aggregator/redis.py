@@ -8,11 +8,10 @@ import logging
 from collections import defaultdict
 import time
 
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING, OPEN_INTEREST, LIQUIDATIONS, PROFILE
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING, OPEN_INTEREST, LIQUIDATIONS, PROFILE, TRANSACTIONS
 from cryptostore.aggregator.util import l2_book_flatten, l3_book_flatten
 from cryptostore.aggregator.cache import Cache
 from cryptostore.engines import StorageEngines
-
 
 LOG = logging.getLogger('cryptostore')
 
@@ -63,7 +62,7 @@ class Redis(Cache):
             updates = l2_book_flatten(updates)
         elif dtype == L3_BOOK:
             updates = l3_book_flatten(updates)
-        elif dtype in {TRADES, TICKER, OPEN_INTEREST, LIQUIDATIONS}:
+        elif dtype in {TRADES, TICKER, OPEN_INTEREST, LIQUIDATIONS, TRANSACTIONS}:
             as_float = ('size', 'amount', 'price', 'timestamp', 'receipt_timestamp', 'bid', 'ask', 'open_interest', 'leaves_qty')
             are_float = filter(as_float.count, updates[0])
             for k in are_float:
@@ -94,3 +93,4 @@ class Redis(Cache):
         else:
             LOG.info("%s: Removed no Redis entries", key)
         self.ids[key] = []
+
