@@ -146,7 +146,7 @@ class Parquet(Store):
         # If `append_counter` is reached, close parquet file and reset `counter`.
         if self.buffer[f_name_tips]['counter'] == self.append_counter:
             # File name with path
-            file_name = writer.file_handle.name
+            file_name = writer.where
             writer.close()
             if self.append_counter:
                 # Remove '.tmp' suffix
