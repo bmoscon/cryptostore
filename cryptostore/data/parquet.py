@@ -90,8 +90,7 @@ class Parquet(Store):
                 cols[key].append(val)
 
         # Items related to 'transactions' data:
-        # 'blockchain', 'transaction_type',
-        # 'to_owner_type', 'from_owner_type', 'to_owner', 'from_owner'
+        # 'blockchain', 'transaction_type', 'to_owner_type', 'from_owner_type', 'to_owner', 'from_owner'
         to_dict = ('feed', 'pair', 'side', 'blockchain', 'transaction_type',
                    'to_owner_type', 'from_owner_type', 'to_owner', 'from_owner')
         arrays = [pa.array(cols[col], pa.string()).dictionary_encode() if col in to_dict
@@ -150,7 +149,7 @@ class Parquet(Store):
         # If `append_counter` is reached, close parquet file and reset `counter`.
         if self.buffer[f_name_tips]['counter'] == self.append_counter:
             # File name with path
-            file_name = writer.file_handle.name
+            file_name = writer.where
             writer.close()
             if self.append_counter:
                 # Remove '.tmp' suffix

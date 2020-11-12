@@ -63,7 +63,8 @@ class Redis(Cache):
         elif dtype == L3_BOOK:
             updates = l3_book_flatten(updates)
         elif dtype in {TRADES, TICKER, OPEN_INTEREST, LIQUIDATIONS, TRANSACTIONS}:
-            as_float = ('size', 'amount', 'price', 'timestamp', 'receipt_timestamp', 'bid', 'ask', 'open_interest', 'leaves_qty')
+            as_float = ('size', 'amount', 'price', 'timestamp', 'receipt_timestamp', 'bid', 'ask', 'open_interest', 'leaves_qty',
+                        'amount_usd', 'transaction_count')
             are_float = filter(as_float.count, updates[0])
             for k in are_float:
                 for update in updates:

@@ -76,6 +76,17 @@ exchanges:
         retries: -1
         # Only a coin is defined to retrieve related transactions
         transactions: [BTC, ETH, TRX] 
+        # Following parameters depend on your plan (free, personal, enterprise)
+        # If not provided, they default to the free plan.
+        # sleep_time: how many seconds to wait between 2 calls (default: 6s)
+        # max_history: how long in the past can cryptofeed start the query: 1H, 1D, 360D (default 1H)
+        # trans_min_value: transaction min value that can be queried in $ (default is 500000)
+        sleep_time: null
+        max_history: null
+        trans_min_value: null
+        # key_id: your API key. If not provided, make sure to provide directly in 'feed_keys.yaml' in your
+        # cryptofeed installation folder. Without API key, it is not possible to query Whale Alert.
+        key_id: null
 
 # Where to store the data. Currently arctic, influx, elastic, and parquet are supported. More than one can be enabled
 storage: [arctic, influx]

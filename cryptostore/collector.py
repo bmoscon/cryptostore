@@ -12,7 +12,7 @@ from cryptofeed import FeedHandler
 from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, BOOK_DELTA, TICKER, FUNDING, OPEN_INTEREST, LIQUIDATIONS, PROFILE, TRANSACTIONS
 
 LOG = logging.getLogger('cryptostore')
-
+known_chan = (TRADES, L2_BOOK, L3_BOOK, BOOK_DELTA, TICKER, FUNDING, OPEN_INTEREST, TRANSACTIONS)
 
 class Collector(Process):
     def __init__(self, exchange, exchange_config, config):
@@ -29,7 +29,8 @@ class Collector(Process):
         retries = self.exchange_config.pop('retries', 30)
         timeouts = self.exchange_config.pop('channel_timeouts', {})
         fh = FeedHandler(retries=retries)
-
+        # Keywords known to be no callback are forwarded to the feed (feed config).
+        f_conf = {key: self.exchange_config.pop(key) for key in list(self.exchange_config) if key not in known_chan}
 
         for callback_type, value in self.exchange_config.items():
             cb = {}
@@ -133,7 +134,7 @@ class Collector(Process):
                     if BOOK_DELTA in cb:
                         cb[BOOK_DELTA].append(BookDeltaZMQ(host=host, port=port))
 
-            fh.add_feed(self.exchange, timeout=timeout, max_depth=depth, snapshot_interval=snap_interval, book_interval=window, config={callback_type: self.exchange_config[callback_type]}, callbacks=cb)
+            fh.add_feed(self.exchange, timeout=timeout, max_depth=depth, snapshot_interval=snap_interval, book_interval=window, config={callback_type: self.exchange_config[callback_type]}, callbacks=cb, **f_conf)
 
         fh.run()
 
