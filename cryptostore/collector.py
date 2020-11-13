@@ -73,7 +73,7 @@ class Collector(Process):
                 ticker_cb = TickerKafka
                 funding_cb = FundingKafka
                 oi_cb = OpenInterestKafka
-                liq_cb = LiquidationsStream
+                liq_cb = LiquidationsKafka
                 kwargs = {'host': self.config['kafka']['ip'], 'port': self.config['kafka']['port']}
 
             if callback_type == TRADES:
