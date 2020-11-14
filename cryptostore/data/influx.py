@@ -95,7 +95,7 @@ class InfluxDB(Store):
         elif data_type == LIQUIDATIONS:
             for entry in self.data:
                 ts = int(Decimal(entry["timestamp"]) * 1000000000)
-                agg.append(f'{data_type}-{exchange},pair={pair},exchange={exchange} side="{entry["side"]}",leaves_qty={entry["leaves_qty"]},order_id="{entry["order_id"]}",price="{entry["price"]}",timestamp={entry["timestamp"]},receipt_timestamp={entry["receipt_timestamp"]} {ts}')
+                agg.append(f'{data_type}-{exchange},pair={pair},exchange={exchange} side="{entry["side"]}",leaves_qty={entry["leaves_qty"]},order_id="{entry["order_id"]}",price={entry["price"]},timestamp={entry["timestamp"]},receipt_timestamp={entry["receipt_timestamp"]} {ts}')
 
         # https://v2.docs.influxdata.com/v2.0/write-data/best-practices/optimize-writes/
         # Tuning docs indicate 5k is the ideal chunk size for batch writes
