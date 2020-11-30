@@ -8,7 +8,7 @@ from decimal import Decimal
 from collections import defaultdict
 import logging
 
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING, OPEN_INTEREST
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING, OPEN_INTEREST, LIQUIDATIONS
 import requests
 
 from cryptostore.exceptions import EngineWriteError
@@ -92,6 +92,10 @@ class InfluxDB(Store):
             for entry in self.data:
                 ts = int(Decimal(entry["timestamp"]) * 1000000000)
                 agg.append(f'{data_type}-{exchange},pair={pair},exchange={exchange} open_interest={entry["open_interest"]},timestamp={entry["timestamp"]},receipt_timestamp={entry["receipt_timestamp"]} {ts}')
+        elif data_type == LIQUIDATIONS:
+            for entry in self.data:
+                ts = int(Decimal(entry["timestamp"]) * 1000000000)
+                agg.append(f'{data_type}-{exchange},pair={pair},exchange={exchange} side="{entry["side"]}",leaves_qty={entry["leaves_qty"]},order_id="{entry["order_id"]}",price={entry["price"]},timestamp={entry["timestamp"]},receipt_timestamp={entry["receipt_timestamp"]} {ts}')
 
         # https://v2.docs.influxdata.com/v2.0/write-data/best-practices/optimize-writes/
         # Tuning docs indicate 5k is the ideal chunk size for batch writes

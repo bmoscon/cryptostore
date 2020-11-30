@@ -1,8 +1,10 @@
 ## Changelog
 
-### 0.3.1
+### 0.3.2
   * Bugfix: Aggregating parquet files at the end of time no longer causes file not found error. 
   * Feature: Temporary parquet files are now gathering in a seperate folder
+
+### 0.3.1 (2020-11-14)
   * Feature: Influxdb 1.x authentication support
   * Bugfix: Extend timeout of Google Drive connection
   * Feature: Parquet file compression
@@ -14,6 +16,7 @@
   * Bugfix: Set arctic storage quota to unlimited (rather than 10G)
   * Bugfix: Regression in arctic storage backend
   * Feature: Opened parquet files (when appended) are suffixed with '.tmp'
+  * Feature: Liquidations support
 
 ### 0.3.0 (2020-08-18)
   * Feature: Config options for controlling data channel timeouts

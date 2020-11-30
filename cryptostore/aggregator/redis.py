@@ -8,7 +8,7 @@ import logging
 from collections import defaultdict
 import time
 
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING, OPEN_INTEREST
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING, OPEN_INTEREST, LIQUIDATIONS
 
 from cryptostore.aggregator.util import l2_book_flatten, l3_book_flatten
 from cryptostore.aggregator.cache import Cache
@@ -64,8 +64,8 @@ class Redis(Cache):
             updates = l2_book_flatten(updates)
         elif dtype == L3_BOOK:
             updates = l3_book_flatten(updates)
-        elif dtype in {TRADES, TICKER, OPEN_INTEREST}:
-            as_float = ('size', 'amount', 'price', 'timestamp', 'receipt_timestamp', 'bid', 'ask', 'open_interest')
+        elif dtype in {TRADES, TICKER, OPEN_INTEREST, LIQUIDATIONS}:
+            as_float = ('size', 'amount', 'price', 'timestamp', 'receipt_timestamp', 'bid', 'ask', 'open_interest', 'leaves_qty')
             are_float = filter(as_float.count, updates[0])
             for k in are_float:
                 for update in updates:
