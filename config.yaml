@@ -71,7 +71,7 @@ exchanges:
     COINGECKO:
         retries: -1
         # Base currencies can only be USD, BTC or ETH for Coingecko
-        profile: [BTC-USD, ETH-BTC, LINK-ETH]   
+        market_info: [BTC-USD, ETH-BTC, LINK-ETH]   
     WHALE_ALERT:
         retries: -1
         # Only a coin is defined to retrieve related transactions
