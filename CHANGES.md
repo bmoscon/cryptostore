@@ -1,9 +1,10 @@
 ## Changelog
 
 ### 0.3.2
-  * Feature: Support for Coingecko aggregated data per coin, to be used with a new data channel 'profile'
+  * Feature: Support for Coingecko aggregated data per coin, to be used with a new data channel 'market_info'
   * Feature: Support for Whale Alert on-chain transaction data per coin, to be used with a new data channel 'transactions'
   * Feature: Any keyword identified as NOT being a channel or 'retries' or 'channel_timeouts' is forwarded directly to the feed as a configuration parameter. 
+  * Bugfix: Fix book building example
 
 ### 0.3.1 (2020-11-14)
   * Feature: Influxdb 1.x authentication support
