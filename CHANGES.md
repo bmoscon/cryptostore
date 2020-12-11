@@ -1,5 +1,8 @@
 ## Changelog
 
+### 0.3.2
+  * Bugfix: Fix book building example
+
 ### 0.3.1 (2020-11-14)
   * Feature: Influxdb 1.x authentication support
   * Bugfix: Extend timeout of Google Drive connection
