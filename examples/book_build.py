@@ -20,7 +20,7 @@ def main():
     for chunk in it:
         for row in chunk.iterrows():
             timestamp = row[0]
-            side, price, size, delta = row[1].values
+            side, price, size, receipt_timestamp, delta = row[1].values
             if size == 0:
                 del book[side][price]
             else:
