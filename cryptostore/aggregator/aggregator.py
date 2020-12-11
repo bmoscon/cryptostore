@@ -17,11 +17,11 @@ from cryptostore.aggregator.kafka import Kafka
 from cryptostore.data.storage import Storage
 from cryptostore.config import DynamicConfig
 from cryptostore.exceptions import EngineWriteError
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, BOOK_DELTA, TICKER, FUNDING, OPEN_INTEREST, LIQUIDATIONS, MARKET_INFO, TRANSACTIONS
+from cryptofeed.defines import BOOK_DELTA, FUNDING, FUTURES_INDEX, LIQUIDATIONS, L2_BOOK, L3_BOOK, MARKET_INFO, OPEN_INTEREST, TICKER, TRADES, TRANSACTIONS, VOLUME
 
 
 LOG = logging.getLogger('cryptostore')
-KNOWN_CHAN = (TRADES, L2_BOOK, L3_BOOK, BOOK_DELTA, TICKER, FUNDING, OPEN_INTEREST, LIQUIDATIONS, MARKET_INFO, TRANSACTIONS)
+KNOWN_CHAN = (BOOK_DELTA, FUNDING, FUTURES_INDEX, LIQUIDATIONS, L2_BOOK, L3_BOOK, MARKET_INFO, OPEN_INTEREST, TICKER, TRADES, TRANSACTIONS, VOLUME)
 
 class Aggregator(Process):
     def __init__(self, config_file=None):
