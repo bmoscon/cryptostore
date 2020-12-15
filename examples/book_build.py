@@ -8,6 +8,7 @@ associated with this software.
 This example builds a book from the data in Arctic.
 '''
 import arctic
+from sortedcontainers import SortedDict as sd
 
 
 def main():
@@ -15,7 +16,7 @@ def main():
     lib = a['BITMEX']
     it = lib.iterator('l2_book-XBTUSD')
 
-    book = {'bid': {}, 'ask': {}}
+    book = {'bid': sd(), 'ask': sd()}
 
     for chunk in it:
         for row in chunk.iterrows():
@@ -27,6 +28,10 @@ def main():
                 book[side][price] = size
             if delta:
                 print(f"Time: {timestamp} L2 Book: {book}")
+                best_bid, best_ask = book['bid'].keys()[-1], book['ask'].keys()[0]
+                print("Best Bid:", best_bid)
+                print("Best Ask:", best_ask)
+                print("\n")
 
 
 if __name__ == '__main__':
