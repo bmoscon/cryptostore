@@ -10,8 +10,10 @@ import os
 from datetime import datetime
 from urllib.parse import urlparse
 
-import boto3
 import yaml
+
+from cryptostore.engines import StorageEngines
+
 
 LOG = logging.getLogger('cryptostore')
 
@@ -55,21 +57,28 @@ class DynamicConfig(Config):
 
         self.s3_object_uri = os.environ.get('S3_CONFIG_FILE_URI') #returns None if env var not present
         self.s3_region     = os.environ.get('S3_REGION') #returns None if env var not present
-        if self.s3_object_uri is None:
+        LOG.debug(f'self.s3_object_uri is: {self.s3_object_uri}')
+
+        if self.s3_object_uri is (None or ''):
             if file_name is None:
                 file_name = os.path.join(os.getcwd(), 'config.yaml')
             if not os.path.isfile(file_name):
                 raise FileNotFoundError(f"Config file {file_name} not found")
-        else:
-            self.s3client = boto3.client('s3', region_name=self.s3_region)
-            s3_uri = urlparse(self.s3_object_uri)
-            self.s3_bucket_name = s3_uri.netloc
-            self.s3_object_name = s3_uri.path.lstrip('/')
+            self.config = {}
+            self._load(file_name, reload_interval, callback)
 
-            obj = self.s3client.get_object(Bucket=self.s3_bucket_name,
-                                           Key=self.s3_object_name)
+        else:
+            self.s3client = StorageEngines.boto3.client('s3', region_name=self.s3_region)
+            s3_uri = urlparse(self.s3_object_uri)
+            s3_bucket_name = s3_uri.netloc
+            s3_object_name = s3_uri.path.lstrip('/')
+
+            obj = self.s3client.get_object(Bucket=s3_bucket_name,
+                                           Key=s3_object_name)
             if obj['ResponseMetadata']['HTTPStatusCode'] != 200:
                 raise FileNotFoundError(f"Failed trying to load config file {s3_uri}. Response metadata: {obj['ResponseMetadata']}")
+            self.config = {}
+            self._load(self.s3_object_uri, reload_interval, callback)
 
         self.config = {}
         self._load(file_name, reload_interval, callback)
@@ -77,36 +86,43 @@ class DynamicConfig(Config):
     async def __loader(self, file, interval, callback):
         last_modified = 0
         last_modified_date = datetime(1990, 1, 1)
-        while True:
-            if self.s3_object_uri is None:
-                LOG.info(f'loading config file locally: {file}')
-                cur_mtime = os.stat(file).st_mtime
-                if cur_mtime != last_modified:
-                    with open(file, 'r') as fp:
-                        self.config = AttrDict(yaml.load(fp, Loader=yaml.FullLoader))
-                        LOG.info('applying local config file')
-                        if callback is not None:
-                            await callback(self.config)
-                        last_modified = cur_mtime
-            else:
-                LOG.info(f'loading config from s3 {self.s3_object_uri}')
-
-                try:
-                    obj = self.s3client.get_object(Bucket=self.s3_bucket_name,
-                                                   Key=self.s3_object_name)
-
-                    if obj['ResponseMetadata']['HTTPStatusCode'] == 200:
-                        if obj['LastModified'].replace(tzinfo=None) > last_modified_date.replace(tzinfo=None):
-                            self.config = AttrDict(yaml.load(obj['Body'].read().decode('utf-8'), Loader=yaml.FullLoader))
-                            LOG.info('applying config file from S3')
+        if file is not None:
+            while True:
+                if file[0:5] != 's3://':
+                    LOG.info(f'loading config file locally: {file} at {datetime.utcnow()}' )
+                    cur_mtime = os.stat(file).st_mtime
+                    if cur_mtime != last_modified:
+                        with open(file, 'r') as fp:
+                            self.config = AttrDict(yaml.load(fp, Loader=yaml.FullLoader))
+                            LOG.info(f'applying local config file: {file} at {datetime.utcnow()}')
                             if callback is not None:
                                 await callback(self.config)
-                            last_modified_date = obj['LastModified']
+                            last_modified = cur_mtime
 
-                except Exception as e:
-                    LOG.info(f'Exception in getting s3 object. {e}')
+                if file[0:5] == 's3://':
+                    LOG.info(f'loading config from s3 {file} at {datetime.utcnow()}')
+                    s3_uri = urlparse(file)
+                    s3_bucket_name = s3_uri.netloc
+                    s3_object_name = s3_uri.path.lstrip('/')
 
-            await asyncio.sleep(interval)
+                    try:
+                        obj = self.s3client.get_object(Bucket=s3_bucket_name,
+                                                       Key=s3_object_name)
+
+                        if obj['ResponseMetadata']['HTTPStatusCode'] == 200:
+                            if obj['LastModified'].replace(tzinfo=None) > last_modified_date.replace(tzinfo=None):
+                                self.config = AttrDict(yaml.load(obj['Body'].read().decode('utf-8'), Loader=yaml.FullLoader))
+                                LOG.info(f'applying config file from S3 {file} at {datetime.utcnow()}')
+                                if callback is not None:
+                                    await callback(self.config)
+                                last_modified_date = obj['LastModified']
+
+                    except Exception as e:
+                        LOG.info(f'Exception in getting s3 object. {e}')
+
+                await asyncio.sleep(interval)
+        else:
+            LOG.info('Received None where config file name or uri should be received, refusing to try to load config for this execution.')
 
     def _load(self, file, interval, callback):
         loop = asyncio.get_event_loop()
