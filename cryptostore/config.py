@@ -59,7 +59,7 @@ class DynamicConfig(Config):
         self.s3_region     = os.environ.get('S3_REGION') #returns None if env var not present
         LOG.debug(f'self.s3_object_uri is: {self.s3_object_uri}')
 
-        if self.s3_object_uri is (None or ''):
+        if not self.s3_object_uri:
             if file_name is None:
                 file_name = os.path.join(os.getcwd(), 'config.yaml')
             if not os.path.isfile(file_name):
@@ -80,13 +80,10 @@ class DynamicConfig(Config):
             self.config = {}
             self._load(self.s3_object_uri, reload_interval, callback)
 
-        self.config = {}
-        self._load(file_name, reload_interval, callback)
-
     async def __loader(self, file, interval, callback):
         last_modified = 0
         last_modified_date = datetime(1990, 1, 1)
-        if file is not None:
+        if file:
             while True:
                 if file[0:5] != 's3://':
                     LOG.info(f'loading config file locally: {file} at {datetime.utcnow()}' )
