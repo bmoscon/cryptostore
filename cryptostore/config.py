@@ -55,8 +55,8 @@ class DynamicConfig(Config):
     def __init__(self, file_name=None, reload_interval=10, callback=None):
         # Normal boto3 credentialing methods are used (see https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html)
 
-        self.s3_object_uri = os.environ.get('S3_CONFIG_FILE_URI') #returns None if env var not present
-        self.s3_region     = os.environ.get('S3_REGION') #returns None if env var not present
+        self.s3_object_uri = os.environ.get('S3_CONFIG_FILE_URI')  # returns None if env var not present
+        self.s3_region = os.environ.get('S3_REGION')  # returns None if env var not present
         LOG.debug(f'self.s3_object_uri is: {self.s3_object_uri}')
 
         if not self.s3_object_uri:
@@ -86,9 +86,9 @@ class DynamicConfig(Config):
         if file:
             while True:
                 if file[0:5] != 's3://':
-                    LOG.info(f'loading config file locally: {file} at {datetime.utcnow()}' )
                     cur_mtime = os.stat(file).st_mtime
                     if cur_mtime != last_modified:
+                        LOG.info(f'loading config file locally: {file} at {datetime.utcnow()}')
                         with open(file, 'r') as fp:
                             self.config = AttrDict(yaml.load(fp, Loader=yaml.FullLoader))
                             LOG.info(f'applying local config file: {file} at {datetime.utcnow()}')
@@ -97,7 +97,6 @@ class DynamicConfig(Config):
                             last_modified = cur_mtime
 
                 if file[0:5] == 's3://':
-                    LOG.info(f'loading config from s3 {file} at {datetime.utcnow()}')
                     s3_uri = urlparse(file)
                     s3_bucket_name = s3_uri.netloc
                     s3_object_name = s3_uri.path.lstrip('/')
@@ -108,6 +107,7 @@ class DynamicConfig(Config):
 
                         if obj['ResponseMetadata']['HTTPStatusCode'] == 200:
                             if obj['LastModified'].replace(tzinfo=None) > last_modified_date.replace(tzinfo=None):
+                                LOG.info(f'loading config from s3 {file} at {datetime.utcnow()}')
                                 self.config = AttrDict(yaml.load(obj['Body'].read().decode('utf-8'), Loader=yaml.FullLoader))
                                 LOG.info(f'applying config file from S3 {file} at {datetime.utcnow()}')
                                 if callback is not None:

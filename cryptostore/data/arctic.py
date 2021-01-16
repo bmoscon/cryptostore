@@ -40,17 +40,17 @@ class Arctic(Store):
             if 'id' in df:
                 df['id'] = df['id'].astype(str)
             df['size'] = df.amount
-            df = df.drop(['pair', 'feed', 'amount'], axis=1)
+            df = df.drop(['symbol', 'feed', 'amount'], axis=1)
             chunk_size = 'H'
         elif data_type == TICKER:
-            df = df.drop(['pair', 'feed'], axis=1)
+            df = df.drop(['symbol', 'feed'], axis=1)
             chunk_size = 'D'
-        elif data_type in { L2_BOOK, L3_BOOK }:
+        elif data_type in {L2_BOOK, L3_BOOK}:
             chunk_size = 'T'
         elif data_type == FUNDING:
             chunk_size = 'D'
         elif data_type == OPEN_INTEREST:
-            df = df.drop(['pair', 'feed'], axis=1)
+            df = df.drop(['symbol', 'feed'], axis=1)
             chunk_size = 'D'
 
         df.set_index('date', inplace=True)

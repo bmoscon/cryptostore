@@ -17,7 +17,7 @@ LOG = logging.getLogger('cryptostore')
 
 
 def chunk(iterable, length):
-    return (iterable[i : i + length] for i in range(0, len(iterable), length))
+    return (iterable[i: i + length] for i in range(0, len(iterable), length))
 
 
 class ElasticSearch(Store):
@@ -26,14 +26,7 @@ class ElasticSearch(Store):
         self.host = config.host
         self.user = config.user
         self.token = config.token
-        self.settings = {'settings': {
-                            "index" : {
-                                "number_of_shards" : config.shards,
-                                "number_of_replicas" : config.replicas,
-                                "refresh_interval": config.refresh_interval
-                                }
-                            }
-                        }
+        self.settings = {'settings': {"index": {"number_of_shards": config.shards, "number_of_replicas": config.replicas, "refresh_interval": config.refresh_interval}}}
 
     def aggregate(self, data):
         if isinstance(data[0], dict):
@@ -66,17 +59,16 @@ class ElasticSearch(Store):
     def get_start_date(self, exchange: str, data_type: str, pair: str) -> float:
         try:
             data = {
-                "query":{
+                "query": {
                     "bool": {
                         "must": [{
                             "match_phrase": {"feed": exchange}
-                        },{
-                            "match_phrase": {"pair": pair}
+                        }, {
+                            "match_phrase": {"symbol": pair}
                         }]
                     }
                 },
-                "aggs" : {
-                    "min_timestamp" : { "min" : { "field" : "timestamp" }}}
+                "aggs": {"min_timestamp": {"min": {"field": "timestamp"}}}
             }
             r = requests.post(f"{self.host}/{data_type}/{data_type}/_search?size=0", auth=(self.user, self.token), data=json.dumps(data), headers={'content-type': 'application/json'})
             return r.json()['aggregations']['min_timestamp']['value']

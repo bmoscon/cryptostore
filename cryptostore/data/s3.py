@@ -8,22 +8,14 @@ from cryptostore.engines import StorageEngines
 
 
 def aws_write(bucket, key, data, creds=(None, None), endpoint=None):
-    client = StorageEngines.boto3.client('s3',
-        aws_access_key_id=creds[0],
-        aws_secret_access_key=creds[1],
-        endpoint_url=endpoint
-    )
+    client = StorageEngines.boto3.client('s3', aws_access_key_id=creds[0], aws_secret_access_key=creds[1], endpoint_url=endpoint)
 
     with open(data, 'rb') as fp:
         client.upload_fileobj(fp, bucket, key)
 
 
 def aws_list(bucket, key, creds=(None, None), limit=None, endpoint=None):
-    client = StorageEngines.boto3.client('s3',
-        aws_access_key_id=creds[0],
-        aws_secret_access_key=creds[1],
-        endpoint_url=endpoint
-    )
+    client = StorageEngines.boto3.client('s3', aws_access_key_id=creds[0], aws_secret_access_key=creds[1], endpoint_url=endpoint)
 
     objs = client.list_objects_v2(Bucket=bucket, Prefix=key)
     if objs and 'Contents' in objs:
@@ -41,10 +33,6 @@ def aws_list(bucket, key, creds=(None, None), limit=None, endpoint=None):
 
 
 def aws_read(bucket, key, file_name, creds=(None, None), endpoint=None):
-    client = StorageEngines.boto3.client('s3',
-        aws_access_key_id=creds[0],
-        aws_secret_access_key=creds[1],
-        endpoint_url=None
-    )
+    client = StorageEngines.boto3.client('s3', aws_access_key_id=creds[0], aws_secret_access_key=creds[1], endpoint_url=None)
 
     client.download_file(bucket, key, file_name)

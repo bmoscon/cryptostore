@@ -16,7 +16,6 @@ from cryptofeed.rest import Rest
 from cryptostore.config import Config
 from cryptostore.plugin.plugin import Plugin
 from cryptostore.data.storage import Storage
-from cryptostore.exceptions import InconsistentStorage
 
 
 LOG = logging.getLogger('cryptostore')

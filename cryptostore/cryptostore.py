@@ -35,7 +35,7 @@ class Cryptostore:
             self.queue.put(json.dumps({'op': 'stop', 'exchange': exchange}))
 
         for exchange in start:
-            self.queue.put(json.dumps({'op': 'start', 'exchange': exchange, 'collector': self.running_config['exchanges'][exchange], 'config': {i : self.running_config[i] for i in self.running_config if i != 'exchanges'}}))
+            self.queue.put(json.dumps({'op': 'start', 'exchange': exchange, 'collector': self.running_config['exchanges'][exchange], 'config': {i: self.running_config[i] for i in self.running_config if i != 'exchanges'}}))
 
     async def _reconfigure(self, config):
         stop = []

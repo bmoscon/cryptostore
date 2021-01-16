@@ -49,13 +49,13 @@ def l2_book_flatten(data: Tuple[dict]) -> Tuple[tuple, Generator]:
     """
 
     data = map(json.loads, [d['data'] for d in data])
-    data = ({'timestamp':float(ts), 'receipt_timestamp':float(r_ts), 'delta': delta, 'side':side,
-             'price': float(price), 'size':float(size)} \
-            for trans in data                                                                          \
-            for ts, r_ts, delta in ((trans['timestamp'], trans['receipt_timestamp'], trans['delta']),) \
-            for side in (BID, ASK)                                                                     \
-            for price, size in trans[side].items()                                                     )
-    keys=('timestamp','receipt_timestamp', 'delta', 'side', 'price', 'size')
+    data = ({'timestamp': float(ts), 'receipt_timestamp': float(r_ts), 'delta': delta, 'side': side,
+             'price': float(price), 'size': float(size)}
+            for trans in data
+            for ts, r_ts, delta in ((trans['timestamp'], trans['receipt_timestamp'], trans['delta']),)
+            for side in (BID, ASK)
+            for price, size in trans[side].items())
+    keys = ('timestamp', 'receipt_timestamp', 'delta', 'side', 'price', 'size')
     return keys, data
 
 
@@ -75,13 +75,12 @@ def l3_book_flatten(data: Tuple[dict]) -> Tuple[tuple, Generator]:
     """
 
     data = map(json.loads, [d['data'] for d in data])
-    data = ({'timestamp':float(ts), 'receipt_timestamp':float(r_ts), 'delta': delta, 'side':side,
-             'price': float(price), 'size':float(size), 'order_id': order_id} \
-            for trans in data                                                                          \
-            for ts, r_ts, delta in ((trans['timestamp'], trans['receipt_timestamp'], trans['delta']),) \
-            for side in (BID, ASK)                                                                     \
-            for price, dat in trans[side].items()                                                      \
-            for order_id, size in dat.items()                                                          )
-    keys=('timestamp','receipt_timestamp', 'delta', 'side', 'price', 'size', 'order_id')
+    data = ({'timestamp': float(ts), 'receipt_timestamp': float(r_ts), 'delta': delta, 'side': side,
+             'price': float(price), 'size': float(size), 'order_id': order_id}
+            for trans in data
+            for ts, r_ts, delta in ((trans['timestamp'], trans['receipt_timestamp'], trans['delta']),)
+            for side in (BID, ASK)
+            for price, dat in trans[side].items()
+            for order_id, size in dat.items())
+    keys = ('timestamp', 'receipt_timestamp', 'delta', 'side', 'price', 'size', 'order_id')
     return keys, data
-

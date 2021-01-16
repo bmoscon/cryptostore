@@ -49,7 +49,7 @@ setup(
         'zmq': ['pyzmq'],
         "drive": ["google-auth", "google-api-python-client"]
     },
-    entry_points = {
+    entry_points={
         'console_scripts': ['cryptostore=cryptostore.bin.cryptostore:main'],
     }
 )

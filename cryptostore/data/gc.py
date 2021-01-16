@@ -20,7 +20,7 @@ def _get_bucket(bucket, creds):
 
 def google_cloud_write(bucket, key, data, creds=None):
 
-    blob =  _get_bucket(bucket, creds).blob(key)
+    blob = _get_bucket(bucket, creds).blob(key)
     blob.upload_from_filename(data)
 
 
