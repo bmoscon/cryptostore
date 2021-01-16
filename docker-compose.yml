@@ -1,6 +1,8 @@
 version: "3.7"
 services:
   cryptostore:
+    env_file:
+      - env.s3config
     logging:
       driver: "json-file"
       options:
