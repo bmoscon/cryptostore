@@ -5,10 +5,6 @@ Please see the LICENSE file for the terms and conditions
 associated with this software.
 '''
 from cryptostore.data.store import Store
-from cryptostore.data.parquet import Parquet
-from cryptostore.data.arctic import Arctic
-from cryptostore.data.influx import InfluxDB
-from cryptostore.data.elastic import ElasticSearch
 
 
 class Storage(Store):
@@ -22,12 +18,16 @@ class Storage(Store):
     @staticmethod
     def __init_helper(store, config, **kwargs):
         if store == 'parquet':
+            from cryptostore.data.parquet import Parquet
             return Parquet(config.exchanges, config.parquet if 'parquet' in config else None, **kwargs)
         elif store == 'arctic':
+            from cryptostore.data.arctic import Arctic
             return Arctic(config.arctic)
         elif store == 'influx':
+            from cryptostore.data.influx import InfluxDB
             return InfluxDB(config.influx)
         elif store == 'elastic':
+            from cryptostore.data.elastic import ElasticSearch
             return ElasticSearch(config.elastic)
         else:
             raise ValueError("Store type not supported")
