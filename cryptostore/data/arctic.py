@@ -35,9 +35,6 @@ class Arctic(Store):
         df['receipt_timestamp'] = pd.to_datetime(df['receipt_timestamp'], unit='s')
         df = df.drop(['timestamp'], axis=1)
         
-        print("liquidations data:", self.data)
-        print("data type:", data_type)
-
         chunk_size = None
         if data_type == TRADES:
             if 'id' in df:
@@ -56,7 +53,6 @@ class Arctic(Store):
             df = df.drop(['symbol', 'feed'], axis=1)
             chunk_size = 'D'
         elif data_type == LIQUIDATIONS:
-            print("liquidations!")
             chunk_size = 'H'
 
         df.set_index('date', inplace=True)
