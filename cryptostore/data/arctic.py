@@ -49,11 +49,9 @@ class Arctic(Store):
             chunk_size = 'T'
         elif data_type == FUNDING:
             chunk_size = 'D'
-        elif data_type == OPEN_INTEREST:
+        elif data_type == OPEN_INTEREST or data_type == LIQUIDATIONS:
             df = df.drop(['symbol', 'feed'], axis=1)
             chunk_size = 'D'
-        elif data_type == LIQUIDATIONS:
-            chunk_size = 'H'
 
         df.set_index('date', inplace=True)
         # All timestamps are in UTC
