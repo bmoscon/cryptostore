@@ -34,7 +34,7 @@ class Arctic(Store):
         df['date'] = pd.to_datetime(df['timestamp'], unit='s')
         df['receipt_timestamp'] = pd.to_datetime(df['receipt_timestamp'], unit='s')
         df = df.drop(['timestamp'], axis=1)
-        
+
         chunk_size = None
         if data_type == TRADES:
             if 'id' in df:
