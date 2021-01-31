@@ -4,6 +4,8 @@
 ### 0.3.2
   * Bugfix: Fix book building example
   * Feature: Ability to pull config file from S3 bucket instead of local filesystem, polling for updated config is supported.
+  * Feature: Updated to work with latest version of cryptofeed
+  * Feature: Liquidations support for Arctic
 
 ### 0.3.1 (2020-11-14)
   * Feature: Influxdb 1.x authentication support
