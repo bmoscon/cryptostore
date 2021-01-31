@@ -5,7 +5,7 @@ Please see the LICENSE file for the terms and conditions
 associated with this software.
 '''
 import pandas as pd
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING, OPEN_INTEREST
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING, OPEN_INTEREST, LIQUIDATIONS
 
 from cryptostore.data.store import Store
 from cryptostore.engines import StorageEngines
@@ -34,7 +34,7 @@ class Arctic(Store):
         df['date'] = pd.to_datetime(df['timestamp'], unit='s')
         df['receipt_timestamp'] = pd.to_datetime(df['receipt_timestamp'], unit='s')
         df = df.drop(['timestamp'], axis=1)
-
+        
         chunk_size = None
         if data_type == TRADES:
             if 'id' in df:
@@ -49,7 +49,7 @@ class Arctic(Store):
             chunk_size = 'T'
         elif data_type == FUNDING:
             chunk_size = 'D'
-        elif data_type == OPEN_INTEREST:
+        elif data_type == OPEN_INTEREST or data_type == LIQUIDATIONS:
             df = df.drop(['symbol', 'feed'], axis=1)
             chunk_size = 'D'
 
