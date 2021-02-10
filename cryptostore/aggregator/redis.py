@@ -31,7 +31,6 @@ class Redis(Cache):
             LOG.info('Flushing cache')
             self.conn.flushall()
 
-
     def read(self, exchange, dtype, pair, start=None, end=None):
         """
         Read list of JSON dictionaries from Redis buffer, flatten the dictionaries and transform all
@@ -39,7 +38,7 @@ class Redis(Cache):
         Data is then returned either as a tuple of dictionaries or as a tuple containing for 1st element
         keys of the dictionaries, and for 2nd element a generator yielding said dictionaries.
         This is depending `dtype`.
-        
+
         Returns:
             updates (tuple[dict] or Tuple[tuple, Generator):
                 Tuple of dictionaries when `dtype` is not a L2 or L3 book.
@@ -80,7 +79,6 @@ class Redis(Cache):
                         pass
 
         return updates
-
 
     def delete(self, exchange, dtype, pair):
         key = f'{dtype}-{exchange}-{pair}'

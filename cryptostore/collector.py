@@ -31,7 +31,6 @@ class Collector(Process):
         timeouts = self.exchange_config.pop('channel_timeouts', {})
         fh = FeedHandler(retries=retries)
 
-
         for callback_type, value in self.exchange_config.items():
             cb = {}
             depth = None
@@ -79,7 +78,7 @@ class Collector(Process):
             if callback_type == TRADES:
                 cb[TRADES] = [trade_cb(**kwargs)]
             elif callback_type == LIQUIDATIONS:
-                 cb[LIQUIDATIONS] = [liq_cb(**kwargs)]
+                cb[LIQUIDATIONS] = [liq_cb(**kwargs)]
             elif callback_type == FUNDING:
                 cb[FUNDING] = [funding_cb(**kwargs)]
             elif callback_type == TICKER:
@@ -98,7 +97,6 @@ class Collector(Process):
             if 'pass_through' in self.config:
                 if self.config['pass_through']['type'] == 'zmq':
                     from cryptofeed.backends.zmq import TradeZMQ, BookDeltaZMQ, BookZMQ, FundingZMQ, OpenInterestZMQ, TickerZMQ, LiquidationsZMQ
-                    import zmq
                     host = self.config['pass_through']['host']
                     port = self.config['pass_through']['port']
 
@@ -119,6 +117,6 @@ class Collector(Process):
                     if BOOK_DELTA in cb:
                         cb[BOOK_DELTA].append(BookDeltaZMQ(host=host, port=port))
 
-            fh.add_feed(self.exchange, timeout=timeout, max_depth=depth, snapshot_interval=snap_interval, book_interval=window, config={callback_type: self.exchange_config[callback_type]}, callbacks=cb)
+            fh.add_feed(self.exchange, timeout=timeout, max_depth=depth, snapshot_interval=snap_interval, book_interval=window, subscription={callback_type: self.exchange_config[callback_type]}, callbacks=cb)
 
         fh.run()

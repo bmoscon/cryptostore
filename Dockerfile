@@ -16,6 +16,7 @@ RUN pip install --no-cache-dir pyarrow
 RUN pip install --no-cache-dir redis
 RUN pip install --no-cache-dir aioredis
 RUN pip install --no-cache-dir arctic
+RUN pip install --no-cache-dir boto3
 
 ## Add any extra dependencies you might have
 # eg RUN pip install --no-cache-dir boto3

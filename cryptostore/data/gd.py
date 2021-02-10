@@ -4,7 +4,7 @@ Copyright (C) 2018-2020  Bryant Moscon - bmoscon@gmail.com
 Please see the LICENSE file for the terms and conditions
 associated with this software.
 '''
-from typing import Tuple, Callable
+from typing import Callable
 import socket
 
 from cryptostore.engines import StorageEngines
@@ -35,7 +35,6 @@ class GDriveConnector:
                 in Google Drive folder name.
             path (Callable[[str, str, str], str]):
                 Function from which deriving folders' name.
-
         """
 
         httplib2 = StorageEngines['httplib2']
@@ -45,12 +44,11 @@ class GDriveConnector:
         # `http` object.
         if creds:
             google = StorageEngines['google.oauth2.service_account']
-            self.creds = google.oauth2.service_account.Credentials.from_service_account_file(creds)\
-                                        .with_scopes(['https://www.googleapis.com/auth/drive'])
+            self.creds = google.oauth2.service_account.Credentials.from_service_account_file(creds).with_scopes(['https://www.googleapis.com/auth/drive'])
         else:
             # Use environment variable GOOGLE_APPLICATION_CREDENTIALS
             google = StorageEngines['google.auth']
-            self.creds, project = google.auth.default(scopes=['https://www.googleapis.com/auth/drive'])
+            self.creds, _ = google.auth.default(scopes=['https://www.googleapis.com/auth/drive'])
         googleapiclient = StorageEngines['googleapiclient._auth']
         auth_http = googleapiclient._auth.authorized_http(self.creds)
         auth_http.cache = httplib2.FileCache(self.cache_path)
@@ -95,9 +93,7 @@ accessible folder.".format(prefix))
                 for pair in exchanges[exchange][dtype] if 'symbols' not in exchanges[exchange][dtype] else exchanges[exchange][dtype]['symbols']:
                     c_folders.append(folder_name_sep.join(path(exchange, dtype, pair).split('/')))
         # Retrieve ID for existing ones.
-        existing_childs = [(folder['name'], folder['id']) for folder in g_drive_folders
-                           if ((folder['name'] in c_folders) and ('parents' in folder)
-                           and (p_folder_id in folder['parents']))]
+        existing_childs = [(folder['name'], folder['id']) for folder in g_drive_folders if ((folder['name'] in c_folders) and ('parents' in folder) and (p_folder_id in folder['parents']))]
         # If duplicates in folder names, throw an exception.
         existing_as_dict = dict(existing_childs)
         n = len(existing_childs) - len(existing_as_dict)
@@ -107,7 +103,8 @@ accessible folder.".format(prefix))
         missing_childs = list(set(c_folders) - set(existing_as_dict))
         # Number of calls in batch is limited to 1000.
         call_limit = 800
-        missing_in_chunks = [missing_childs[x:x+call_limit] for x in range(0, len(missing_childs), call_limit)]
+        missing_in_chunks = [missing_childs[x: x + call_limit] for x in range(0, len(missing_childs), call_limit)]
+
         # Setup & operate requests in batch.
         def _callback(request_id, response, exception, keep=existing_as_dict):
             keep[response['name']] = response['id']
@@ -121,7 +118,6 @@ accessible folder.".format(prefix))
                 batch.add(files.create(body=folder_metadata, fields='id, name'))
             batch.execute()
         self.folders = existing_as_dict
-
 
     def write(self, bucket: str, path: str, file_name: str, **kwargs):
         """

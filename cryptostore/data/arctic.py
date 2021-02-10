@@ -5,7 +5,7 @@ Please see the LICENSE file for the terms and conditions
 associated with this software.
 '''
 import pandas as pd
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING, OPEN_INTEREST
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING, OPEN_INTEREST, LIQUIDATIONS
 
 from cryptostore.data.store import Store
 from cryptostore.engines import StorageEngines
@@ -40,17 +40,17 @@ class Arctic(Store):
             if 'id' in df:
                 df['id'] = df['id'].astype(str)
             df['size'] = df.amount
-            df = df.drop(['pair', 'feed', 'amount'], axis=1)
+            df = df.drop(['symbol', 'feed', 'amount'], axis=1)
             chunk_size = 'H'
         elif data_type == TICKER:
-            df = df.drop(['pair', 'feed'], axis=1)
+            df = df.drop(['symbol', 'feed'], axis=1)
             chunk_size = 'D'
-        elif data_type in { L2_BOOK, L3_BOOK }:
+        elif data_type in {L2_BOOK, L3_BOOK}:
             chunk_size = 'T'
         elif data_type == FUNDING:
             chunk_size = 'D'
-        elif data_type == OPEN_INTEREST:
-            df = df.drop(['pair', 'feed'], axis=1)
+        elif data_type == OPEN_INTEREST or data_type == LIQUIDATIONS:
+            df = df.drop(['symbol', 'feed'], axis=1)
             chunk_size = 'D'
 
         df.set_index('date', inplace=True)

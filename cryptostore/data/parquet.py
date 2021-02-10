@@ -20,8 +20,6 @@ from cryptostore.exceptions import InconsistentStorage
 
 class Parquet(Store):
 
-    default_path = lambda self, exchange, data_type, pair: f'{exchange}/{data_type}/{pair}'
-
     def __init__(self, exchanges, config=None, parquet_buffer=None):
         self._write = []
         self._read = []
@@ -64,7 +62,7 @@ class Parquet(Store):
                 self.kwargs.append({'creds': (config['S3']['key_id'], config['S3']['secret']), 'endpoint': config['S3'].get('endpoint')})
             if 'GD' in config:
                 folder_name_sep = config['GD']['folder_name_sep'] if 'folder_name_sep' in config['GD'] else '-'
-                g_drive = GDriveConnector(config['GD']['service_account'], exchanges, config['GD']['prefix'], folder_name_sep, self.default_path)
+                g_drive = GDriveConnector(config['GD']['service_account'], exchanges, config['GD']['prefix'], folder_name_sep, self._default_path)
                 self._write.append(g_drive.write)
                 self.prefix.append(None)
                 self.bucket.append(None)
@@ -72,6 +70,8 @@ class Parquet(Store):
             # Counter
             self.append_counter = config.get('append_counter') if 'append_counter' in config else 0
 
+    def _default_path(self, exchange, data_type, pair):
+        return f'{exchange}/{data_type}/{pair}'
 
     def aggregate(self, data):
         if isinstance(data[0], dict):
@@ -82,19 +82,18 @@ class Parquet(Store):
             # and generator of dicts as 2nd paramter.
             names = data[0]
             data = data[1]
-           
+
         cols = {name: [] for name in names}
         for entry in data:
             for key in entry:
                 val = entry[key]
                 cols[key].append(val)
 
-        to_dict = ('feed', 'pair', 'side')
+        to_dict = ('feed', 'symbol', 'side')
         arrays = [pa.array(cols[col], pa.string()).dictionary_encode() if col in to_dict
                   else pa.array(cols[col]) for col in cols]
         table = pa.Table.from_arrays(arrays, names=names)
         self.data = table
-
 
     def write(self, exchange, data_type, pair, timestamp):
         if not self.data:
@@ -109,7 +108,7 @@ class Parquet(Store):
                     file_name += f"{data_type}-"
                 elif var == "exchange":
                     file_name += f"{exchange}-"
-                elif var == "pair":
+                elif var == "symbol":
                     file_name += f"{pair}-"
                 else:
                     raise ValueError("Invalid file format specified for parquet file")
@@ -162,7 +161,7 @@ class Parquet(Store):
                 if self._write:
                     # Upload in cloud storage (GCS, S3 or GD)
                     for func, bucket, prefix, kwargs in zip(self._write, self.bucket, self.prefix, self.kwargs):
-                        path = self.default_path(exchange, data_type, pair) + f'/{exchange}-{data_type}-{pair}-{timestamp}.parquet'
+                        path = self._default_path(exchange, data_type, pair) + f'/{exchange}-{data_type}-{pair}-{timestamp}.parquet'
                         if prefix:
                             path = f"{prefix}/{path}"
                         elif self.prefix_date:
@@ -173,7 +172,6 @@ class Parquet(Store):
                         os.remove(final_path)
             # Reset counter
             del self.buffer[f_name_tips]
-
 
     def get_start_date(self, exchange: str, data_type: str, pair: str) -> float:
         objs = []

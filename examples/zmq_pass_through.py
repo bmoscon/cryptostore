@@ -27,8 +27,9 @@ def receiver(port):
         print(key)
         print(json.loads(msg))
 
+
 def main():
-    receiver(5678)    
+    receiver(5678)
 
 
 if __name__ == '__main__':

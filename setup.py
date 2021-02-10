@@ -18,7 +18,7 @@ except BaseException:
 
 setup(
     name="cryptostore",
-    version="0.4.0",
+    version="0.3.2",
     author="Bryant Moscon",
     author_email="bmoscon@gmail.com",
     description=("Storage engine for cryptocurrency data"),
@@ -49,7 +49,7 @@ setup(
         'zmq': ['pyzmq'],
         "drive": ["google-auth", "google-api-python-client"]
     },
-    entry_points = {
+    entry_points={
         'console_scripts': ['cryptostore=cryptostore.bin.cryptostore:main'],
     }
 )

@@ -75,11 +75,11 @@ class Kafka(Cache):
             msg = message.value().decode('utf8')
             try:
                 update = json.loads(msg)
-            except:
+            except Exception:
                 if 'Subscribed topic not available' in msg:
                     return ret
             if dtype in {L2_BOOK, L3_BOOK}:
-                update = book_flatten(update, update['timestamp'], update['delta'])
+                update = book_flatten(update, update['timestamp'], update['delta'], update['receipt_timestamp'])
                 ret.extend(update)
             if dtype in {TRADES, TICKER, FUNDING, OPEN_INTEREST}:
                 ret.append(update)
