@@ -90,7 +90,9 @@ class Parquet(Store):
                 cols[key].append(val)
 
         to_dict = ('feed', 'symbol', 'side')
+        to_double = ('size', 'amount')
         arrays = [pa.array(cols[col], pa.string()).dictionary_encode() if col in to_dict
+                  else pa.array(cols[col], pa.float64()) if col in to_double
                   else pa.array(cols[col]) for col in cols]
         table = pa.Table.from_arrays(arrays, names=names)
         self.data = table
