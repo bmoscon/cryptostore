@@ -8,6 +8,7 @@
   * Bugfix: Aggregating parquet files at the end of time no longer causes file not found error. 
   * Feature: Temporary parquet files are now gathering in a seperate folder
   * Bugfix: Parquet column type fix
+  * Bugfix: Fix issue where max depth was being passed incorrectly to cryptofeed
 
 ### 0.3.1 (2020-11-14)
   * Feature: Influxdb 1.x authentication support
