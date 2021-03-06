@@ -53,13 +53,13 @@ exchanges:
             funding: -1
         retries: -1
         l2_book:
-            symbols: [XBTUSD]
+            symbols: [BTC-USD]
             max_depth: 10
             book_delta: true
             book_interval: 100000
-        trades: [XBTUSD]
-        ticker: [XBTUSD]
-        funding: [XBTUSD]
+        trades: [BTC-USD]
+        ticker: [BTC-USD]
+        funding: [BTC-USD]
     COINBASE:
         retries: -1
         l3_book:
