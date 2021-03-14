@@ -1,5 +1,4 @@
 ## Changelog
-  * Bugfix: rename kafka host kwarg to bootstrap, as cryptofeed backend expects
 
 ### 0.3.2
   * Bugfix: Fix book building example
@@ -10,6 +9,7 @@
   * Feature: Temporary parquet files are now gathering in a seperate folder
   * Bugfix: Parquet column type fix
   * Bugfix: Fix issue where max depth was being passed incorrectly to cryptofeed
+  * Bugfix: rename kafka host kwarg to bootstrap, as cryptofeed backend expects
 
 ### 0.3.1 (2020-11-14)
   * Feature: Influxdb 1.x authentication support
