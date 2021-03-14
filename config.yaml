@@ -25,9 +25,8 @@ redis:
 # must be capitalized) and only exchanges supported by cryptofeed are supported.
 # Data types follow cryptofeed definitions, see defines.py in cryptofeed for more details, common ones are
 # trades, l2_book, l3_book, funding, ticker, and open_interest
-# Trading pairs for all exchanges (except BitMEX, Deribit and other derivatives) follow the currency-quote format.
-# Information about what an exchange supports (pairs, data types, etc) can be found via the info() merhod available on
-# all cryptofeed exchange clases.
+# Trading pairs for most exchanges follow the currency-quote format. Information about what an exchange supports (pairs, data types, etc)
+# can be found via the info() merhod available on all cryptofeed exchange clases.
 #
 # max_depth controls the size of the book to return. The top N levels will be returned, only when those N levels
 # have changed.
@@ -53,13 +52,13 @@ exchanges:
             funding: -1
         retries: -1
         l2_book:
-            symbols: [XBTUSD]
+            symbols: [BTC-USD]
             max_depth: 10
             book_delta: true
             book_interval: 100000
-        trades: [XBTUSD]
-        ticker: [XBTUSD]
-        funding: [XBTUSD]
+        trades: [BTC-USD]
+        ticker: [BTC-USD]
+        funding: [BTC-USD]
     COINBASE:
         retries: -1
         l3_book:

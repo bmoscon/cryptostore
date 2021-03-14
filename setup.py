@@ -1,5 +1,5 @@
 '''
-Copyright (C) 2018-2020  Bryant Moscon - bmoscon@gmail.com
+Copyright (C) 2018-2021  Bryant Moscon - bmoscon@gmail.com
 
 Please see the LICENSE file for the terms and conditions
 associated with this software.
@@ -35,10 +35,10 @@ setup(
     ],
     install_requires=[
         "pandas",
-        "cryptofeed>=1.3.1",
+        "cryptofeed>=1.7.0",
         "pyyaml",
         "pyarrow",
-        "aiohttp>=3.7.1"
+        "aiohttp>=3.7.1, < 4.0.0"
     ],
     extras_require={
         'redis': ['redis', 'aioredis'],

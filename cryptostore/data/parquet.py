@@ -1,5 +1,5 @@
 '''
-Copyright (C) 2018-2020  Bryant Moscon - bmoscon@gmail.com
+Copyright (C) 2018-2021  Bryant Moscon - bmoscon@gmail.com
 
 Please see the LICENSE file for the terms and conditions
 associated with this software.
@@ -90,7 +90,9 @@ class Parquet(Store):
                 cols[key].append(val)
 
         to_dict = ('feed', 'symbol', 'side')
+        to_double = ('size', 'amount')
         arrays = [pa.array(cols[col], pa.string()).dictionary_encode() if col in to_dict
+                  else pa.array(cols[col], pa.float64()) if col in to_double
                   else pa.array(cols[col]) for col in cols]
         table = pa.Table.from_arrays(arrays, names=names)
         self.data = table
@@ -123,15 +125,19 @@ class Parquet(Store):
             local_path = os.path.join(self.path, date)
         else:
             local_path = self.path
+       
+        save_path = os.path.join(self.path, "temp") if self.append_counter else local_path
 
         # Write parquet file and manage `counter`.
         if f_name_tips not in self.buffer:
             # Case 'create new parquet file'.
             file_name += '.tmp' if self.append_counter else ''
+
             if self.path:
-                os.makedirs(local_path, mode=0o755, exist_ok=True)
-                file_name = os.path.join(local_path, file_name)
-            writer = pq.ParquetWriter(file_name, self.data.schema, compression=self.comp_codec, compression_level=self.comp_level)
+                os.makedirs(save_path, mode=0o755, exist_ok=True)
+                save_path = os.path.join(save_path, file_name)
+            
+            writer = pq.ParquetWriter(save_path, self.data.schema, compression=self.comp_codec, compression_level=self.comp_level)
             writer.write_table(table=self.data)
             self.buffer[f_name_tips] = {'counter': 0, 'writer': writer, 'timestamp': timestamp}
         else:
@@ -149,10 +155,11 @@ class Parquet(Store):
                 timestamp = self.buffer[f_name_tips]['timestamp']
                 file_name = f_name_tips[0] + timestamp + f_name_tips[1]
                 if self.path:
-                    file_name = os.path.join(local_path, file_name)
+                    os.makedirs(local_path, mode=0o755, exist_ok=True)
+                    final_path = os.path.join(local_path, file_name)
                 if self.append_counter:
                     # Remove '.tmp' suffix
-                    os.rename(file_name + '.tmp', file_name)
+                    os.rename(os.path.join(save_path, file_name + ".tmp"), final_path)
                 if self._write:
                     # Upload in cloud storage (GCS, S3 or GD)
                     for func, bucket, prefix, kwargs in zip(self._write, self.bucket, self.prefix, self.kwargs):
@@ -162,9 +169,9 @@ class Parquet(Store):
                         elif self.prefix_date:
                             date = str(datetime.date.fromtimestamp(int(timestamp)))
                             path = f"{date}/{path}"
-                        func(bucket, path, file_name, **kwargs)
+                        func(bucket, path, final_path, **kwargs)
                     if self.del_file:
-                        os.remove(file_name)
+                        os.remove(final_path)
             # Reset counter
             del self.buffer[f_name_tips]
 
