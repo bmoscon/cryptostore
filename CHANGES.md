@@ -1,5 +1,5 @@
 ## Changelog
-
+  * Bugfix: rename kafka host kwarg to bootstrap, as cryptofeed backend expects
 
 ### 0.3.2
   * Bugfix: Fix book building example
