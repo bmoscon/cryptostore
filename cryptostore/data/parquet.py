@@ -37,7 +37,7 @@ class Parquet(Store):
         self.buffer = parquet_buffer
         if config:
             self.file_name = config.get('file_format')
-            self.path = config.get('path')
+            self.path = config.get('path') or os.getcwd()
             self.prefix_date = config.get('prefix_date', False)
             self.del_file = config.get('del_file', True)
             # Compression
@@ -125,7 +125,6 @@ class Parquet(Store):
             local_path = os.path.join(self.path, date)
         else:
             local_path = self.path
-       
         save_path = os.path.join(self.path, "temp") if self.append_counter else local_path
 
         # Write parquet file and manage `counter`.
@@ -136,7 +135,7 @@ class Parquet(Store):
             if self.path:
                 os.makedirs(save_path, mode=0o755, exist_ok=True)
                 save_path = os.path.join(save_path, file_name)
-            
+
             writer = pq.ParquetWriter(save_path, self.data.schema, compression=self.comp_codec, compression_level=self.comp_level)
             writer.write_table(table=self.data)
             self.buffer[f_name_tips] = {'counter': 0, 'writer': writer, 'timestamp': timestamp}

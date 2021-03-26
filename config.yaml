@@ -25,7 +25,7 @@ redis:
 # must be capitalized) and only exchanges supported by cryptofeed are supported.
 # Data types follow cryptofeed definitions, see defines.py in cryptofeed for more details, common ones are
 # trades, l2_book, l3_book, funding, ticker, and open_interest
-# Trading pairs for most exchanges follow the currency-quote format. Information about what an exchange supports (pairs, data types, etc)
+# Trading symbols for most exchanges follow the currency-quote format. Information about what an exchange supports (symbols, data types, etc)
 # can be found via the info() merhod available on all cryptofeed exchange clases.
 #
 # max_depth controls the size of the book to return. The top N levels will be returned, only when those N levels
@@ -108,15 +108,15 @@ parquet:
     # Remove this parameter or set it to 0 to write a new file each 'storage_interval' (appending is then disabled).
     # Beware that a parquet file not properly closed cannot be read back. Closing is made at the last appending iteration.
     append_counter: 4
-    # File name format, as a list of arguments. Default is <exchange>-<data_type>-<pair>-<timestamp>.parquet, which would be exchange, data_type, pair, timestamp
-    # Can specify any combination exchange, data_type, pair, and timestamp
+    # File name format, as a list of arguments. Default is <exchange>-<data_type>-<symbol>-<timestamp>.parquet, which would be exchange, data_type, symbol, timestamp
+    # Can specify any combination exchange, data_type, symbol, and timestamp
     # timestamp MUST be present.
     # examples:
-    #    pair,timestamp
+    #    symbol,timestamp
     #    timestamp
     #    timestamp,exchange
     #    etc
-    file_format: [exchange, pair, data_type, timestamp]
+    file_format: [exchange, symbol, data_type, timestamp]
     # A compression codec (and level if relevant) can be defined to compress data when writing parquet file.
     # Compression is managed by use of `pyarrow.parquet.write_table()` interface.
     # Compression codecs (and levels in parentheses) are: NONE, SNAPPY, GZIP (1 to 9), BROTLI (1 to 11), LZ4 (1 is forced) & ZSTD (1 to 22).
@@ -154,7 +154,7 @@ parquet:
         # exist, it will not be created.
         service_account: null
         prefix: null
-        # Separator between `exchange`, `data_type`, and `pair` in Google Drive folder name.
+        # Separator between `exchange`, `data_type`, and `symbol` in Google Drive folder name.
         folder_name_sep: '.'
 
 # arctic specific configuration options - the mongo URL
