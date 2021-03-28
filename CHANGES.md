@@ -5,11 +5,12 @@
   * Feature: Ability to pull config file from S3 bucket instead of local filesystem, polling for updated config is supported.
   * Feature: Updated to work with latest version of cryptofeed
   * Feature: Liquidations support for Arctic
-  * Bugfix: Aggregating parquet files at the end of time no longer causes file not found error. 
+  * Bugfix: Aggregating parquet files at the end of time no longer causes file not found error.
   * Feature: Temporary parquet files are now gathering in a seperate folder
   * Bugfix: Parquet column type fix
   * Bugfix: Fix issue where max depth was being passed incorrectly to cryptofeed
   * Bugfix: rename kafka host kwarg to bootstrap, as cryptofeed backend expects
+  * Feature: Candles support
 
 ### 0.3.1 (2020-11-14)
   * Feature: Influxdb 1.x authentication support
@@ -44,7 +45,7 @@
   * Bugfix: Fixed elasticsearch timestamps
   * Feature: Support for different S3 endpoints to allow writing to other providers
   * Bugfix: Missing config value for redis socket
-  
+
 ### 0.1.1 (2019-11-27)
   * Feature: Rework backfill to operate even when store's data differs
   * Bugfix: Log exception/traceback when aggregator process dies
