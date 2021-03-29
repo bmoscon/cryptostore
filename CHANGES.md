@@ -11,6 +11,7 @@
   * Bugfix: Fix issue where max depth was being passed incorrectly to cryptofeed
   * Bugfix: rename kafka host kwarg to bootstrap, as cryptofeed backend expects
   * Feature: Candles support
+  * Bugfix: Fix l2/l3_book_flatten routines
 
 ### 0.3.1 (2020-11-14)
   * Feature: Influxdb 1.x authentication support
