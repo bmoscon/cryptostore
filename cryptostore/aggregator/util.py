@@ -71,14 +71,12 @@ def l3_book_flatten(data: Tuple[dict]) -> Tuple[tuple, Generator]:
          Keys of the dictionaries are also returned in a tuple to prevent having to touch the generator only for
          having this information (is used for instance for `parquet` and `artctic` backends).
     """
-
-    data = map(json.loads, [d['data'] for d in data])
     data = ({'timestamp': float(ts), 'receipt_timestamp': float(r_ts), 'delta': delta, 'side': side,
              'price': float(price), 'size': float(size), 'order_id': order_id}
             for trans in data
             for ts, r_ts, delta in ((trans['timestamp'], trans['receipt_timestamp'], trans['delta']),)
             for side in (BID, ASK)
-            for price, dat in trans[side].items()
+            for price, dat in json.loads(trans[side]).items()
             for order_id, size in dat.items())
     keys = ('timestamp', 'receipt_timestamp', 'delta', 'side', 'price', 'size', 'order_id')
     return keys, data
