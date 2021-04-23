@@ -29,7 +29,7 @@ class Collector(Process):
         cache = self.config['cache']
         retries = self.exchange_config.pop('retries', 30)
         timeouts = self.exchange_config.pop('channel_timeouts', {})
-        fh = FeedHandler(retries=retries)
+        fh = FeedHandler()
 
         for callback_type, value in self.exchange_config.items():
             cb = {}
@@ -120,6 +120,6 @@ class Collector(Process):
                     if BOOK_DELTA in cb:
                         cb[BOOK_DELTA].append(BookDeltaZMQ(host=host, port=port))
 
-            fh.add_feed(self.exchange, subscription={callback_type: self.exchange_config[callback_type]}, callbacks=cb, **fh_kwargs)
+            fh.add_feed(self.exchange, retries=retries, subscription={callback_type: self.exchange_config[callback_type]}, callbacks=cb, **fh_kwargs)
 
         fh.run()

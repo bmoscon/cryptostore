@@ -25,13 +25,8 @@ class InfluxDB(Store):
     def __init__(self, config: dict):
         self.data = None
         self.host = config.host
-        self.db = config.db
-        self.username = config.username if "username" in config else None
-        self.password = config.password if "password" in config else None
-        self.addr = f"{config.host}/write?db={config.db}&u={self.username}&p={self.password}"
-        if 'create' in config and config.create:
-            r = requests.post(f'{config.host}/query?u={self.username}&p={self.password}', data={'q': f'CREATE DATABASE {config.db}'})
-            r.raise_for_status()
+        self.headers = {"Authorization": f"Token {config.token}"}
+        self.addr = f"{self.host}/api/v2/write?org={config.org}&bucket={config.bucket}&precision=ns"
 
     def aggregate(self, data):
         if isinstance(data[0], dict):
@@ -100,16 +95,9 @@ class InfluxDB(Store):
         # Tuning docs indicate 5k is the ideal chunk size for batch writes
         for c in chunk(agg, 5000):
             c = '\n'.join(c)
-            r = requests.post(self.addr, data=c)
+            r = requests.post(self.addr, data=c, headers=self.headers)
             # per influx docs, returns 204 on success
             if r.status_code != 204:
                 LOG.error("Influx: Failed to write data to %s - %d:%s", self.addr, r.status_code, r.reason)
                 raise EngineWriteError
         self.data = None
-
-    def get_start_date(self, exchange: str, data_type: str, pair: str) -> float:
-        try:
-            r = requests.get(f"{self.host}/query?db={self.db}&u={self.username}&p={self.password}", params={'q': f'SELECT first(timestamp) from "{data_type}-{exchange}" where symbol=\'{pair}\''})
-            return r.json()['results'][0]['series'][0]['values'][0][1]
-        except Exception:
-            return None

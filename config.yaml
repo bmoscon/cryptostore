@@ -91,12 +91,12 @@ elastic:
     replicas: 0
     refresh_interval: '30s'
 
+# Cryptostore only works with InfluxDB 2.x
 influx:
     host: 'http://127.0.0.1:8086'
-    db: example
-    create: true
-    username: None
-    password: None
+    bucket: None
+    org: None
+    token: None
 
 # Parquet specific options. Parquet will default to storing the data on disk unless these are specified
 parquet:
