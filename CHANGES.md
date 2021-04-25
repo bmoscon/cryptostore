@@ -1,6 +1,6 @@
 ## Changelog
 
-### 0.3.2
+### 0.3.2 (2021-04-25)
   * Bugfix: Fix book building example
   * Feature: Ability to pull config file from S3 bucket instead of local filesystem, polling for updated config is supported.
   * Feature: Updated to work with latest version of cryptofeed

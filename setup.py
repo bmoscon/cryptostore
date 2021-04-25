@@ -35,7 +35,7 @@ setup(
     ],
     install_requires=[
         "pandas",
-        "cryptofeed>=1.8.1",
+        "cryptofeed>=1.9.0",
         "pyyaml",
         "pyarrow",
         "aiohttp>=3.7.1, < 4.0.0"
