@@ -67,6 +67,9 @@ exchanges:
             book_interval: 100000
         trades: [BTC-USD, ETH-USD, ETH-BTC]
         ticker: [BTC-USD]
+    COINGECKO:
+        retries: -1
+        market_info: [BTC-USD, ETH-BTC, LINK-ETH]   
 
 # Where to store the data. Currently arctic, influx, elastic, and parquet are supported. More than one can be enabled
 storage: [arctic, influx]

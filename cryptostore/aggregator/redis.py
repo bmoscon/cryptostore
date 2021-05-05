@@ -8,7 +8,7 @@ import logging
 from collections import defaultdict
 import time
 
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING, OPEN_INTEREST, LIQUIDATIONS
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, MARKET_INFO, TICKER, FUNDING, OPEN_INTEREST, LIQUIDATIONS
 
 from cryptostore.aggregator.util import l2_book_flatten, l3_book_flatten
 from cryptostore.aggregator.cache import Cache
@@ -40,7 +40,7 @@ class Redis(Cache):
         This is depending `dtype`.
 
         Returns:
-            updates (tuple[dict] or Tuple[tuple, Generator):
+            updates (tuple[dict] or Tuple[tuple, Generator]):
                 Tuple of dictionaries when `dtype` is not a L2 or L3 book.
                 Tuple of the tuple of keys as 1st element, and as 2nd element a generator yielding
                 dictionaries when `dtype` is a L2 or L3 book.
@@ -69,7 +69,7 @@ class Redis(Cache):
             for k in are_float:
                 for update in updates:
                     update[k] = float(update[k])
-        elif dtype == FUNDING:
+        elif dtype in {FUNDING, MARKET_INFO}:
             for update in updates:
                 for k in update:
                     try:
