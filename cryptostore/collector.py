@@ -9,7 +9,7 @@ from multiprocessing import Process
 import logging
 
 from cryptofeed import FeedHandler
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, BOOK_DELTA, TICKER, FUNDING, OPEN_INTEREST, LIQUIDATIONS, CANDLES
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, MARKET_INFO, BOOK_DELTA, TICKER, FUNDING, OPEN_INTEREST, LIQUIDATIONS, CANDLES
 
 
 LOG = logging.getLogger('cryptostore')
@@ -53,20 +53,22 @@ class Collector(Process):
                     kwargs = {'host': self.config['redis']['ip'], 'port': self.config['redis']['port'], 'numeric_type': float}
                 else:
                     kwargs = {'socket': self.config['redis']['socket'], 'numeric_type': float}
-                from cryptofeed.backends.redis import TradeStream, BookStream, BookDeltaStream, TickerStream, FundingStream, OpenInterestStream, LiquidationsStream, CandlesStream
+                from cryptofeed.backends.redis import TradeStream, BookStream, BookDeltaStream, TickerStream, FundingStream, OpenInterestStream, LiquidationsStream, MarketInfoStream, CandlesStream
                 trade_cb = TradeStream
                 book_cb = BookStream
                 book_up = BookDeltaStream if delta else None
+                market_info_cb = MarketInfoStream
                 ticker_cb = TickerStream
                 funding_cb = FundingStream
                 oi_cb = OpenInterestStream
                 liq_cb = LiquidationsStream
                 candles_cb = CandlesStream
             elif cache == 'kafka':
-                from cryptofeed.backends.kafka import TradeKafka, BookKafka, BookDeltaKafka, TickerKafka, FundingKafka, OpenInterestKafka, LiquidationsKafka, CandlesKafka
+                from cryptofeed.backends.kafka import TradeKafka, BookKafka, BookDeltaKafka, TickerKafka, FundingKafka, OpenInterestKafka, LiquidationsKafka, MarketInfoKafka, CandlesKafka
                 trade_cb = TradeKafka
                 book_cb = BookKafka
                 book_up = BookDeltaKafka if delta else None
+                market_info_cb = MarketInfoKafka
                 ticker_cb = TickerKafka
                 funding_cb = FundingKafka
                 oi_cb = OpenInterestKafka
@@ -92,12 +94,14 @@ class Collector(Process):
                     cb[BOOK_DELTA] = [book_up(key=L3_BOOK, **kwargs)]
             elif callback_type == OPEN_INTEREST:
                 cb[OPEN_INTEREST] = [oi_cb(**kwargs)]
+            elif callback_type == MARKET_INFO:
+                cb[MARKET_INFO] = [market_info_cb(**kwargs)]
             elif callback_type == CANDLES:
                 cb[CANDLES] = [candles_cb(**kwargs)]
 
             if 'pass_through' in self.config:
                 if self.config['pass_through']['type'] == 'zmq':
-                    from cryptofeed.backends.zmq import TradeZMQ, BookDeltaZMQ, BookZMQ, FundingZMQ, OpenInterestZMQ, TickerZMQ, LiquidationsZMQ, CandlesZMQ
+                    from cryptofeed.backends.zmq import TradeZMQ, BookDeltaZMQ, BookZMQ, FundingZMQ, OpenInterestZMQ, TickerZMQ, LiquidationsZMQ, MarketInfoZMQ, CandlesZMQ
                     host = self.config['pass_through']['host']
                     port = self.config['pass_through']['port']
 
@@ -111,6 +115,8 @@ class Collector(Process):
                         cb[L2_BOOK].append(BookZMQ(host=host, port=port))
                     elif callback_type == L3_BOOK:
                         cb[L3_BOOK].append(BookZMQ(host=host, port=port))
+                    elif callback_type == MARKET_INFO:
+                        cb[MARKET_INFO].append(MarketInfoZMQ(host=host, port=port))
                     elif callback_type == OPEN_INTEREST:
                         cb[OPEN_INTEREST].append(OpenInterestZMQ(host=host, port=port))
                     elif callback_type == TICKER:
