@@ -147,4 +147,4 @@ class Collector(Process):
             fh.add_feed(self.exchange, subscription={callback_type: self.exchange_config[callback_type]}, callbacks=cb, **feed_kwargs)
             LOG.info(f"Collector added feed handler - {self.exchange}({callback_type.upper()}, {({'book_delta': book_delta, **feed_kwargs})})")
 
-            fh.run()
+        fh.run()
