@@ -53,11 +53,15 @@ class Collector(Process):
         cache = self.config['cache']
         retries = self.exchange_config.pop('retries', 30)
         timeouts = self.exchange_config.pop('channel_timeouts', {})
+        http_proxy = self.exchange_config.pop('http_proxy', None)
         fh = FeedHandler()
 
         for callback_type, feed_config in self.exchange_config.items():
             # config value can be a dict or list of symbols
             feed_kwargs = {'retries': retries, 'timeout': timeouts.get(callback_type, 120)}
+            if http_proxy is not None:
+                feed_kwargs['http_proxy'] = http_proxy
+                
             if isinstance(feed_config, dict):
                 feed_kwargs.update(self._exchange_feed_options(feed_config))
                 book_delta = feed_config.get('book_delta', False)

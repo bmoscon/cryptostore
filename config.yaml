@@ -46,6 +46,8 @@ redis:
 # In other words, enabling snapshot_interval and setting it to a value (say 1000) will cause every 1000th book update to be stored (the full book). Other
 # updates will be dropped. Can also set up book_depth with snapshot_interval enabled.
 #
+# http_proxy: URL to proxy GET requests. Only used for collecting http data from the exchanges.
+#
 # Some exchange's have unique config options found in cryptofeed.exchange.*
 # i.e. only Binance's L2_BOOK has 'depth_interval', applying it to other exchange's L2_BOOK will be ignored.
 
@@ -57,6 +59,7 @@ exchanges:
             ticker: 120
             funding: -1
         retries: -1
+
         l2_book:
             symbols: [BTC-USD]
             max_depth: 10
@@ -66,6 +69,7 @@ exchanges:
         trades: [BTC-USD]
         ticker: [BTC-USD]
         funding: [BTC-USD]
+
     COINBASE:
         retries: -1
         l3_book:

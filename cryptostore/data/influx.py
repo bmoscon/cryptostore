@@ -95,7 +95,6 @@ class InfluxDB(Store):
                 ts = int(Decimal(entry["timestamp"]) * 1000000000)
                 agg.append(f'{data_type}-{exchange},symbol={pair},exchange={exchange} start="{entry["start"]}",stop="{entry["stop"]}",interval="{entry["interval"]}",open_price={entry["open_price"]},high_price={entry["high_price"]},low_price={entry["low_price"]},close_price={entry["close_price"]},trades={entry["trades"]},volume={entry["volume"]},timestamp={entry["timestamp"]},receipt_timestamp={entry["receipt_timestamp"]} {ts}')
 
-
         # https://v2.docs.influxdata.com/v2.0/write-data/best-practices/optimize-writes/
         # Tuning docs indicate 5k is the ideal chunk size for batch writes
         for c in chunk(agg, 5000):
