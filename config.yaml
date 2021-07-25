@@ -74,11 +74,9 @@ exchanges:
             book_interval: 100000
         trades: [BTC-USD, ETH-USD, ETH-BTC]
         ticker: [BTC-USD]
-    COINGECKO:
-        retries: -1
 
 # Where to store the data. Currently arctic, influx, elastic, and parquet are supported. More than one can be enabled
-storage: [artic, influx]
+storage: [arctic, influx]
 # These two values configure how many times to retry a write (before dying)
 # and how long to wait between attempts to write after a failure is encountered.
 storage_retries: 5
