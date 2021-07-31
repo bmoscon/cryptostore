@@ -85,7 +85,7 @@ class Aggregator(Process):
                     for exchange in self.config.exchanges:
                         for dtype in self.config.exchanges[exchange]:
                             # Skip over the retries arg in the config if present.
-                            if dtype in {'retries', 'channel_timeouts'}:
+                            if dtype in {'retries', 'channel_timeouts', 'http_proxy'}:
                                 continue
                             for pair in self.config.exchanges[exchange][dtype] if 'symbols' not in self.config.exchanges[exchange][dtype] else self.config.exchanges[exchange][dtype]['symbols']:
                                 LOG.info('Reading %s-%s-%s', exchange, dtype, pair)

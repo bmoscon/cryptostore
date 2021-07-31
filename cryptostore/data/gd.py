@@ -88,7 +88,7 @@ accessible folder.".format(prefix))
         for exchange in exchanges:
             for dtype in exchanges[exchange]:
                 # Skip over the retries arg in the config if present.
-                if dtype in {'retries', 'channel_timeouts'}:
+                if dtype in {'retries', 'channel_timeouts', 'http_proxy'}:
                     continue
                 for pair in exchanges[exchange][dtype] if 'symbols' not in exchanges[exchange][dtype] else exchanges[exchange][dtype]['symbols']:
                     c_folders.append(folder_name_sep.join(path(exchange, dtype, pair).split('/')))
