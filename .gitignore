@@ -106,8 +106,4 @@ venv.bak/
 .mypy_cache/
 
 # PyCharm / jetbrains
-<<<<<<< HEAD
 .idea
-=======
-.idea
->>>>>>> 88385b1 (Add support for 'http_proxy' in exchanges config.)
