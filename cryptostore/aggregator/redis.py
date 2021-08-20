@@ -8,7 +8,7 @@ import logging
 from collections import defaultdict
 import time
 
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, MARKET_INFO, TICKER, FUNDING, OPEN_INTEREST, LIQUIDATIONS
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING, OPEN_INTEREST, LIQUIDATIONS
 
 from cryptostore.aggregator.util import l2_book_flatten, l3_book_flatten
 from cryptostore.aggregator.cache import Cache
@@ -69,7 +69,7 @@ class Redis(Cache):
             for k in are_float:
                 for update in updates:
                     update[k] = float(update[k])
-        elif dtype in {FUNDING, MARKET_INFO}:
+        elif dtype in {FUNDING}:
             for update in updates:
                 for k in update:
                     try:
