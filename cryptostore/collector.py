@@ -10,7 +10,7 @@ import os
 from multiprocessing import Process
 
 from cryptofeed import FeedHandler
-from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, BOOK_DELTA, TICKER, FUNDING, OPEN_INTEREST, LIQUIDATIONS, CANDLES
+from cryptofeed.defines import TRADES, L2_BOOK, L3_BOOK, TICKER, FUNDING, OPEN_INTEREST, LIQUIDATIONS, CANDLES
 from cryptofeed.exchanges import EXCHANGE_MAP
 
 LOG = logging.getLogger('cryptostore')
@@ -77,20 +77,18 @@ class Collector(Process):
                     kwargs = {'host': self.config['redis']['ip'], 'port': self.config['redis']['port'], 'numeric_type': float}
                 else:
                     kwargs = {'socket': self.config['redis']['socket'], 'numeric_type': float}
-                from cryptofeed.backends.redis import TradeStream, BookStream, BookDeltaStream, TickerStream, FundingStream, OpenInterestStream, LiquidationsStream, CandlesStream
+                from cryptofeed.backends.redis import TradeStream, BookStream, TickerStream, FundingStream, OpenInterestStream, LiquidationsStream, CandlesStream
                 trade_cb = TradeStream
                 book_cb = BookStream
-                book_up = BookDeltaStream if book_delta else None
                 ticker_cb = TickerStream
                 funding_cb = FundingStream
                 oi_cb = OpenInterestStream
                 liq_cb = LiquidationsStream
                 candles_cb = CandlesStream
             elif cache == 'kafka':
-                from cryptofeed.backends.kafka import TradeKafka, BookKafka, BookDeltaKafka, TickerKafka, FundingKafka, OpenInterestKafka, LiquidationsKafka, CandlesKafka
+                from cryptofeed.backends.kafka import TradeKafka, BookKafka, TickerKafka, FundingKafka, OpenInterestKafka, LiquidationsKafka, CandlesKafka
                 trade_cb = TradeKafka
                 book_cb = BookKafka
-                book_up = BookDeltaKafka if book_delta else None
                 ticker_cb = TickerKafka
                 funding_cb = FundingKafka
                 oi_cb = OpenInterestKafka
@@ -108,12 +106,8 @@ class Collector(Process):
                 cb[TICKER] = [ticker_cb(**kwargs)]
             elif callback_type == L2_BOOK:
                 cb[L2_BOOK] = [book_cb(key=L2_BOOK, **kwargs)]
-                if book_up:
-                    cb[BOOK_DELTA] = [book_up(key=L2_BOOK, **kwargs)]
             elif callback_type == L3_BOOK:
                 cb[L3_BOOK] = [book_cb(key=L3_BOOK, **kwargs)]
-                if book_up:
-                    cb[BOOK_DELTA] = [book_up(key=L3_BOOK, **kwargs)]
             elif callback_type == OPEN_INTEREST:
                 cb[OPEN_INTEREST] = [oi_cb(**kwargs)]
             elif callback_type == CANDLES:
@@ -141,8 +135,6 @@ class Collector(Process):
                         cb[TICKER].append(TickerZMQ(host=host, port=port))
                     elif callback_type == CANDLES:
                         cb[CANDLES].append(CandlesZMQ(host=host, port=port))
-                    if BOOK_DELTA in cb:
-                        cb[BOOK_DELTA].append(BookDeltaZMQ(host=host, port=port))
 
             fh.add_feed(self.exchange, subscription={callback_type: self.exchange_config[callback_type]}, callbacks=cb, **feed_kwargs)
             LOG.info(f"Collector added feed handler - {self.exchange}({callback_type.upper()}, {({'book_delta': book_delta, **feed_kwargs})})")
