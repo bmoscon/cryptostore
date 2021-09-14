@@ -4,6 +4,7 @@
   * Feature: Support for Coingecko aggregated data per coin, to be used with a new data channel 'market_info'
   * Feature: Config.yaml supports individual exchange's Feed class params. 
   * Feature: Support for 'http_proxy' in exchanges config. 
+  * Bugfix: Update aggregator util functions for level 2 and level 3 order book to handle book delta
 
 ### 0.3.2 (2021-04-25)
   * Bugfix: Fix book building example
