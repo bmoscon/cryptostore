@@ -100,11 +100,11 @@ def l3_book_flatten(data: Tuple[dict]) -> Tuple[tuple, Generator]:
                 res['side'] = side
                 if delta:
                     for order_id, price, size in _d[side]:
-                        res['price'], res['size'], res['order_id'] = float(price), float(size), order_id
+                        res['price'], res['size'], res['order_id'] = float(price), float(size), str(order_id)
                         yield res
                 else:
                     for price, dat in _d[side].items():
                         for order_id, size in dat.items():
-                            res['price'], res['size'], res['order_id'] = float(price), float(size), order_id
+                            res['price'], res['size'], res['order_id'] = float(price), float(size), str(order_id)
                             yield res
     return keys, _parse(data)
