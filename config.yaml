@@ -33,9 +33,6 @@ redis:
 # max_depth controls the size of the book to return. The top N levels will be returned, only when those N levels
 # have changed.
 #
-# book_delta enables book deltas (snapshot, then only deltas are delivered). Snapshops are delivered
-# every book_interval updates. book_interval defaults to 1000 if not specified
-#
 # Retries are the number of times the connection to the exchange will be retried before exiting. -1 is infinity.
 # Using a retry of -1 with a bug in your config can lead to bans by exchanges
 #
@@ -44,7 +41,7 @@ redis:
 #
 # snapshot_interval controls how often to deliver snapshots on NON delta feeds. Book updates between the snapshots are discarded.
 # In other words, enabling snapshot_interval and setting it to a value (say 1000) will cause every 1000th book update to be stored (the full book). Other
-# updates will be dropped. Can also set up book_depth with snapshot_interval enabled.
+# updates will be dropped.
 #
 # http_proxy: URL to proxy GET requests. Only used for collecting http data from the exchanges.
 #
@@ -52,7 +49,7 @@ redis:
 # i.e. only Binance's L2_BOOK has 'depth_interval', applying it to other exchange's L2_BOOK will be ignored.
 
 exchanges:
-    BITMEX:
+    BINANCE:
         channel_timeouts:
             l2_book: 30
             trades: 120
@@ -61,26 +58,23 @@ exchanges:
         retries: -1
 
         l2_book:
-            symbols: [BTC-USD]
+            symbols: [BTC-USDT]
             max_depth: 10
-            book_delta: true
             depth_interval: 1000ms
-            book_interval: 100000
-        trades: [BTC-USD]
-        ticker: [BTC-USD]
-        funding: [BTC-USD]
+            snapshot_interval: 100000
+        trades: [BTC-USDT]
+        ticker: [BTC-USDT]
 
     COINBASE:
         retries: -1
         l3_book:
             symbols: [BTC-USD]
-            book_delta: true
-            book_interval: 100000
+            snapshot_interval: 100000
         trades: [BTC-USD, ETH-USD, ETH-BTC]
         ticker: [BTC-USD]
 
 # Where to store the data. Currently arctic, influx, elastic, and parquet are supported. More than one can be enabled
-storage: [arctic, influx]
+storage: [arctic]
 # These two values configure how many times to retry a write (before dying)
 # and how long to wait between attempts to write after a failure is encountered.
 storage_retries: 5
@@ -178,7 +172,7 @@ arctic: mongodb://127.0.0.1
 # for the time intervals from from Kafka's internal timestamp offsets - these will differ from the exchange
 # provided timestamps - it may be anywhere from 0.001 ms to seconds depending on your kafka cluster and
 # other hardware and setup configurations.
-storage_interval: 60
+storage_interval: 10
 
 
 #

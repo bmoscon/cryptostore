@@ -18,8 +18,7 @@ exchanges:
     COINBASE:
         l3_book:
             symbols: [BTC-USD, ETH-USD]
-            book_delta: true
-            book_interval: 10000
+            snapshot_interval: 10000
         trades: [BTC-USD, ETH-USD, ETH-BTC]
 
 storage: [arctic]
@@ -28,13 +27,3 @@ arctic: mongodb://mongo:27017
 storage_interval: 60
 storage_retries: 5
 storage_retry_wait: 30
-
-plugins:
-  backfill:
-    module: [cryptostore.plugin.backfill, Backfill]
-    config: config.yaml
-
-backfill:
-    COINBASE:
-        BTC-USD:
-            start: '2017-01-01'

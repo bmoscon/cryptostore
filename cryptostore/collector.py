@@ -32,7 +32,7 @@ class Collector(Process):
         ex: 'depth_interval' option will be consumed from config since it is found in cryptofeed.exchange.Binance.__init__
         """
         # base Feed options
-        base_feed_options = {'book_interval', 'max_depth', 'snapshot_interval'}
+        base_feed_options = {'max_depth', 'snapshot_interval'}
 
         # exchange specific Feed options
         ExchangeFeedClass = EXCHANGE_MAP[self.exchange]
@@ -41,7 +41,7 @@ class Collector(Process):
 
         available_options = base_feed_options.union(exchange_feed_options)
 
-        fh_kwargs = {'book_interval': 1000}
+        fh_kwargs = {}
         for key, value in feed_config.items():
             if key in available_options:
                 fh_kwargs[key] = value
@@ -64,9 +64,6 @@ class Collector(Process):
 
             if isinstance(feed_config, dict):
                 feed_kwargs.update(self._exchange_feed_options(feed_config))
-                book_delta = feed_config.get('book_delta', False)
-            else:
-                book_delta = False
 
             cb = {}
             if callback_type in (L2_BOOK, L3_BOOK):
@@ -105,9 +102,9 @@ class Collector(Process):
             elif callback_type == TICKER:
                 cb[TICKER] = [ticker_cb(**kwargs)]
             elif callback_type == L2_BOOK:
-                cb[L2_BOOK] = [book_cb(key=L2_BOOK, **kwargs)]
+                cb[L2_BOOK] = [book_cb(key=L2_BOOK, snapshot_interval=feed_config.get('snapshot_interval', 1000), **kwargs)]
             elif callback_type == L3_BOOK:
-                cb[L3_BOOK] = [book_cb(key=L3_BOOK, **kwargs)]
+                cb[L3_BOOK] = [book_cb(key=L3_BOOK, snapshot_interval=feed_config.get('snapshot_interval', 1000), **kwargs)]
             elif callback_type == OPEN_INTEREST:
                 cb[OPEN_INTEREST] = [oi_cb(**kwargs)]
             elif callback_type == CANDLES:
@@ -115,7 +112,7 @@ class Collector(Process):
 
             if 'pass_through' in self.config:
                 if self.config['pass_through']['type'] == 'zmq':
-                    from cryptofeed.backends.zmq import TradeZMQ, BookDeltaZMQ, BookZMQ, FundingZMQ, OpenInterestZMQ, TickerZMQ, LiquidationsZMQ, CandlesZMQ
+                    from cryptofeed.backends.zmq import TradeZMQ, BookZMQ, FundingZMQ, OpenInterestZMQ, TickerZMQ, LiquidationsZMQ, CandlesZMQ
                     host = self.config['pass_through']['host']
                     port = self.config['pass_through']['port']
 
@@ -137,6 +134,6 @@ class Collector(Process):
                         cb[CANDLES].append(CandlesZMQ(host=host, port=port))
 
             fh.add_feed(self.exchange, subscription={callback_type: self.exchange_config[callback_type]}, callbacks=cb, **feed_kwargs)
-            LOG.info(f"Collector added feed handler - {self.exchange}({callback_type.upper()}, {({'book_delta': book_delta, **feed_kwargs})})")
+            LOG.info(f"Collector added feed handler - {self.exchange}({callback_type.upper()}, {feed_kwargs})")
 
         fh.run()

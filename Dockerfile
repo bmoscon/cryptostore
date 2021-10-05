@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir git+https://github.com/bmoscon/cryptofeed.git
 RUN pip install --no-cache-dir cython
 RUN pip install --no-cache-dir pyarrow
 RUN pip install --no-cache-dir redis
-RUN pip install --no-cache-dir git+https://github.com/aio-libs/aioredis-py@4dfdc05
+RUN pip install --no-cache-dir aioredis==2.0.0
 RUN pip install --no-cache-dir arctic
 RUN pip install --no-cache-dir boto3
 

@@ -39,9 +39,3 @@ class Storage(Store):
     def aggregate(self, data: list, transform=lambda x: x):
         for s in self.s:
             s.aggregate(transform(data))
-
-    def get_start_date(self, exchange: str, data_type: str, pair: str) -> list:
-        ret = []
-        for s in self.s:
-            ret.append(s.get_start_date(exchange, data_type, pair))
-        return ret

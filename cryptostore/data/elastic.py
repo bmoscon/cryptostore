@@ -55,22 +55,3 @@ class ElasticSearch(Store):
                 LOG.error("Elasticsearch insert failed: %s", r.text)
             r.raise_for_status()
         self.data = None
-
-    def get_start_date(self, exchange: str, data_type: str, pair: str) -> float:
-        try:
-            data = {
-                "query": {
-                    "bool": {
-                        "must": [{
-                            "match_phrase": {"feed": exchange}
-                        }, {
-                            "match_phrase": {"symbol": pair}
-                        }]
-                    }
-                },
-                "aggs": {"min_timestamp": {"min": {"field": "timestamp"}}}
-            }
-            r = requests.post(f"{self.host}/{data_type}/{data_type}/_search?size=0", auth=(self.user, self.token), data=json.dumps(data), headers={'content-type': 'application/json'})
-            return r.json()['aggregations']['min_timestamp']['value']
-        except Exception:
-            return None

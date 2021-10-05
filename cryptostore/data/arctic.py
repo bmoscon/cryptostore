@@ -33,6 +33,8 @@ class Arctic(Store):
         df = self.data
         df['date'] = pd.to_datetime(df['timestamp'], unit='s')
         df['receipt_timestamp'] = pd.to_datetime(df['receipt_timestamp'], unit='s')
+        if df.date.isnull().values.any():
+            df['date'] = pd.to_datetime(df['receipt_timestamp'], unit='s')
         df = df.drop(['timestamp'], axis=1)
 
         chunk_size = None
@@ -40,17 +42,17 @@ class Arctic(Store):
             if 'id' in df:
                 df['id'] = df['id'].astype(str)
             df['size'] = df.amount
-            df = df.drop(['symbol', 'feed', 'amount'], axis=1)
+            df = df.drop(['symbol', 'exchange', 'amount'], axis=1)
             chunk_size = 'H'
         elif data_type == TICKER:
-            df = df.drop(['symbol', 'feed'], axis=1)
+            df = df.drop(['symbol', 'exchange'], axis=1)
             chunk_size = 'D'
         elif data_type in {L2_BOOK, L3_BOOK}:
             chunk_size = 'T'
         elif data_type == FUNDING:
             chunk_size = 'D'
         elif data_type == OPEN_INTEREST or data_type == LIQUIDATIONS:
-            df = df.drop(['symbol', 'feed'], axis=1)
+            df = df.drop(['symbol', 'exchange'], axis=1)
             chunk_size = 'D'
 
         df.set_index('date', inplace=True)
@@ -61,9 +63,3 @@ class Arctic(Store):
             # set the quota of each arctic library to unlimited
             self.con.set_quota(exchange, 0)
         self.con[exchange].append(f"{data_type}-{pair}", df, upsert=True, chunk_size=chunk_size)
-
-    def get_start_date(self, exchange: str, data_type: str, pair: str) -> float:
-        try:
-            return next(self.con[exchange].iterator(f"{data_type}-{pair}")).index[0].timestamp()
-        except Exception:
-            return None

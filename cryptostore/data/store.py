@@ -12,6 +12,3 @@ class Store:
 
     def aggregate(self, data: dict, transform=lambda x: x):
         raise NotImplementedError
-
-    def get_start_date(self, exchange: str, data_type: str, pair: str) -> float:
-        raise NotImplementedError
