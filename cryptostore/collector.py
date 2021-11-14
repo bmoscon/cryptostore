@@ -123,9 +123,9 @@ class Collector(Process):
                     elif callback_type == FUNDING:
                         cb[FUNDING].append(FundingZMQ(host=host, port=port))
                     elif callback_type == L2_BOOK:
-                        cb[L2_BOOK].append(BookZMQ(host=host, port=port, snapshot_interval=feed_config.get('snapshot_interval', 1000), **kwargs))
+                        cb[L2_BOOK].append(BookZMQ(host=host, port=port, snapshot_interval=feed_config.get('snapshot_interval', 1000)))
                     elif callback_type == L3_BOOK:
-                        cb[L3_BOOK].append(BookZMQ(host=host, port=port, snapshot_interval=feed_config.get('snapshot_interval', 1000), **kwargs))
+                        cb[L3_BOOK].append(BookZMQ(host=host, port=port, snapshot_interval=feed_config.get('snapshot_interval', 1000)))
                     elif callback_type == OPEN_INTEREST:
                         cb[OPEN_INTEREST].append(OpenInterestZMQ(host=host, port=port))
                     elif callback_type == TICKER:
