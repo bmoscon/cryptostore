@@ -1,6 +1,6 @@
 ## Changelog
 
-### 0.4.0
+### 0.4.0 (2021-11-14)
   * Feature: Support for Coingecko aggregated data per coin, to be used with a new data channel 'market_info'
   * Feature: Config.yaml supports individual exchange's Feed class params. 
   * Feature: Support for 'http_proxy' in exchanges config. 

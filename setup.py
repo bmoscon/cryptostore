@@ -32,10 +32,11 @@ setup(
         "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
     ],
     install_requires=[
         "pandas",
-        "cryptofeed>=2.0.0",
+        "cryptofeed>=2.1.0",
         "pyyaml",
         "pyarrow",
         "aiohttp>=3.7.1, < 4.0.0"
