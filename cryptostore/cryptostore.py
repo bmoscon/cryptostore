@@ -9,12 +9,15 @@ import asyncio
 import logging
 import json
 import os
+import signal
+import functools
 
 from cryptostore.spawn import Spawn
 from cryptostore.config import DynamicConfig
 from cryptostore.log import get_logger
 from cryptostore.aggregator.aggregator import Aggregator
 from cryptostore.plugin.controller import PluginController
+from cryptostore.util import stop_event_loop, setup_event_loop_signal_handlers
 
 
 LOG = get_logger('cryptostore', 'cryptostore.log', logging.INFO, size=50000000, num_files=10)
@@ -22,20 +25,45 @@ LOG = get_logger('cryptostore', 'cryptostore.log', logging.INFO, size=50000000, 
 
 class Cryptostore:
     def __init__(self, config=None):
+        self.terminating = False
         self.queue = Queue()
         self.spawner = Spawn(self.queue)
+        self.aggregator = Aggregator(config_file=config)
         self.running_config = {}
         self.cfg_path = config
         self.plugin = PluginController(config)
         self.plugin.start()
 
+    def _stop_on_signal(self, sig, loop):
+        if self.terminating:
+            LOG.info("Cryptostore is already being stopped...")
+            return
+
+        LOG.info("Stopping Cryptostore due to signal %d", sig)
+        self.terminating = True
+        self.queue.close()
+        self.config.set_terminating()
+
+        to_stop = [p for p in [self.spawner, self.aggregator] if p is not None]
+        for p in to_stop:
+            p.terminate()
+
+        for p in to_stop:
+            if p.is_alive():
+                p.join()
+
+        stop_event_loop(loop)
+
     async def _load_config(self, start, stop):
         LOG.info("start: %s stop: %s", str(start), str(stop))
-        for exchange in stop:
-            self.queue.put(json.dumps({'op': 'stop', 'exchange': exchange}))
+        try:
+            for exchange in stop:
+                self.queue.put(json.dumps({'op': 'stop', 'exchange': exchange}))
 
-        for exchange in start:
-            self.queue.put(json.dumps({'op': 'start', 'exchange': exchange, 'collector': self.running_config['exchanges'][exchange], 'config': {i: self.running_config[i] for i in self.running_config if i != 'exchanges'}}))
+            for exchange in start:
+                self.queue.put(json.dumps({'op': 'start', 'exchange': exchange, 'collector': self.running_config['exchanges'][exchange], 'config': {i: self.running_config[i] for i in self.running_config if i != 'exchanges'}}))
+        except (ValueError, AssertionError) as e:
+            LOG.info('Config queue put interrupt')
 
     async def _reconfigure(self, config):
         stop = []
@@ -78,12 +106,13 @@ class Cryptostore:
         self.spawner.start()
         LOG.info("Spawner started")
 
-        self.aggregator = Aggregator(config_file=self.cfg_path)
         self.aggregator.start()
         LOG.info("Aggregator started")
 
         loop = asyncio.get_event_loop()
-        self.config = DynamicConfig(file_name=self.cfg_path, callback=self._reconfigure)
+        setup_event_loop_signal_handlers(loop, self._stop_on_signal)
+        self.config = DynamicConfig(loop=loop, file_name=self.cfg_path, callback=self._reconfigure)
 
         LOG.info("Cryptostore started")
         loop.run_forever()
+        LOG.info("Cryptostore main process stopped")
