@@ -136,4 +136,6 @@ class Collector(Process):
             fh.add_feed(self.exchange, subscription={callback_type: self.exchange_config[callback_type]}, callbacks=cb, **feed_kwargs)
             LOG.info(f"Collector added feed handler - {self.exchange}({callback_type.upper()}, {feed_kwargs})")
 
+        # Signal handlers are set up inside FeedHandler objects
         fh.run()
+        LOG.info("Collector for %s on PID %d stopped", self.exchange, os.getpid())

@@ -52,12 +52,16 @@ class Config:
 
 
 class DynamicConfig(Config):
-    def __init__(self, file_name=None, reload_interval=10, callback=None):
+    def __init__(self, loop, file_name=None, reload_interval=10, callback=None):
+        self.loop = loop
+
         # Normal boto3 credentialing methods are used (see https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html)
 
         self.s3_object_uri = os.environ.get('S3_CONFIG_FILE_URI')  # returns None if env var not present
         self.s3_region = os.environ.get('S3_REGION')  # returns None if env var not present
         LOG.debug(f'self.s3_object_uri is: {self.s3_object_uri}')
+
+        self.terminating = False
 
         if not self.s3_object_uri:
             if file_name is None:
@@ -84,7 +88,7 @@ class DynamicConfig(Config):
         last_modified = 0
         last_modified_date = datetime(1990, 1, 1)
         if file:
-            while True:
+            while not self.terminating:
                 if file[0:5] != 's3://':
                     cur_mtime = os.stat(file).st_mtime
                     if cur_mtime != last_modified:
@@ -117,10 +121,22 @@ class DynamicConfig(Config):
                     except Exception as e:
                         LOG.info(f'Exception in getting s3 object. {e}')
 
-                await asyncio.sleep(interval)
+                try:
+                    await asyncio.sleep(delay=interval, loop=self.loop)
+                except asyncio.CancelledError as e:
+                    pass
+
+            LOG.info('Dynamic config stopped')
         else:
             LOG.info('Received None where config file name or uri should be received, refusing to try to load config for this execution.')
 
     def _load(self, file, interval, callback):
-        loop = asyncio.get_event_loop()
-        loop.create_task(self.__loader(file, interval, callback))
+        self.loop.create_task(self.__loader(file, interval, callback))
+
+    def set_terminating(self):
+        if self.terminating:
+            LOG.info('Dynamic config is already being stopped...')
+            return
+
+        LOG.info('Stopping Dynamic config...')
+        self.terminating = True
