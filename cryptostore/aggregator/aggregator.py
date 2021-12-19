@@ -9,6 +9,8 @@ from multiprocessing import Process
 import time
 import logging
 import os
+import threading
+import concurrent.futures
 from datetime import timedelta
 
 from cryptostore.util import get_time_interval, setup_event_loop_signal_handlers, stop_event_loop
@@ -33,8 +35,12 @@ class Aggregator(Process):
         LOG.info("Aggregator running on PID %d", os.getpid())
         loop = asyncio.get_event_loop()
         self.config = DynamicConfig(loop=loop, file_name=self.config_file)
-        loop.create_task(self.loop())
+        loop.create_task(self.loop(loop=loop))
+
+        self.event = threading.Event() # sleep control for write threads
+
         setup_event_loop_signal_handlers(loop, self._stop_on_signal)
+
         try:
             loop.run_forever()
         except KeyboardInterrupt:
@@ -50,13 +56,14 @@ class Aggregator(Process):
         LOG.info("Stopping Aggregator on %d due to signal %d", os.getpid(), sig)
         self.terminating = True
         self.config.set_terminating()
+        self.event.set()
         if 'write_on_stop' in self.config and self.config.write_on_stop \
                 and 'exchanges' in self.config and self.config.exchanges:
-            stop_event_loop(loop, self._write_storage(write_on_stop=True))
+            stop_event_loop(loop, self._write_storage(loop=loop, write_on_stop=True))
         else:
             stop_event_loop(loop)
 
-    async def loop(self):
+    async def loop(self, loop):
         if self.config.cache == 'redis':
             self.cache = Redis(ip=self.config.redis['ip'],
                           port=self.config.redis['port'],
@@ -98,19 +105,19 @@ class Aggregator(Process):
                         interval_start = end + timedelta(seconds=interval + 1)
                     start, end = get_time_interval(interval_start, base_interval, multiplier=multiplier)
                 if 'exchanges' in self.config and self.config.exchanges:
-                    await self._write_storage(start=start, end=end)
+                    await self._write_storage(loop=loop, start=start, end=end)
                     total = time.time() - aggregation_start
                     wait = interval - total
                     if wait <= 0:
                         LOG.warning("Storage operations currently take %.1f seconds, longer than the interval of %d", total, interval)
                         wait = 0.5
                     try:
-                        await asyncio.sleep(wait)
+                        await asyncio.sleep(delay=wait, loop=loop)
                     except asyncio.CancelledError as e:
                         pass
                 else:
                     try:
-                        await asyncio.sleep(30)
+                        await asyncio.sleep(delay=30, loop=loop)
                     except asyncio.CancelledError as e:
                         pass
             except Exception:
@@ -119,64 +126,69 @@ class Aggregator(Process):
 
         LOG.info("Aggregator running on PID %d stopped", os.getpid())
 
-    async def _write_storage(self, start=None, end=None, write_on_stop=False):
+    async def _write_storage(self, loop, start=None, end=None, write_on_stop=False):
         if write_on_stop:
             LOG.info("Writing cached data before stopping...")
-        store = Storage(self.config, parquet_buffer=self.parquet_buffer)
-        for exchange in self.config.exchanges:
-            for dtype in self.config.exchanges[exchange]:
-                # Skip over the retries arg in the config if present.
-                if dtype in {'retries', 'channel_timeouts', 'http_proxy'}:
-                    continue
-                for pair in self.config.exchanges[exchange][dtype] if 'symbols' not in \
-                                                                      self.config.exchanges[exchange][dtype] else \
-                self.config.exchanges[exchange][dtype]['symbols']:
-                    LOG.info('Reading cache for %s-%s-%s', exchange, dtype, pair)
-                    data = self.cache.read(exchange, dtype, pair, start=start, end=end)
-                    if len(data) == 0:
-                        LOG.info('No data for %s-%s-%s', exchange, dtype, pair)
+        else:
+            LOG.info("Writing cached data...")
+
+        max_workers = self.config.num_write_threads if 'num_write_threads' in self.config else 1
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as pool:
+            futures = []
+            for exchange in self.config.exchanges:
+                for dtype in self.config.exchanges[exchange]:
+                    # Skip over the retries arg in the config if present.
+                    if dtype in {'retries', 'channel_timeouts', 'http_proxy'}:
                         continue
+                    for pair in self.config.exchanges[exchange][dtype] if 'symbols' not in \
+                                                                          self.config.exchanges[exchange][dtype] else \
+                    self.config.exchanges[exchange][dtype]['symbols']:
+                        futures.append(loop.run_in_executor(pool, self._write_pair_blocking, exchange, dtype, pair, start, end, write_on_stop))
 
-                    store.aggregate(data)
+            await asyncio.gather(*futures, loop=loop, return_exceptions=False)
 
-                    retries = 0
-                    while ((not self.terminating) or write_on_stop):
-                        if retries > self.config.storage_retries:
-                            LOG.error("Failed to write after %d retries", self.config.storage_retries)
-                            raise EngineWriteError
+        LOG.info("Write finished")
 
-                        try:
-                            # retrying this is ok, provided every
-                            # engine clears its internal buffer after writing successfully.
-                            LOG.info('Writing cached data to store for %s-%s-%s', exchange, dtype, pair)
-                            store.write(exchange, dtype, pair, time.time())
-                        except OSError as e:
-                            LOG.warning('Could not write %s-%s-%s. %s', exchange, dtype, pair, e)
-                            if write_on_stop:
-                                break
-                            if e.errno == 112:  # Host is down
-                                retries += 1
-                                try:
-                                    await asyncio.sleep(self.config.storage_retry_wait)
-                                except asyncio.CancelledError as e:
-                                    pass
-                                continue
-                            else:
-                                raise
+    def _write_pair_blocking(self, exchange, dtype, pair, start, end, write_on_stop):
+        LOG.info('Reading cache for %s-%s-%s', exchange, dtype, pair)
+        store = Storage(self.config, parquet_buffer=self.parquet_buffer)
+        data = self.cache.read(exchange, dtype, pair, start=start, end=end)
+        if len(data) == 0:
+            LOG.info('No data for %s-%s-%s', exchange, dtype, pair)
+            return
 
-                        except EngineWriteError:
-                            LOG.warning('Could not write %s-%s-%s. %s', exchange, dtype, pair, e)
-                            if write_on_stop:
-                                break
-                            retries += 1
-                            try:
-                                await asyncio.sleep(self.config.storage_retry_wait)
-                            except asyncio.CancelledError as e:
-                                pass
-                            continue
-                        else:
-                            break
+        store.aggregate(data)
 
-                    LOG.info('Deleting cached data for %s-%s-%s', exchange, dtype, pair)
-                    self.cache.delete(exchange, dtype, pair)
-                    LOG.info('Write Complete %s-%s-%s', exchange, dtype, pair)
+        retries = 0
+        while ((not self.terminating) or write_on_stop):
+            if retries > self.config.storage_retries:
+                LOG.error("Failed to write after %d retries", self.config.storage_retries)
+                raise EngineWriteError
+
+            try:
+                # retrying this is ok, provided every
+                # engine clears its internal buffer after writing successfully.
+                LOG.info('Writing cached data to store for %s-%s-%s', exchange, dtype, pair)
+                store.write(exchange, dtype, pair, time.time())
+            except OSError as e:
+                LOG.warning('Could not write %s-%s-%s. %s', exchange, dtype, pair, e)
+                if write_on_stop:
+                    break
+                if e.errno == 112:  # Host is down
+                    retries += 1
+                    self.event.wait(self.config.storage_retry_wait)
+                else:
+                    raise
+
+            except EngineWriteError:
+                LOG.warning('Could not write %s-%s-%s. %s', exchange, dtype, pair, e)
+                if write_on_stop:
+                    break
+                retries += 1
+                self.event.wait(self.config.storage_retry_wait)
+            else:
+                break
+
+        LOG.info('Deleting cached data for %s-%s-%s', exchange, dtype, pair)
+        self.cache.delete(exchange, dtype, pair)
+        LOG.info('Write Complete %s-%s-%s', exchange, dtype, pair)
