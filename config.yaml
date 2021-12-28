@@ -84,6 +84,10 @@ storage_retry_wait: 30
 # Set this to true to write cached data on Cryptostore stop/interrupt/terminate signals
 write_on_stop: false
 
+# Number of threads for concurrent writes (WARNING: make sure the backend of your choice allows concurrent writes)
+# Defaults to sequential writes (1 thread)
+num_write_threads: 1
+
 # Configurable passthrough for data - data will be sent in realtime (no aggregation in redis).
 # To disable, remove
 pass_through:
