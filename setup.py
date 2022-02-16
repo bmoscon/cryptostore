@@ -1,5 +1,5 @@
 '''
-Copyright (C) 2018-2021  Bryant Moscon - bmoscon@gmail.com
+Copyright (C) 2018-2022  Bryant Moscon - bmoscon@gmail.com
 
 Please see the LICENSE file for the terms and conditions
 associated with this software.
@@ -18,7 +18,7 @@ except BaseException:
 
 setup(
     name="cryptostore",
-    version="0.4.0",
+    version="1.0.0",
     author="Bryant Moscon",
     author_email="bmoscon@gmail.com",
     description=("Storage engine for cryptocurrency data"),
@@ -35,22 +35,7 @@ setup(
         "Programming Language :: Python :: 3.9",
     ],
     install_requires=[
-        "pandas",
         "cryptofeed>=2.1.0",
         "pyyaml",
-        "pyarrow",
-        "aiohttp>=3.7.1, < 4.0.0"
     ],
-    extras_require={
-        'redis': ['redis', 'aioredis'],
-        'kafka': ['aiokafka', 'confluent-kafka'],
-        'arctic': ['arctic'],
-        'gcs': ['google-cloud-storage'],
-        'aws': ['boto3'],
-        'zmq': ['pyzmq'],
-        "drive": ["google-auth", "google-api-python-client"]
-    },
-    entry_points={
-        'console_scripts': ['cryptostore=cryptostore.bin.cryptostore:main'],
-    }
 )
