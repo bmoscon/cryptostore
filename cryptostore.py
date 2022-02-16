@@ -37,8 +37,8 @@ def load_config() -> Feed:
     backend = os.environ.get('BACKEND')
     snap_only = os.environ.get('SNAPSHOT_ONLY', False)
     snap_interval = os.environ.get('SNAPSHOT_INTERVAL', 1000)
-    host = os.environ.get('host', '127.0.0.1')
-    port = os.environ.get('port')
+    host = os.environ.get('HOST', '127.0.0.1')
+    port = os.environ.get('PORT')
     candle_interval = os.environ.get('CANDLE_INTERVAL')
     database = os.environ.get('DATABASE')
 
