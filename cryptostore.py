@@ -80,9 +80,8 @@ def load_config() -> Feed:
 
 
 def main():
-    cfg = load_config()
-
     fh = FeedHandler()
+    cfg = load_config()
     fh.add_feed(cfg)
     fh.run()
 
