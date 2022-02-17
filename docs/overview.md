@@ -1,4 +1,4 @@
-### High Level Overview
+## High Level Overview
 
 
 Cryptostore utilizes the supports backends of cryptofeed to store data from exchanges in various databases and other services. The following are supported data stores / destinations:
