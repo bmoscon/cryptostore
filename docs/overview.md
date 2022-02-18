@@ -30,7 +30,7 @@ An example of how the configuration would look when subscribing to BTC-USD and E
 docker run -e EXCHANGE='COINBASE' \
            -e CHANNELS='trades,ticker,l2_book' \
            -e SYMBOLS='BTC-USD,ETH-USD' \
-           -e BACKEND='REDISSTREAM' 
-           <networking and other params>
+           -e BACKEND='REDISSTREAM' \
+           ... networking and other params ... \
            cryptostore:latest
 ```
