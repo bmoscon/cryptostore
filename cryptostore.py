@@ -11,6 +11,7 @@ from cryptofeed.exchanges import EXCHANGE_MAP
 from cryptofeed.feed import Feed
 from cryptofeed.defines import L2_BOOK, TICKER, TRADES, FUNDING, CANDLES, OPEN_INTEREST, LIQUIDATIONS
 from cryptofeed.backends.redis import BookRedis, TradeRedis, TickerRedis, FundingRedis, CandlesRedis, OpenInterestRedis, LiquidationsRedis
+from cryptofeed.backends.redis import BookStream, TradeStream, TickerStream, FundingStream, CandlesStream, OpenInterestStream, LiquidationsStream
 from cryptofeed.backends.mongo import BookMongo, TradeMongo, TickerMongo, FundingMongo, CandlesMongo, OpenInterestMongo, LiquidationsMongo
 
 
@@ -53,16 +54,16 @@ def load_config() -> Feed:
     database = os.environ.get('DATABASE')
 
     cbs = None
-    if backend == 'REDIS':
+    if backend == 'REDIS' or backend == 'REDISSTREAM':
         kwargs = {'host': host, 'port': port if port else 6379}
         cbs = {
-            L2_BOOK: BookRedis(snapshot_interval=snap_interval, snapshots_only=snap_only, **kwargs),
-            TRADES: TradeRedis(**kwargs),
-            TICKER: TickerRedis(**kwargs),
-            FUNDING: FundingRedis(**kwargs),
-            CANDLES: CandlesRedis(**kwargs),
-            OPEN_INTEREST: OpenInterestRedis(**kwargs),
-            LIQUIDATIONS: LiquidationsRedis(**kwargs)
+            L2_BOOK: BookRedis(snapshot_interval=snap_interval, snapshots_only=snap_only, **kwargs) if backend == 'REDIS' else BookStream(snapshot_interval=snap_interval, snapshots_only=snap_only, **kwargs),
+            TRADES: TradeRedis(**kwargs) if backend == 'REDIS' else TradeStream(**kwargs),
+            TICKER: TickerRedis(**kwargs) if backend == 'REDIS' else TickerStream(**kwargs),
+            FUNDING: FundingRedis(**kwargs) if backend == 'REDIS' else FundingStream(**kwargs),
+            CANDLES: CandlesRedis(**kwargs) if backend == 'REDIS' else CandlesStream(**kwargs),
+            OPEN_INTEREST: OpenInterestRedis(**kwargs) if backend == 'REDIS' else OpenInterestStream(**kwargs),
+            LIQUIDATIONS: LiquidationsRedis(**kwargs) if backend == 'REDIS' else LiquidationsStream(**kwargs)
         }
     elif backend == 'MONGO':
         kwargs = {'host': host, 'port': port if port else 27101}
