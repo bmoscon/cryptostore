@@ -20,3 +20,12 @@ Cryptostore runs in a docker container, and expects configuration to be provided
 * PORT - Port for service. Defaults to backend default.
 * CANDLE_INTERVAL - Used for candles. Default is 1m.
 * DATABASE - Specify the database for MongoDB.
+
+
+### Example
+
+An example of how the configuration would look when subscribing to BTC-USD and ETH-USD on Coinbase for Trades, Ticker and L2 Book channels, using Redis Streams:
+
+```
+docker run -e EXCHANGE='COINBASE' -e CHANNELS='trades,ticker,l2_book' -e SYMBOLS='BTC-USD,ETH-USD' -e BACKEND='REDISSTREAM' ... cryptostore:latest
+```
