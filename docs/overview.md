@@ -1,10 +1,11 @@
 ## High Level Overview
 
 
-Cryptostore utilizes the supports backends of cryptofeed to store data from exchanges in various databases and other services. The following are supported data stores / destinations:
+Cryptostore utilizes the supports backends of cryptofeed to store data from exchanges in various databases and other services. The following are supported data stores / destinations allong with the flag that should be used in the BACKEND environment variable:
 
-* Redis
-* MongoDB
+* Redis Sorted Sets (ZSET) - `REDIS`
+* Redis Streams - `REDISSTREAM`
+* MongoDB - `MONGO`
 
 Cryptostore runs in a docker container, and expects configuration to be provided to it via environment variables. The env vars it expects (not all are requires for all configurations) are:
 
