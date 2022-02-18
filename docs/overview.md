@@ -27,5 +27,10 @@ Cryptostore runs in a docker container, and expects configuration to be provided
 An example of how the configuration would look when subscribing to BTC-USD and ETH-USD on Coinbase for Trades, Ticker and L2 Book channels, using Redis Streams:
 
 ```
-docker run -e EXCHANGE='COINBASE' -e CHANNELS='trades,ticker,l2_book' -e SYMBOLS='BTC-USD,ETH-USD' -e BACKEND='REDISSTREAM' ... cryptostore:latest
+docker run -e EXCHANGE='COINBASE' \
+           -e CHANNELS='trades,ticker,l2_book' \
+           -e SYMBOLS='BTC-USD,ETH-USD' \
+           -e BACKEND='REDISSTREAM' 
+           <networking and other params>
+           cryptostore:latest
 ```
