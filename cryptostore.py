@@ -36,32 +36,44 @@ def load_config() -> Feed:
     config = os.environ.get('CONFIG')
     backend = os.environ.get('BACKEND')
     snap_only = os.environ.get('SNAPSHOT_ONLY', False)
+    if snap_only:
+        if snap_only.lower().startswith('f'):
+            snap_only = False
+        elif snap_only.lower().startswith('t'):
+            snap_only = True
+        else:
+            raise ValueError('Invalid value specified for SNAPSHOT_ONLY')
     snap_interval = os.environ.get('SNAPSHOT_INTERVAL', 1000)
+    snap_interval = int(snap_interval)
     host = os.environ.get('HOST', '127.0.0.1')
     port = os.environ.get('PORT')
-    candle_interval = os.environ.get('CANDLE_INTERVAL')
+    if port:
+        port = int(port)
+    candle_interval = os.environ.get('CANDLE_INTERVAL', '1m')
     database = os.environ.get('DATABASE')
 
     cbs = None
     if backend == 'REDIS':
+        kwargs = {'host': host, 'port': port if port else 6379}
         cbs = {
-            L2_BOOK: BookRedis(host=host, port=port if port else 6379, snapshot_interval=snap_interval, snapshots_only=snap_only),
-            TRADES: TradeRedis(host=host, port=port if port else 6379),
-            TICKER: TickerRedis(host=host, port=port if port else 6379),
-            FUNDING: FundingRedis(host=host, port=port if port else 6379),
-            CANDLES: CandlesRedis(host=host, port=port if port else 6379),
-            OPEN_INTEREST: OpenInterestRedis(host=host, port=port if port else 6379),
-            LIQUIDATIONS: LiquidationsRedis(host=host, port=port if port else 6379)
+            L2_BOOK: BookRedis(snapshot_interval=snap_interval, snapshots_only=snap_only, **kwargs),
+            TRADES: TradeRedis(**kwargs),
+            TICKER: TickerRedis(**kwargs),
+            FUNDING: FundingRedis(**kwargs),
+            CANDLES: CandlesRedis(**kwargs),
+            OPEN_INTEREST: OpenInterestRedis(**kwargs),
+            LIQUIDATIONS: LiquidationsRedis(**kwargs)
         }
     elif backend == 'MONGO':
+        kwargs = {'host': host, 'port': port if port else 27101}
         cbs = {
-            L2_BOOK: BookMongo(database, host=host, port=port if port else 27101, snapshot_interval=snap_interval, snapshots_only=snap_only),
-            TRADES: TradeMongo(database, host=host, port=port if port else 27101),
-            TICKER: TickerMongo(database, host=host, port=port if port else 27101),
-            FUNDING: FundingMongo(database, host=host, port=port if port else 27101),
-            CANDLES: CandlesMongo(database, host=host, port=port if port else 27101),
-            OPEN_INTEREST: OpenInterestMongo(database, host=host, port=port if port else 27101),
-            LIQUIDATIONS: LiquidationsMongo(database, host=host, port=port if port else 27101)
+            L2_BOOK: BookMongo(database, snapshot_interval=snap_interval, snapshots_only=snap_only, **kwargs),
+            TRADES: TradeMongo(database, **kwargs),
+            TICKER: TickerMongo(database, **kwargs),
+            FUNDING: FundingMongo(database, **kwargs),
+            CANDLES: CandlesMongo(database, **kwargs),
+            OPEN_INTEREST: OpenInterestMongo(database, **kwargs),
+            LIQUIDATIONS: LiquidationsMongo(database, **kwargs)
         }
     elif backend == 'TTY':
         cbs = {
@@ -75,6 +87,11 @@ def load_config() -> Feed:
         }
     else:
         raise ValueError('Invalid backend specified')
+
+    # Prune unused callbacks
+    remove = [chan for chan in cbs if chan not in channels]
+    for r in remove:
+        del cbs[r]
 
     return EXCHANGE_MAP[exchange](candle_intterval=candle_interval, symbols=symbols, channels=channels, config=config, callbacks=cbs)
 
