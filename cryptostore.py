@@ -13,6 +13,7 @@ from cryptofeed.defines import L2_BOOK, TICKER, TRADES, FUNDING, CANDLES, OPEN_I
 from cryptofeed.backends.redis import BookRedis, TradeRedis, TickerRedis, FundingRedis, CandlesRedis, OpenInterestRedis, LiquidationsRedis
 from cryptofeed.backends.redis import BookStream, TradeStream, TickerStream, FundingStream, CandlesStream, OpenInterestStream, LiquidationsStream
 from cryptofeed.backends.mongo import BookMongo, TradeMongo, TickerMongo, FundingMongo, CandlesMongo, OpenInterestMongo, LiquidationsMongo
+from cryptofeed.backends.postgres import BookPostgres, TradePostgres, TickerPostgres, FundingPostgres, CandlesPostgres, OpenInterestPostgres, LiquidationsPostgres
 
 
 async def tty(obj, receipt_ts):
@@ -52,6 +53,8 @@ def load_config() -> Feed:
         port = int(port)
     candle_interval = os.environ.get('CANDLE_INTERVAL', '1m')
     database = os.environ.get('DATABASE')
+    user = os.environ.get('USER')
+    password = os.environ.get('PASSWORD')
 
     cbs = None
     if backend == 'REDIS' or backend == 'REDISSTREAM':
@@ -75,6 +78,17 @@ def load_config() -> Feed:
             CANDLES: CandlesMongo(database, **kwargs),
             OPEN_INTEREST: OpenInterestMongo(database, **kwargs),
             LIQUIDATIONS: LiquidationsMongo(database, **kwargs)
+        }
+    elif backend == 'POSTGRES':
+        kwargs = {'db': database, 'host': host, 'port': port if port else 5432, 'user': user, 'pw': password}
+        cbs = {
+            L2_BOOK: BookPostgres(snapshot_interval=snap_interval, snapshots_only=snap_only, **kwargs),
+            TRADES: TradePostgres(**kwargs),
+            TICKER: TickerPostgres(**kwargs),
+            FUNDING: FundingPostgres(**kwargs),
+            CANDLES: CandlesPostgres(**kwargs),
+            OPEN_INTEREST: OpenInterestPostgres(**kwargs),
+            LIQUIDATIONS: LiquidationsPostgres(**kwargs)
         }
     elif backend == 'TTY':
         cbs = {
