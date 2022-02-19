@@ -19,12 +19,19 @@ docker pull ghcr.io/bmoscon/cryptostore:latest
 
 ### To Build a Container
 
-`docker build . -t "cryptostore:latest"`
+```
+docker build . -t "cryptostore:latest"`
+```
 
 
 ### To Run a Container
 
-`docker run -e EXCHANGE='COINBASE' -e CHANNELS='trades' -e SYMBOLS='BTC-USD' -e BACKEND='REDIS' cryptostore:latest`
+```
+docker run -e EXCHANGE='COINBASE' -e CHANNELS='trades' -e SYMBOLS='BTC-USD' -e BACKEND='REDIS' cryptostore:latest`
+```
+
+*Note*: if you've pulled the image from GitHub, the container name will be `ghcr.io/bmoscon/cryptostore:latest` as opposed to `cryptostore:latest`.
+
 
 Depending on your operating system and how your backends are set up, networking configuration may need to be supplied to docker, or other backend specific environment variables might need to be supplied. 
 
