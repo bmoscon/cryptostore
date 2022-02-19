@@ -17,7 +17,7 @@ Docker images are hosted in GitHub and can be pulled using the following command
 docker pull ghcr.io/bmoscon/cryptostore:latest
 ```
 
-### To Build a Container
+### To Build a Container From Source
 
 ```
 docker build . -t "cryptostore:latest"
