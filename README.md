@@ -9,6 +9,14 @@ A storage engine for cryptocurrency data, Cryptostore is an application wrapper 
 
 This project assumes familiarity with Docker, but some basic commands are available to get you started below.
 
+### Using a Prebuilt Container Image
+
+Docker images are hosted in GitHub and can be pulled using the following command:
+
+```
+docker pull ghcr.io/bmoscon/cryptostore:latest
+```
+
 ### To Build a Container
 
 `docker build . -t "cryptostore:latest"`
