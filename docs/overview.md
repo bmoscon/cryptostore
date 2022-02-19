@@ -6,6 +6,7 @@ Cryptostore utilizes the supports backends of cryptofeed to store data from exch
 * Redis Sorted Sets (ZSET) - `REDIS`
 * Redis Streams - `REDISSTREAM`
 * MongoDB - `MONGO`
+* Postgres - `POSTGRES`
 
 Cryptostore runs in a docker container, and expects configuration to be provided to it via environment variables. The env vars it expects (not all are requires for all configurations) are:
 
@@ -19,7 +20,9 @@ Cryptostore runs in a docker container, and expects configuration to be provided
 * HOST - Host for backend. Defaults to localhost.
 * PORT - Port for service. Defaults to backend default.
 * CANDLE_INTERVAL - Used for candles. Default is 1m.
-* DATABASE - Specify the database for MongoDB.
+* DATABASE - Specify the database for MongoDB or Postgres
+* USER - the username for Postgres
+* PASSWORD - the password for the specified Postgres user
 
 
 ### Example

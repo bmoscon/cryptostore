@@ -6,3 +6,4 @@
   * Bugfix: Input validation, remove unused callbacks from Feed.
   * Docs: Start documentation.
   * Feature: Add support for Redis Streams
+  * Feature: Add support for Postgres
