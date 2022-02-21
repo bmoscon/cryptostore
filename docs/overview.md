@@ -20,7 +20,7 @@ Cryptostore runs in a docker container, and expects configuration to be provided
 * BACKEND - Backend to be used, see list of supported backends above.
 * SNAPSHOT_ONLY - Valid for orderbook channel only, specifies that only complete books should be stored. Default is False.
 * SNAPSHOT_INTERVAL - Specifies how often snapshot is stored in terms of number of delta updates between snapshots. Default is 1000.
-* HOST - Host for backend. Defaults to localhost. TCP, UDP and UDS require the protocol to be prepended to the host/url. E.g. tcp://127.0.0.1, uds://udsfile.tmp, etc. 
+* HOST - Host for backend. Defaults to localhost. TCP, UDP and UDS require the protocol to be prepended to the host/url. E.g. `tcp://127.0.0.1`, `uds://udsfile.tmp`, etc. 
 * PORT - Port for service. Defaults to backend default.
 * CANDLE_INTERVAL - Used for candles. Default is 1m.
 * DATABASE - Specify the database for MongoDB or Postgres
