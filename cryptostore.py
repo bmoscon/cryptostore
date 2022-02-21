@@ -94,13 +94,13 @@ def load_config() -> Feed:
     elif backend in ('TCP', 'UDP', 'UDS'):
         kwargs = {'port': port}
         cbs = {
-            L2_BOOK: BookPostgres(snapshot_interval=snap_interval, snapshots_only=snap_only, **kwargs),
-            TRADES: TradePostgres(host, **kwargs),
-            TICKER: TickerPostgres(host, **kwargs),
-            FUNDING: FundingPostgres(host, **kwargs),
-            CANDLES: CandlesPostgres(host, **kwargs),
-            OPEN_INTEREST: OpenInterestPostgres(host, **kwargs),
-            LIQUIDATIONS: LiquidationsPostgres(host, **kwargs)
+            L2_BOOK: BookSocket(host, snapshot_interval=snap_interval, snapshots_only=snap_only, **kwargs),
+            TRADES: TradeSocket(host, **kwargs),
+            TICKER: TickerSocket(host, **kwargs),
+            FUNDING: FundingSocket(host, **kwargs),
+            CANDLES: CandlesSocket(host, **kwargs),
+            OPEN_INTEREST: OpenInterestSocket(host, **kwargs),
+            LIQUIDATIONS: LiquidationsSocket(host, **kwargs)
         }
     elif backend == 'TTY':
         cbs = {
