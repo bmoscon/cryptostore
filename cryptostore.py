@@ -14,6 +14,7 @@ from cryptofeed.backends.redis import BookRedis, TradeRedis, TickerRedis, Fundin
 from cryptofeed.backends.redis import BookStream, TradeStream, TickerStream, FundingStream, CandlesStream, OpenInterestStream, LiquidationsStream
 from cryptofeed.backends.mongo import BookMongo, TradeMongo, TickerMongo, FundingMongo, CandlesMongo, OpenInterestMongo, LiquidationsMongo
 from cryptofeed.backends.postgres import BookPostgres, TradePostgres, TickerPostgres, FundingPostgres, CandlesPostgres, OpenInterestPostgres, LiquidationsPostgres
+from cryptofeed.backends.socket import BookSocket, TradeSocket, TickerSocket, FundingSocket, CandlesSocket, OpenInterestSocket, LiquidationsSocket
 
 
 async def tty(obj, receipt_ts):
@@ -89,6 +90,17 @@ def load_config() -> Feed:
             CANDLES: CandlesPostgres(**kwargs),
             OPEN_INTEREST: OpenInterestPostgres(**kwargs),
             LIQUIDATIONS: LiquidationsPostgres(**kwargs)
+        }
+    elif backend in ('TCP', 'UDP', 'UDS'):
+        kwargs = {'port': port}
+        cbs = {
+            L2_BOOK: BookPostgres(snapshot_interval=snap_interval, snapshots_only=snap_only, **kwargs),
+            TRADES: TradePostgres(host, **kwargs),
+            TICKER: TickerPostgres(host, **kwargs),
+            FUNDING: FundingPostgres(host, **kwargs),
+            CANDLES: CandlesPostgres(host, **kwargs),
+            OPEN_INTEREST: OpenInterestPostgres(host, **kwargs),
+            LIQUIDATIONS: LiquidationsPostgres(host, **kwargs)
         }
     elif backend == 'TTY':
         cbs = {
