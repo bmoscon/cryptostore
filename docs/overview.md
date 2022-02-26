@@ -10,6 +10,7 @@ Cryptostore utilizes the supported backends of cryptofeed to store data from exc
 * TCP - `TCP`
 * UDP - `UDP`
 * UDS - `UDS`
+* InfluxDB - `INFLUX`
 
 Cryptostore runs in a docker container, and expects configuration to be provided to it via environment variables. The env vars it utilizes (not all are required for all configurations) are:
 
@@ -26,6 +27,9 @@ Cryptostore runs in a docker container, and expects configuration to be provided
 * DATABASE - Specify the database for MongoDB or Postgres
 * USER - the username for Postgres
 * PASSWORD - the password for the specified Postgres user
+* ORG - the InfluxDB organization
+* BUCKET - the InfluxDB bucket
+* TOKEN - the InfluxDB token
 
 
 ### Example
