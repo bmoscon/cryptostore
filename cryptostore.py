@@ -15,7 +15,7 @@ from cryptofeed.backends.redis import BookStream, TradeStream, TickerStream, Fun
 from cryptofeed.backends.mongo import BookMongo, TradeMongo, TickerMongo, FundingMongo, CandlesMongo, OpenInterestMongo, LiquidationsMongo
 from cryptofeed.backends.postgres import BookPostgres, TradePostgres, TickerPostgres, FundingPostgres, CandlesPostgres, OpenInterestPostgres, LiquidationsPostgres
 from cryptofeed.backends.socket import BookSocket, TradeSocket, TickerSocket, FundingSocket, CandlesSocket, OpenInterestSocket, LiquidationsSocket
-
+from cryptofeed.backends.influxdb import BookInflux, TradeInflux, TickerInflux, FundingInflux, CandlesInflux, OpenInterestInflux, LiquidationsInflux
 
 async def tty(obj, receipt_ts):
     # For debugging purposes
@@ -56,6 +56,9 @@ def load_config() -> Feed:
     database = os.environ.get('DATABASE')
     user = os.environ.get('USER')
     password = os.environ.get('PASSWORD')
+    org = os.environ.get('ORG')
+    bucket = os.environ.get('BUCKET')
+    token = os.environ.get('TOKEN')
 
     cbs = None
     if backend == 'REDIS' or backend == 'REDISSTREAM':
@@ -101,6 +104,17 @@ def load_config() -> Feed:
             CANDLES: CandlesSocket(host, **kwargs),
             OPEN_INTEREST: OpenInterestSocket(host, **kwargs),
             LIQUIDATIONS: LiquidationsSocket(host, **kwargs)
+        }
+    elif backend in ('INFLUX'):
+        args = (host, org, bucket, token)
+        cbs = {
+            L2_BOOK: BookInflux(*args, snapshot_interval=snap_interval, snapshots_only=snap_only),
+            TRADES: TradeInflux(*args),
+            TICKER: TickerInflux(*args),
+            FUNDING: FundingInflux(*args),
+            CANDLES: CandlesInflux(*args),
+            OPEN_INTEREST: OpenInterestInflux(*args),
+            LIQUIDATIONS: LiquidationsInflux(*args)
         }
     elif backend == 'TTY':
         cbs = {
