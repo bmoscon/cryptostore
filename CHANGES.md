@@ -1,8 +1,9 @@
 ## Changelog
 
-### 1.0.1
+### 1.0.1 (2022-02-26)
   * Feature: Add support for socket backends (TCP, UDS, UDP)
   * Example: Add example for receiving TCP messages from cryptofeed via container
+  * Feature: Support for InfluxDB
 
 ### 1.0.0 (2022-02-18)
   * Update: Old repo moved to legacy branch, new version (1.X) created.
