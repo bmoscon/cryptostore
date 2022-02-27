@@ -1,6 +1,6 @@
 VER=`cat VERSION`
 
-build:
+build: Dockerfile cryptostore.py
 	docker build . -t ghcr.io/bmoscon/cryptostore:latest
 
 release: build
