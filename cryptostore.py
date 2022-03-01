@@ -16,6 +16,8 @@ from cryptofeed.backends.mongo import BookMongo, TradeMongo, TickerMongo, Fundin
 from cryptofeed.backends.postgres import BookPostgres, TradePostgres, TickerPostgres, FundingPostgres, CandlesPostgres, OpenInterestPostgres, LiquidationsPostgres
 from cryptofeed.backends.socket import BookSocket, TradeSocket, TickerSocket, FundingSocket, CandlesSocket, OpenInterestSocket, LiquidationsSocket
 from cryptofeed.backends.influxdb import BookInflux, TradeInflux, TickerInflux, FundingInflux, CandlesInflux, OpenInterestInflux, LiquidationsInflux
+from cryptofeed.backends.quest import BookQuest, TradeQuest, TickerQuest, FundingQuest, CandlesQuest, OpenInterestQuest, LiquidationsQuest
+
 
 async def tty(obj, receipt_ts):
     # For debugging purposes
@@ -105,7 +107,7 @@ def load_config() -> Feed:
             OPEN_INTEREST: OpenInterestSocket(host, **kwargs),
             LIQUIDATIONS: LiquidationsSocket(host, **kwargs)
         }
-    elif backend in ('INFLUX'):
+    elif backend == 'INFLUX':
         args = (host, org, bucket, token)
         cbs = {
             L2_BOOK: BookInflux(*args, snapshot_interval=snap_interval, snapshots_only=snap_only),
@@ -115,6 +117,17 @@ def load_config() -> Feed:
             CANDLES: CandlesInflux(*args),
             OPEN_INTEREST: OpenInterestInflux(*args),
             LIQUIDATIONS: LiquidationsInflux(*args)
+        }
+    elif backend == 'QUEST':
+        kwargs = {'host': host, 'port': port if port else 9009}
+        cbs = {
+            L2_BOOK: BookQuest(**kwargs),
+            TRADES: TradeQuest(**kwargs),
+            TICKER: TickerQuest(**kwargs),
+            FUNDING: FundingQuest(**kwargs),
+            CANDLES: CandlesQuest(**kwargs),
+            OPEN_INTEREST: OpenInterestQuest(**kwargs),
+            LIQUIDATIONS: LiquidationsQuest(**kwargs)
         }
     elif backend == 'TTY':
         cbs = {
