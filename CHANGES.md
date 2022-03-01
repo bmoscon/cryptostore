@@ -1,5 +1,8 @@
 ## Changelog
 
+### 1.0.2 (2022-03-01)
+  * Feature: QuestDB support
+
 ### 1.0.1 (2022-02-26)
   * Feature: Add support for socket backends (TCP, UDS, UDP)
   * Example: Add example for receiving TCP messages from cryptofeed via container
