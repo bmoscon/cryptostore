@@ -1,0 +1,19 @@
+exchanges:
+  - COINBASE
+  - BINANCE
+
+symbols:
+  COINBASE: ALL
+  BINANCE: ALL
+
+channels:
+  - l2book
+  - trades
+
+symbols_per_channel: 10
+
+backend: INFLUX
+org: crypto
+bucket: crypto
+token: TOKEN
+host: http://127.0.0.1:8086
