@@ -147,7 +147,7 @@ def load_config() -> Feed:
     for r in remove:
         del cbs[r]
 
-    return EXCHANGE_MAP[exchange](candle_intterval=candle_interval, symbols=symbols, channels=channels, config=config, callbacks=cbs)
+    return EXCHANGE_MAP[exchange](candle_interval=candle_interval, symbols=symbols, channels=channels, config=config, callbacks=cbs)
 
 
 def main():

@@ -2,6 +2,7 @@
 
 ### 1.0.3
   * Feature: Add tool to generate docker run commands
+  * Bugfix: Fixed a kwarg typo
 
 ### 1.0.2 (2022-03-01)
   * Feature: QuestDB support
