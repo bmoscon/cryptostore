@@ -1,6 +1,6 @@
 ## Changelog
 
-### 1.0.3
+### 1.0.4
   * Bugfix: Fixed a kwarg typo
 
 ### 1.0.3
