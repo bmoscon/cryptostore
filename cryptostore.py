@@ -7,6 +7,7 @@ from datetime import datetime
 import os
 
 from cryptofeed import FeedHandler
+from cryptofeed.raw_data_collection import AsyncFileCallback
 from cryptofeed.exchanges import EXCHANGE_MAP
 from cryptofeed.feed import Feed
 from cryptofeed.defines import L2_BOOK, TICKER, TRADES, FUNDING, CANDLES, OPEN_INTEREST, LIQUIDATIONS
@@ -151,7 +152,16 @@ def load_config() -> Feed:
 
 
 def main():
-    fh = FeedHandler()
+    save_raw = os.environ.get('SAVE_RAW', False)
+    if save_raw:
+        if save_raw.lower().startswith('f'):
+            save_raw = False
+        elif save_raw.lower().startswith('t'):
+            save_raw = True
+        else:
+            raise ValueError('Invalid value specified for SAVE_RAW')
+        
+    fh = FeedHandler(raw_data_collection=AsyncFileCallback("./raw_data") if save_raw else None)
     cfg = load_config()
     fh.add_feed(cfg)
     fh.run()
