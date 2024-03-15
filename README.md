@@ -35,7 +35,7 @@ docker run -e EXCHANGE='COINBASE' -e CHANNELS='trades' -e SYMBOLS='BTC-USD' -e B
 
 Depending on your operating system and how your backends are set up, networking configuration may need to be supplied to docker, or other backend specific environment variables might need to be supplied. 
 
-Configuration is passed to the container via environment variables. `CHANNELS` and `SYMBOLS` can be single values, or list of values. Only one exchange per container is supported.
+Configuration is passed to the container via environment variables. `CHANNELS` and `SYMBOLS` can be single values, or list of values (separated by comas). Only one exchange per container is supported. For candlestick data, only one candle interval per feed is supported.
 
 
 ### Documentation
