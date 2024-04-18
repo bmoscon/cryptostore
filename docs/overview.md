@@ -15,22 +15,23 @@ Cryptostore utilizes the supported backends of cryptofeed to store data from exc
 
 Cryptostore runs in a docker container, and expects configuration to be provided to it via environment variables. The env vars it utilizes (not all are required for all configurations) are:
 
-* EXCHANGE - the exchange. Only one can be specified. Run multiple containers to collect data from more than 1 exchange. Should be in all caps.
-* SYMBOLS - a single symbol, or a list of symbols. Must follow cryptofeed naming conventions for symbols.
-* CHANNELS - cryptofeed data channels (trades, l2book, ticker, etc.) Can be a single channel or a list of channels.
-* CONFIG - path to cryptofeed config file (must be built into the container or otherwise accessible in the container). Not required. 
-* BACKEND - Backend to be used, see list of supported backends above.
-* SNAPSHOT_ONLY - Valid for orderbook channel only, specifies that only complete books should be stored. Default is False.
-* SNAPSHOT_INTERVAL - Specifies how often snapshot is stored in terms of number of delta updates between snapshots. Default is 1000.
-* HOST - Host for backend. Defaults to localhost. TCP, UDP and UDS require the protocol to be prepended to the host/url. E.g. `tcp://127.0.0.1`, `uds://udsfile.tmp`, etc.
-* PORT - Port for service. Defaults to backend default.
-* CANDLE_INTERVAL - Used for candles. Default is 1m.
-* DATABASE - Specify the database for MongoDB or Postgres
-* USER - the username for Postgres
-* PASSWORD - the password for the specified Postgres user
-* ORG - the InfluxDB organization
-* BUCKET - the InfluxDB bucket
-* TOKEN - the InfluxDB token
+* `EXCHANGE` - the exchange. Only one can be specified. Run multiple containers to collect data from more than 1 exchange. Should be in all caps.
+* `SYMBOLS` - a single symbol, or a list of symbols. Must follow cryptofeed naming conventions for symbols.
+* `CHANNELS` - cryptofeed data channels (`trades`, `l2_book`, `ticker`, etc.) Can be a single channel or a list of channels.
+* `CONFIG` - path to cryptofeed config file (must be built into the container or otherwise accessible in the container). Not required. 
+* `BACKEND` - Backend to be used, see list of supported backends above.
+* `SAVE_RAW` - Keep raw data and save it to file. Default is False, and even when True you still have to specify a backend for the processed data. To persist the raw data files you should bind the /raw_data folder in the container to a local volume. E.g. add `-v /your/local/path:/raw_data` to your `docker run` command.
+* `SNAPSHOT_ONLY` - Valid for orderbook channel only, specifies that only complete books should be stored. Default is False.
+* `SNAPSHOT_INTERVAL` - Specifies how often snapshot is stored in terms of number of delta updates between snapshots. Default is 1000.
+* `HOST` - Host for backend. Defaults to `localhost`. TCP, UDP and UDS require the protocol to be prepended to the host/url. E.g. `tcp://127.0.0.1`, `uds://udsfile.tmp`, etc.
+* `PORT` - Port for service. Defaults to backend default.
+* `CANDLE_INTERVAL` - Used for candles. Default is 1m.
+* `DATABASE` - Specify the database for MongoDB or Postgres
+* `USER` - the username for Postgres
+* `PASSWORD` - the password for the specified Postgres user
+* `ORG` - the InfluxDB organization
+* `BUCKET` - the InfluxDB bucket
+* `TOKEN` - the InfluxDB token
 
 
 ### Example

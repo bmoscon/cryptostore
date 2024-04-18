@@ -7,6 +7,7 @@ from datetime import datetime
 import os
 
 from cryptofeed import FeedHandler
+from cryptofeed.raw_data_collection import AsyncFileCallback
 from cryptofeed.exchanges import EXCHANGE_MAP
 from cryptofeed.feed import Feed
 from cryptofeed.defines import L2_BOOK, TICKER, TRADES, FUNDING, CANDLES, OPEN_INTEREST, LIQUIDATIONS
@@ -63,84 +64,86 @@ def load_config() -> Feed:
     token = os.environ.get('TOKEN')
 
     cbs = None
-    if backend == 'REDIS' or backend == 'REDISSTREAM':
-        kwargs = {'host': host, 'port': port if port else 6379}
-        cbs = {
-            L2_BOOK: BookRedis(snapshot_interval=snap_interval, snapshots_only=snap_only, **kwargs) if backend == 'REDIS' else BookStream(snapshot_interval=snap_interval, snapshots_only=snap_only, **kwargs),
-            TRADES: TradeRedis(**kwargs) if backend == 'REDIS' else TradeStream(**kwargs),
-            TICKER: TickerRedis(**kwargs) if backend == 'REDIS' else TickerStream(**kwargs),
-            FUNDING: FundingRedis(**kwargs) if backend == 'REDIS' else FundingStream(**kwargs),
-            CANDLES: CandlesRedis(**kwargs) if backend == 'REDIS' else CandlesStream(**kwargs),
-            OPEN_INTEREST: OpenInterestRedis(**kwargs) if backend == 'REDIS' else OpenInterestStream(**kwargs),
-            LIQUIDATIONS: LiquidationsRedis(**kwargs) if backend == 'REDIS' else LiquidationsStream(**kwargs)
-        }
-    elif backend == 'MONGO':
-        kwargs = {'host': host, 'port': port if port else 27101}
-        cbs = {
-            L2_BOOK: BookMongo(database, snapshot_interval=snap_interval, snapshots_only=snap_only, **kwargs),
-            TRADES: TradeMongo(database, **kwargs),
-            TICKER: TickerMongo(database, **kwargs),
-            FUNDING: FundingMongo(database, **kwargs),
-            CANDLES: CandlesMongo(database, **kwargs),
-            OPEN_INTEREST: OpenInterestMongo(database, **kwargs),
-            LIQUIDATIONS: LiquidationsMongo(database, **kwargs)
-        }
-    elif backend == 'POSTGRES':
-        kwargs = {'db': database, 'host': host, 'port': port if port else 5432, 'user': user, 'pw': password}
-        cbs = {
-            L2_BOOK: BookPostgres(snapshot_interval=snap_interval, snapshots_only=snap_only, **kwargs),
-            TRADES: TradePostgres(**kwargs),
-            TICKER: TickerPostgres(**kwargs),
-            FUNDING: FundingPostgres(**kwargs),
-            CANDLES: CandlesPostgres(**kwargs),
-            OPEN_INTEREST: OpenInterestPostgres(**kwargs),
-            LIQUIDATIONS: LiquidationsPostgres(**kwargs)
-        }
-    elif backend in ('TCP', 'UDP', 'UDS'):
-        kwargs = {'port': port}
-        cbs = {
-            L2_BOOK: BookSocket(host, snapshot_interval=snap_interval, snapshots_only=snap_only, **kwargs),
-            TRADES: TradeSocket(host, **kwargs),
-            TICKER: TickerSocket(host, **kwargs),
-            FUNDING: FundingSocket(host, **kwargs),
-            CANDLES: CandlesSocket(host, **kwargs),
-            OPEN_INTEREST: OpenInterestSocket(host, **kwargs),
-            LIQUIDATIONS: LiquidationsSocket(host, **kwargs)
-        }
-    elif backend == 'INFLUX':
-        args = (host, org, bucket, token)
-        cbs = {
-            L2_BOOK: BookInflux(*args, snapshot_interval=snap_interval, snapshots_only=snap_only),
-            TRADES: TradeInflux(*args),
-            TICKER: TickerInflux(*args),
-            FUNDING: FundingInflux(*args),
-            CANDLES: CandlesInflux(*args),
-            OPEN_INTEREST: OpenInterestInflux(*args),
-            LIQUIDATIONS: LiquidationsInflux(*args)
-        }
-    elif backend == 'QUEST':
-        kwargs = {'host': host, 'port': port if port else 9009}
-        cbs = {
-            L2_BOOK: BookQuest(**kwargs),
-            TRADES: TradeQuest(**kwargs),
-            TICKER: TickerQuest(**kwargs),
-            FUNDING: FundingQuest(**kwargs),
-            CANDLES: CandlesQuest(**kwargs),
-            OPEN_INTEREST: OpenInterestQuest(**kwargs),
-            LIQUIDATIONS: LiquidationsQuest(**kwargs)
-        }
-    elif backend == 'TTY':
-        cbs = {
-            L2_BOOK: tty,
-            TRADES: tty,
-            TICKER: tty,
-            FUNDING: tty,
-            CANDLES: tty,
-            OPEN_INTEREST: tty,
-            LIQUIDATIONS: tty
-        }
+    allowed_backends = ['REDIS', 'REDISSTREAM', 'MONGO', 'POSTGRES', 'TCP', 'UDP', 'UDS', 'INFLUX', 'QUEST', 'TTY']
+    if backend in allowed_backends:
+        if backend == 'REDIS' or backend == 'REDISSTREAM':
+            kwargs = {'host': host, 'port': port if port else 6379}
+            cbs = {
+                L2_BOOK: BookRedis(snapshot_interval=snap_interval, snapshots_only=snap_only, **kwargs) if backend == 'REDIS' else BookStream(snapshot_interval=snap_interval, snapshots_only=snap_only, **kwargs),
+                TRADES: TradeRedis(**kwargs) if backend == 'REDIS' else TradeStream(**kwargs),
+                TICKER: TickerRedis(**kwargs) if backend == 'REDIS' else TickerStream(**kwargs),
+                FUNDING: FundingRedis(**kwargs) if backend == 'REDIS' else FundingStream(**kwargs),
+                CANDLES: CandlesRedis(**kwargs) if backend == 'REDIS' else CandlesStream(**kwargs),
+                OPEN_INTEREST: OpenInterestRedis(**kwargs) if backend == 'REDIS' else OpenInterestStream(**kwargs),
+                LIQUIDATIONS: LiquidationsRedis(**kwargs) if backend == 'REDIS' else LiquidationsStream(**kwargs)
+            }
+        elif backend == 'MONGO':
+            kwargs = {'host': host, 'port': port if port else 27101}
+            cbs = {
+                L2_BOOK: BookMongo(database, snapshot_interval=snap_interval, snapshots_only=snap_only, **kwargs),
+                TRADES: TradeMongo(database, **kwargs),
+                TICKER: TickerMongo(database, **kwargs),
+                FUNDING: FundingMongo(database, **kwargs),
+                CANDLES: CandlesMongo(database, **kwargs),
+                OPEN_INTEREST: OpenInterestMongo(database, **kwargs),
+                LIQUIDATIONS: LiquidationsMongo(database, **kwargs)
+            }
+        elif backend == 'POSTGRES':
+            kwargs = {'db': database, 'host': host, 'port': port if port else 5432, 'user': user, 'pw': password}
+            cbs = {
+                L2_BOOK: BookPostgres(snapshot_interval=snap_interval, snapshots_only=snap_only, **kwargs),
+                TRADES: TradePostgres(**kwargs),
+                TICKER: TickerPostgres(**kwargs),
+                FUNDING: FundingPostgres(**kwargs),
+                CANDLES: CandlesPostgres(**kwargs),
+                OPEN_INTEREST: OpenInterestPostgres(**kwargs),
+                LIQUIDATIONS: LiquidationsPostgres(**kwargs)
+            }
+        elif backend in ('TCP', 'UDP', 'UDS'):
+            kwargs = {'port': port}
+            cbs = {
+                L2_BOOK: BookSocket(host, snapshot_interval=snap_interval, snapshots_only=snap_only, **kwargs),
+                TRADES: TradeSocket(host, **kwargs),
+                TICKER: TickerSocket(host, **kwargs),
+                FUNDING: FundingSocket(host, **kwargs),
+                CANDLES: CandlesSocket(host, **kwargs),
+                OPEN_INTEREST: OpenInterestSocket(host, **kwargs),
+                LIQUIDATIONS: LiquidationsSocket(host, **kwargs)
+            }
+        elif backend == 'INFLUX':
+            args = (host, org, bucket, token)
+            cbs = {
+                L2_BOOK: BookInflux(*args, snapshot_interval=snap_interval, snapshots_only=snap_only),
+                TRADES: TradeInflux(*args),
+                TICKER: TickerInflux(*args),
+                FUNDING: FundingInflux(*args),
+                CANDLES: CandlesInflux(*args),
+                OPEN_INTEREST: OpenInterestInflux(*args),
+                LIQUIDATIONS: LiquidationsInflux(*args)
+            }
+        elif backend == 'QUEST':
+            kwargs = {'host': host, 'port': port if port else 9009}
+            cbs = {
+                L2_BOOK: BookQuest(**kwargs),
+                TRADES: TradeQuest(**kwargs),
+                TICKER: TickerQuest(**kwargs),
+                FUNDING: FundingQuest(**kwargs),
+                CANDLES: CandlesQuest(**kwargs),
+                OPEN_INTEREST: OpenInterestQuest(**kwargs),
+                LIQUIDATIONS: LiquidationsQuest(**kwargs)
+            }
+        elif backend == 'TTY':
+            cbs = {
+                L2_BOOK: tty,
+                TRADES: tty,
+                TICKER: tty,
+                FUNDING: tty,
+                CANDLES: tty,
+                OPEN_INTEREST: tty,
+                LIQUIDATIONS: tty
+            }
     else:
-        raise ValueError('Invalid backend specified')
+        raise ValueError(f"Invalid backend '{backend}' specified - must be in {allowed_backends}")
 
     # Prune unused callbacks
     remove = [chan for chan in cbs if chan not in channels]
@@ -151,7 +154,16 @@ def load_config() -> Feed:
 
 
 def main():
-    fh = FeedHandler()
+    save_raw = os.environ.get('SAVE_RAW', False)
+    if save_raw:
+        if save_raw.lower().startswith('f'):
+            save_raw = False
+        elif save_raw.lower().startswith('t'):
+            save_raw = True
+        else:
+            raise ValueError('Invalid value specified for SAVE_RAW')
+        
+    fh = FeedHandler(raw_data_collection=AsyncFileCallback("./raw_data") if save_raw else None)
     cfg = load_config()
     fh.add_feed(cfg)
     fh.run()

@@ -1,0 +1,9 @@
+version: "3.3"
+services:
+  cryptostore2tty:
+    image: ghcr.io/bmoscon/cryptostore:latest
+    environment:
+      - EXCHANGE=BINANCE
+      - CHANNELS=trades
+      - SYMBOLS=BTC-USDT
+      - BACKEND=TTY
