@@ -59,10 +59,10 @@ The container reads `/config/config.yaml` (override with `CRYPTOSTORE_CONFIG` or
 
 | tag | interpreter |
 | --- | --- |
-| `latest`, `2.0.0`, `edge` | CPython 3.15 |
-| `latest-t`, `2.0.0-t`, `edge-t` | CPython 3.15t, the free-threaded build - use this one with `workers` |
+| `latest`, `2.0.0` | CPython 3.15 |
+| `latest-t`, `2.0.0-t` | CPython 3.15t, the free-threaded build - use this one with `workers` |
 
-`edge` tracks the master branch. Build locally with `docker build -t cryptostore .` or
+Build locally with `docker build -t cryptostore .` or
 `docker build --build-arg PYTHON_VERSION=3.15t -t cryptostore:t .`.
 
 [examples/compose](examples/compose) has ready to run docker compose set-ups: Postgres plus streaming,
@@ -280,8 +280,8 @@ make test-ft        # the same tests on the free-threaded interpreter
 ```
 
 The tests need no network and no databases. CI runs lint and the tests on 3.15 and 3.15t, builds the
-container for both interpreters on amd64 and arm64, publishes `edge` images on pushes to master, and
-publishes the release images and the PyPI package when a GitHub release is published.
+container for both interpreters on amd64 and arm64, and publishes the release images and the PyPI
+package when a GitHub release is published.
 
 ## Releasing
 
