@@ -6,9 +6,8 @@
 [![PyPI](https://img.shields.io/badge/PyPI-cryptostore-brightgreen.svg)](https://pypi.org/project/cryptostore/)
 
 Cryptostore subscribes to cryptocurrency exchanges with [cryptofeed](https://github.com/bmoscon/cryptofeed),
-stores the normalised data in your database and streams it in real time to your own applications. One
-config file says which exchanges, channels and symbols to collect, where each goes and how many threads
-to spread it over. It runs as a container, or as a Python package.
+stores the normalized data in your database and streams it in real time to your own applications. One config file 
+powers the whole collection. You can run cryptostore as a container, or as a Python package.
 
 ```yaml
 backends:
@@ -36,7 +35,7 @@ exchanges:
       liquidations: ['*-USDT-PERP']      # or a pattern
       funding: [BTC-USDT-PERP]
 
-workers: 4                               # threads; parallel on the free-threaded image
+workers: 4                               # threads
 ```
 
 * **Exchanges and channels**: everything cryptofeed supports - 30 exchanges, `trades`, `l2_book`, `l3_book`, `l1_book`, `ticker`, `funding`, `open_interest`, `liquidations`, `index`, `candles`
@@ -79,14 +78,10 @@ cryptostore run config.yaml
 ```
 
 The `all` extra installs every backend's driver. Pick individual ones with `cryptostore[postgres]`,
-`[redis]`, `[mongo]`, `[kafka]`, `[zmq]`; the stream backend's TCP and unix endpoints need nothing extra.
+`[redis]`, `[mongo]`, `[kafka]`, `[zmq]` (the stream backend's TCP and unix endpoints need nothing extra).
 
-**Free-threaded Python.** Every dependency keeps the GIL disabled on 3.15t except two optional C
-extensions: `hiredis` (redis-py's parser) does not declare free-threading support and re-enables the GIL
-when imported, so leave it out (`pip uninstall hiredis`; redis-py falls back to its pure python parser),
-and aiokafka's extension must be skipped at install time (`AIOKAFKA_NO_EXTENSIONS=1`). The `-t` image
-does both. cryptostore logs a warning at start-up when it finds the GIL enabled on a free-threaded build,
-and the health file reports `gil_enabled`.
+**Free-threaded Python.** Every dependency keeps the GIL disabled on 3.15t. 
+cryptostore logs a warning at start-up when it finds the GIL enabled on a free-threaded build, and the health file reports `gil_enabled`.
 
 ## Commands
 
@@ -100,8 +95,8 @@ and the health file reports `gil_enabled`.
 
 ## Configuration
 
-The file is YAML; a `.json` file with the same structure works too. It is found in this order: the path
-on the command line, `$CRYPTOSTORE_CONFIG`, `./config.yaml`. The container sets
+YAML or JSON is accepted. Cryptostore looks at the path
+on the command line, `$CRYPTOSTORE_CONFIG`, or `./config.yaml`. The container sets
 `CRYPTOSTORE_CONFIG=/config/config.yaml`, so mounting a file there is enough.
 [examples/config.yaml](examples/config.yaml) shows every option with its default.
 
@@ -110,12 +105,11 @@ default is an error. When the whole value is one reference the result is parsed 
 `port: ${PGPORT}` becomes an integer.
 
 Validation is strict and runs before anything connects: unknown keys, exchanges, channels, backends and
-feed options are errors with a suggestion.
+feed options will cause errors.
 
 ### `backends`
 
-A mapping of backend name to definition. Names are yours; `type` picks the implementation. Every other
-key is passed to the backend's constructor, except three cryptostore interprets:
+A mapping of backend name to definition. They map to crytofeed backends except these three:
 
 | key | purpose |
 | --- | --- |
@@ -144,7 +138,7 @@ exchanges writing trades to one Postgres backend share one connection pool per w
 ### `exchanges`
 
 A mapping of cryptofeed exchange id (case-insensitive) to what to subscribe to. `cryptostore exchanges`
-lists them; `cryptostore exchanges binance` shows one with the options it accepts.
+lists them. `cryptostore exchanges binance` shows one with the options it accepts.
 
 ```yaml
 exchanges:
@@ -161,7 +155,7 @@ exchanges:
     shards: 4                      # at most this many shards when split across workers (default: no limit)
 ```
 
-Symbols follow cryptofeed's normalised naming (`BTC-USD`, `BTC-USDT-PERP`, `BTC-USD-26H05`). A symbol
+Symbols follow cryptofeed's normalized naming (`BTC-USD`, `BTC-USDT-PERP`, `BTC-USD-26H05`). A symbol
 list may also contain `all` or glob patterns (`*-USDT`, `BTC-*`, `*-USDT-PERP`), which are expanded from
 the exchange's symbol list when cryptostore starts. A pattern that matches nothing is an error. Explicit
 symbols are checked when the feed starts, or ahead of time with `cryptostore check --symbols`.
@@ -196,7 +190,7 @@ dropped. `cryptostore check` prints the plan. See [Scaling](#scaling) for why an
 ## Streaming
 
 The `stream` backend turns cryptostore into a market data server: cryptostore binds the endpoints and
-your applications connect. Every update routed to the backend goes to every connected client; filter on
+your applications connect. Every update routed to the backend goes to every connected client, filter on
 the client side, or with a ZeroMQ subscription prefix.
 
 | endpoint | option | wire format |
@@ -205,11 +199,11 @@ the client side, or with a ZeroMQ subscription prefix.
 | Unix socket | `uds: /data/cryptostore.sock` | the same frames |
 | ZeroMQ PUB | `zmq: tcp://0.0.0.0:5555` | `<EXCHANGE>-<channel>-<SYMBOL> <json>`, so a SUB socket can subscribe by prefix |
 
-`data` is the update as cryptofeed serialises it plus `receipt_timestamp`. Prices and sizes are exact
+`data` is the update as cryptofeed seriaizes it plus `receipt_timestamp`. Prices and sizes are exact
 decimals on the wire (`numeric_type: decimal`, the default), so parse them as decimals. A book frame
 carries either `book` (a full snapshot: `{"bid": {price: size}, "ask": {...}}`) or `delta` (changed
 levels as `[price, size]` pairs, size 0 means removed). A full book is sent first, then deltas, then
-another full book every `snapshot_interval` deltas so late joiners can resynchronise; `snapshots_only`
+another full book every `snapshot_interval` deltas so late joiners can resynchronize. `snapshots_only`
 sends only full books. The TCP and unix frames are byte for byte what cryptofeed's own socket backend
 writes, and the ZeroMQ messages match cryptofeed's ZeroMQ backend, so readers written for either work.
 
@@ -262,7 +256,7 @@ Every `stats_interval` seconds cryptostore logs, and writes to `health_file` as 
 | `connections` | per exchange websocket: `received`, `reconnects`, `watchdog_trips`, `open` |
 
 A worker whose `loop_lag_max` exceeds `workers.lag_warn` logs a warning. `cryptostore health` checks
-that the file is fresh and lists feeds; `docker ps` shows the result.
+that the file is fresh and lists feeds. `docker ps` shows the result.
 
 ## PostgreSQL tables
 
@@ -274,7 +268,7 @@ the compose example mounts into Postgres. cryptofeed's classes print their own `
 python -c "from cryptofeed.backends import postgres as pg; print(pg.TradePostgres.create_table_sql())"
 ```
 
-`table` renames the table a backend writes to; `custom_columns` maps update fields to your own columns.
+`table` renames the table a backend writes to, `custom_columns` maps update fields to your own columns.
 
 ## Development
 
@@ -302,7 +296,7 @@ workflows:
 
 One-time setup, both in the browser: on pypi.org open the `cryptostore` project, *Publishing*, and add a
 GitHub publisher with owner `bmoscon`, repository `cryptostore`, workflow `pypi.yml`, environment
-`pypi`; then create an environment named `pypi` under the repository's *Settings, Environments*. On
+`pypi`, then create an environment named `pypi` under the repository's *Settings, Environments*. On
 GitHub open the `cryptostore` package under *Packages*, *Package settings*, *Manage Actions access*, and
 give this repository the write role - needed because the package predates these workflows.
 
