@@ -306,7 +306,20 @@ GitHub publisher with owner `bmoscon`, repository `cryptostore`, workflow `pypi.
 GitHub open the `cryptostore` package under *Packages*, *Package settings*, *Manage Actions access*, and
 give this repository the write role - needed because the package predates these workflows.
 
+
+## Future Work
+
+More features are in the works! If you'd like to discuss ongoing development, please join the [discord](https://discord.gg/zaBYaGAYfR).
+
 ## Contributing
 
-Issues and PRs are welcome. For questions about the data itself (symbols, channels, exchange quirks)
-see [cryptofeed](https://github.com/bmoscon/cryptofeed), which cryptostore is a thin layer over.
+Issues and PRs are welcomed!
+
+For questions about the data itself (symbols, channels, exchanges, etc) see [cryptofeed](https://github.com/bmoscon/cryptofeed).
+
+## Donations / Support
+
+Support and donations are appreciated but not required. You can donate via [GitHub Sponsors](https://github.com/sponsors/bmoscon), or via the addresses below:
+
+* Bitcoin: bc1qm0kxz8hqacaglku5fjhfe9a5hjnuyfwk02lsyr
+* Ethereum: 0x690709FEe13eEce9E7852089BB2D53Ae5D073154
