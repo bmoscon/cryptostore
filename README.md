@@ -1,6 +1,6 @@
 # Cryptostore
 
-[![License](https://img.shields.io/badge/license-AGPL-3.0-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-AGPL3.0--blue.svg)](LICENSE)
 ![Python](https://img.shields.io/badge/Python-3.15%20%7C%203.15t-green.svg)
 [![Container](https://img.shields.io/badge/ghcr.io-bmoscon%2Fcryptostore-brightgreen.svg)](https://github.com/bmoscon/cryptostore/pkgs/container/cryptostore)
 [![PyPI](https://img.shields.io/badge/PyPI-cryptostore-brightgreen.svg)](https://pypi.org/project/cryptostore/)
