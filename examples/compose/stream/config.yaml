@@ -1,0 +1,20 @@
+backends:
+  stream:
+    type: stream
+    tcp: 0.0.0.0:8080
+    zmq: tcp://0.0.0.0:5555
+    book:
+      snapshot_interval: 100
+
+exchanges:
+  COINBASE:
+    channels:
+      trades: [BTC-USD, ETH-USD]
+      l2_book: [BTC-USD]
+    options:
+      max_depth: 10
+  KRAKEN:
+    channels:
+      trades: [BTC-USD, ETH-USD]
+
+health_file: /data/health.json

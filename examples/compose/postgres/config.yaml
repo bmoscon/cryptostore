@@ -1,0 +1,29 @@
+backends:
+  postgres:
+    type: postgres
+    host: postgres
+    database: cryptostore
+    user: cryptostore
+    password: ${PGPASSWORD}
+    book:
+      snapshot_interval: 1000
+  stream:
+    type: stream
+    tcp: 0.0.0.0:8080
+
+exchanges:
+  COINBASE:
+    channels:
+      trades: [BTC-USD, ETH-USD]
+      ticker: [BTC-USD, ETH-USD]
+      l2_book: [BTC-USD]
+    options:
+      max_depth: 25
+  BINANCE:
+    channels:
+      trades: [BTC-USDT, ETH-USDT]
+      l2_book: [BTC-USDT]
+    options:
+      max_depth: 25
+
+health_file: /data/health.json

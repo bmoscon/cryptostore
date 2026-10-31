@@ -1,0 +1,20 @@
+# Stream Coinbase and Kraken trades and books to anything on the host that connects to
+# tcp://localhost:8080 or a ZeroMQ SUB on tcp://localhost:5555, with no database involved.
+#
+#   docker compose up
+#   python ../../clients/tcp_client.py            # in another terminal
+#   python ../../clients/zmq_client.py COINBASE-trades-
+services:
+  cryptostore:
+    image: ghcr.io/bmoscon/cryptostore:latest
+    # build: {context: ../../.., args: {PYTHON_VERSION: '3.15'}}
+    volumes:
+      - ./config.yaml:/config/config.yaml:ro
+      - data:/data
+    ports:
+      - "8080:8080"
+      - "5555:5555"
+    restart: unless-stopped
+
+volumes:
+  data:

@@ -1,0 +1,181 @@
+# cryptostore config reference - every option, with its default where it has one
+# YAML and JSON are supported
+# Any string may read an environment variable: ${NAME} or ${NAME:-default}.
+# Validate a config and see the worker plan:          cryptostore check examples/config.yaml
+# Also verify the symbols exist on each exchange:    cryptostore check --symbols examples/config.yaml
+
+# ---------------------------------------------------------------------------------------------
+# Backends: where data goes. Name them anything; the `type` picks the implementation.
+# Every exchange routes every channel to every backend unless it (or a channel) names its own backends.
+# ---------------------------------------------------------------------------------------------
+backends:
+
+  # Real-time fan-out to your applications. cryptostore listens, your programs connect
+  # Frames on tcp/uds are newline-delimited JSON: {"type": "trades", "data": {...}}
+  # ZeroMQ messages are "<EXCHANGE>-<channel>-<SYMBOL> <json>" so subscriptions can filter by prefix.
+  stream:
+    type: stream
+    tcp: 0.0.0.0:8080             # host:port, :port or a bare port. Omit to not listen on TCP
+    uds: /data/cryptostore.sock   # unix domain socket path. Omit to not create one
+    zmq: tcp://0.0.0.0:5555       # ZeroMQ PUB endpoint (needs pyzmq). Omit to not publish on ZeroMQ
+    client_queue: 10000           # frames a tcp/uds client may fall behind before it is disconnected
+    zmq_hwm: 100000               # ZeroMQ send high-water mark (0 = unlimited)
+    numeric_type: decimal         # decimal (exact, default), float or str
+    book:
+      snapshot_interval: 1000     # emit a full book every N deltas so late joiners can sync
+      snapshots_only: false       # true: never send deltas, only full books every snapshot_interval updates
+
+  # PostgreSQL. Tables must exist - examples/compose/postgres/init.sql creates them
+  postgres:
+    type: postgres
+    host: ${PGHOST:-127.0.0.1}
+    port: 5432
+    database: cryptostore         # alias for cryptofeed's `db`
+    user: cryptostore
+    password: ${PGPASSWORD:-change-me}  # alias for cryptofeed's `pw`
+    # numeric_type: decimal       # cryptofeed's default for postgres - exact NUMERIC columns
+    book:
+      snapshot_interval: 1000
+    queue:                        # cryptofeed BackendQueue tuning, same keys for every backend type
+      max_depth: 10000            # messages buffered before `overflow` applies
+      overflow: drop_oldest       # drop_oldest | drop_new | block
+      batch_max: 500              # messages per write
+      batch_interval: 0.5         # seconds to wait for a batch to fill
+      flush_deadline: 5.0         # seconds to drain the queue at shutdown
+      retry: {max_attempts: 5, base: 0.5, jitter: true, max_delay: 60}
+
+  # Redis - sorted sets scored by timestamp (type: redis) or Redis Streams (type: redis_stream)
+  redis:
+    type: redis_stream
+    host: 127.0.0.1
+    port: 6379
+    # socket: /var/run/redis.sock  # connect through a unix socket instead of host/port
+    # numeric_type: float
+
+  # MongoDB
+  mongo:
+    type: mongo
+    database: cryptostore
+    host: 127.0.0.1
+    port: 27017
+    # uri: mongodb://user:pass@host/   # alternative to host/port
+    # client_options: {serverSelectionTimeoutMS: 5000}
+
+  # InfluxDB 2.x
+  influx:
+    type: influxdb
+    host: http://127.0.0.1:8086   # alias for `addr`
+    org: crypto
+    bucket: crypto
+    token: ${INFLUX_TOKEN:-change-me}
+
+  # QuestDB. Books are stored as the top `depth` levels per side.
+  quest:
+    type: questdb
+    host: 127.0.0.1
+    port: 9000
+    book:
+      depth: 10
+
+  # Kafka. Every option other than book/queue/numeric_type is passed to aiokafka's AIOKafkaProducer.
+  kafka:
+    type: kafka
+    bootstrap_servers: 127.0.0.1:9092
+    # client_id: cryptostore
+    # acks: 1
+
+  # cryptofeed's client-mode outputs: cryptostore connects to something you already run.
+  socket:
+    type: socket
+    addr: tcp://127.0.0.1         # tcp://host, udp://host or uds:///path
+    port: 9000
+  zmq_connect:
+    type: zmq
+    host: 127.0.0.1               # a ZeroMQ SUB/XSUB that is *bound* at host:port
+    port: 5556
+
+  # Debugging: print every update to stdout
+  console:
+    type: tty
+
+# ---------------------------------------------------------------------------------------------
+# Exchanges: what to subscribe to. Names are cryptofeed exchange ids (case-insensitive).
+#   cryptostore exchanges            lists them all with their channels
+#   cryptostore exchanges binance    shows one, including the options it accepts
+# ---------------------------------------------------------------------------------------------
+exchanges:
+
+  COINBASE:
+    backends: [postgres, stream]       # default backends for this exchange (default: every backend above)
+    channels:
+      trades: [BTC-USD, ETH-USD]       # a list of symbols routes to the exchange's default backends
+      ticker: [BTC-USD]
+      l2_book:                         # or a mapping, to pick backends per channel
+        symbols: [BTC-USD]
+        backends: [stream]
+    options:                           # keyword arguments for the cryptofeed Feed - anything the exchange accepts
+      max_depth: 25                    # book levels per side (0 = full book)
+      retries: -1                      # reconnect attempts before giving up (-1 = forever)
+      timeout: 120                     # seconds without a message before the connection is considered dead
+    shards: 2                          # when workers > 1: split this exchange into at most 2 shards (default: up to one per worker)
+
+  BINANCE_FUTURES:
+    backends: [postgres, stream]
+    channels:
+      trades: [BTC-USDT-PERP, ETH-USDT-PERP]
+      l2_book: [BTC-USDT-PERP]
+      funding: [BTC-USDT-PERP, ETH-USDT-PERP]
+      open_interest: [BTC-USDT-PERP]
+      liquidations: [BTC-USDT-PERP, ETH-USDT-PERP]
+      candles: [BTC-USDT-PERP]
+    options:
+      depth_interval: 100ms            # exchange specific
+      candle_interval: 1m
+      candle_closed_only: true
+
+  KRAKEN:
+    backends: [console]
+    channels:
+      trades: all                      # every symbol Kraken lists. Symbols may also be glob patterns such as
+                                       # ['*-USD', 'BTC-EUR']; `all` and patterns are expanded at start-up
+
+# ---------------------------------------------------------------------------------------------
+# Workers: threads, each running its own event loop and its share of the exchanges. An exchange with
+# enough symbols is split into shards across them. The threads run in parallel on the free-threaded
+# image (the -t tags); on the standard image they take turns on one core.
+# ---------------------------------------------------------------------------------------------
+workers:
+  count: 4                           # worker threads, or auto for one per CPU (default: 1)
+  min_symbols: 50                    # split an exchange only into shards of at least this many symbols (default: 50)
+  lag_warn: 1.0                      # warn when a worker's event loop runs more than this many seconds behind (default: 1)
+
+# ---------------------------------------------------------------------------------------------
+# Everything else
+# ---------------------------------------------------------------------------------------------
+
+# Record the raw exchange traffic (every websocket message and HTTP response) to pcap files that
+# Wireshark opens and cryptofeed can replay. A directory gets timestamped files. Recording needs
+# workers: 1 - cryptofeed's recorder is bound to one event loop
+# record:
+#   path: /data/captures/
+#   rotate_size: 1073741824          # start a new file after this many bytes (default: never)
+#   compress: true                   # zstandard compression (default: true)
+
+log:
+  level: INFO                        # DEBUG, INFO, WARNING, ERROR
+  # file: /data/cryptostore.log      # also log to a rotating file (always logs to stdout)
+
+stats_interval: 60                   # seconds between stats reports (worker lag, connection and backend counters). 0 disables
+health_file: /data/health.json       # written with every stats report; `cryptostore health` and the docker HEALTHCHECK read it
+
+# What happens when a feed fails permanently (e.g. the exchange keeps rejecting the connection):
+#   raise        - stop everything and exit non-zero, so the container restarts (default)
+#   remove_feed  - drop that exchange and keep the others running
+on_feed_error: raise
+
+# Passed straight to cryptofeed's Config: uvloop, symbol_cache_ttl, ignore_invalid_instruments and
+# per-exchange credentials for authenticated channels.
+cryptofeed:
+  uvloop: true
+  symbol_cache_ttl: 3600
+  ignore_invalid_instruments: false

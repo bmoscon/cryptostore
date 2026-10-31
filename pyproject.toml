@@ -1,0 +1,86 @@
+# Copyright (C) 2018-2026 Bryant Moscon - bmoscon@gmail.com
+#
+# Please see the LICENSE file for the terms and conditions
+# associated with this software.
+
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cryptostore"
+version = "2.0.0"
+description = "Config-driven collector that subscribes to cryptocurrency exchanges with cryptofeed, stores the data and streams it to your applications"
+readme = "README.md"
+license = "AGPL-3.0-or-later"
+license-files = ["LICENSE"]
+authors = [
+    {name = "Bryant Moscon", email = "bmoscon@gmail.com"}
+]
+keywords = [
+    "cryptocurrency", "bitcoin", "market data", "feed handler", "cryptofeed", "order book", "trades",
+    "docker", "postgres", "redis", "mongodb", "kafka", "influxdb", "questdb", "zeromq", "streaming",
+]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.15",
+    "Programming Language :: Python :: Free Threading :: 2 - Beta",
+    "Framework :: AsyncIO",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS :: MacOS X",
+    "Topic :: Office/Business :: Financial",
+]
+requires-python = ">=3.15"
+dependencies = [
+    "cryptofeed>=3.0.2",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+kafka = ["cryptofeed[kafka]"]
+mongo = ["cryptofeed[mongo]"]
+postgres = ["cryptofeed[postgres]"]
+redis = ["cryptofeed[redis]"]
+zmq = ["cryptofeed[zmq]"]
+all = ["cryptofeed[all]"]
+
+[project.scripts]
+cryptostore = "cryptostore.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/bmoscon/cryptostore"
+Changelog = "https://github.com/bmoscon/cryptostore/blob/master/CHANGES.md"
+Container = "https://github.com/bmoscon/cryptostore/pkgs/container/cryptostore"
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "pytest-timeout",
+    "pyzmq",
+    "ruff",
+]
+
+[tool.setuptools.packages.find]
+include = ["cryptostore*"]
+
+[tool.ruff]
+line-length = 160
+target-version = "py315"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "ASYNC", "I"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["cryptostore"]
+lines-after-imports = 2
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+timeout = 60

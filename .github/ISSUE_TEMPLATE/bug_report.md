@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Report an issue
 title: ''
 labels: bug
 assignees: ''
@@ -8,12 +8,11 @@ assignees: ''
 ---
 
 **Describe the bug**
-A clear and concise description of what the bug is.
-
+A clear and concise description of the issue
 **To Reproduce**
-Steps to reproduce the behavior:
-* Provide config (at least as much as is relevant)
-* redis or kafka?
+Steps to reproduce:
+* Provide the config (at least as much as is relevant, with secrets removed)
+* Which storage backends are involved?
 * What behavior did you see?
 * Provide any tracebacks if applicable
 
@@ -23,7 +22,8 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
+**How are you running it?**
+ - container image tag, or Python version and `pip show cryptostore cryptofeed`
+
 **Operating System:**
  - macOS, linux, etc
-
-**Cryptofeed Version**

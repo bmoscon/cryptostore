@@ -1,0 +1,37 @@
+# Store Coinbase and Binance data in PostgreSQL and stream it on tcp://localhost:8080 at the same time.
+#
+#   docker compose up
+#   docker compose exec postgres psql -U cryptostore -c 'select count(*) from trades'
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: cryptostore
+      POSTGRES_PASSWORD: cryptostore
+      POSTGRES_DB: cryptostore
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cryptostore"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  cryptostore:
+    image: ghcr.io/bmoscon/cryptostore:latest
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: cryptostore
+    volumes:
+      - ./config.yaml:/config/config.yaml:ro
+      - data:/data
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  data:

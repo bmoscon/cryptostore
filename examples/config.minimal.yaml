@@ -1,0 +1,16 @@
+# The smallest useful cryptostore config - print Coinbase trades to the console
+#
+#   cryptostore run examples/config.minimal.yaml
+#
+# or, with docker:
+#
+#   docker run --rm -v "$PWD/examples:/config:ro" ghcr.io/bmoscon/cryptostore:latest run /config/config.minimal.yaml
+
+backends:
+  console:
+    type: tty
+
+exchanges:
+  COINBASE:
+    channels:
+      trades: [BTC-USD, ETH-USD]

@@ -1,0 +1,60 @@
+name: ci
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.15'
+      - run: uv sync --all-extras
+      - run: uv run ruff check .
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.15', '3.15t']
+    env:
+      # aiokafka has no free-threaded wheel and its C extension re-enables the GIL - use the pure python build
+      AIOKAFKA_NO_EXTENSIONS: ${{ endsWith(matrix.python-version, 't') && '1' || '' }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      # hiredis does not declare free-threading support and re-enables the GIL - leave it out on 3.15t.
+      # `uv run --no-sync` below keeps uv from reinstalling it
+      - run: uv sync --all-extras ${{ endsWith(matrix.python-version, 't') && '--no-install-package hiredis' || '' }}
+      - name: Verify the interpreter
+        run: |
+          uv run --no-sync python -c "
+          import sys, sysconfig
+          print(sys.version)
+          if sysconfig.get_config_var('Py_GIL_DISABLED'):
+              assert not sys._is_gil_enabled(), 'free-threaded build but the GIL is enabled'
+          "
+      - run: uv run --no-sync pytest -v
+      - name: Build the wheel and run the CLI from it
+        run: |
+          uv build
+          uv venv /tmp/verify --python ${{ matrix.python-version }}
+          VIRTUAL_ENV=/tmp/verify uv pip install dist/*.whl
+          /tmp/verify/bin/cryptostore --version
+          /tmp/verify/bin/cryptostore check examples/config.minimal.yaml
