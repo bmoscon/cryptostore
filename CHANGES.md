@@ -1,5 +1,8 @@
 ## Changelog
 
+### 2.0.1
+  * Update: Multi-stage Dockerfile on debian slim with 3.15t, running as an unprivileged user. The container ships only 3.15t. PyPI release contains 3.15 and 3.15t builds
+
 ### 2.0.0 (2026-10-31)
   * Update: Rewritten for cryptofeed 3.x, Python 3.15
   * Update: Configuration moved from environment variables to one YAML/JSON file. 
@@ -12,8 +15,6 @@
   * Feature: `record` - raw exchange traffic capture to pcap via cryptofeed 
   * Feature: `cryptostore` command line: `run`, `check` (with `--symbols`), `exchanges`, `backends`, `health`
   * Feature: Periodic stats reports, health file and a container `HEALTHCHECK`
-  * Feature: GitHub Actions for lint and tests (3.15, 3.15t); publishing a GitHub release pushes the multi-arch images to ghcr.io and the package to PyPI
-  * Update: Multi-stage Dockerfile on debian slim with a uv-managed interpreter, running as an unprivileged user
 
 ### 1.0.3 (2023-01-28)
   * Feature: Add tool to generate docker run commands

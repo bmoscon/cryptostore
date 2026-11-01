@@ -7,7 +7,7 @@
 services:
   cryptostore:
     image: ghcr.io/bmoscon/cryptostore:latest
-    # build: {context: ../../.., args: {PYTHON_VERSION: '3.15'}}
+    # build: {context: ../../..}
     volumes:
       - ./config.yaml:/config/config.yaml:ro
       - data:/data

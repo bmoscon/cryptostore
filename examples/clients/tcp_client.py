@@ -5,7 +5,7 @@ Please see the LICENSE file for the terms and conditions
 associated with this software.
 
 
-Reads frames from a cryptostore stream backend over TCP or a unix socket.
+Reads from a cryptostore stream backend over TCP or a unix socket.
 
     python tcp_client.py                       # tcp://127.0.0.1:8080
     python tcp_client.py 10.0.0.5:8080

@@ -141,8 +141,8 @@ exchanges:
 
 # ---------------------------------------------------------------------------------------------
 # Workers: threads, each running its own event loop and its share of the exchanges. An exchange with
-# enough symbols is split into shards across them. The threads run in parallel on the free-threaded
-# image (the -t tags); on the standard image they take turns on one core.
+# enough symbols is split into shards across them. The threads run in parallel on free-threaded Python
+# (3.15t, which the container image ships); on the standard 3.15 interpreter they take turns on one core.
 # ---------------------------------------------------------------------------------------------
 workers:
   count: 4                           # worker threads, or auto for one per CPU (default: 1)

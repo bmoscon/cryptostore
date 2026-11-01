@@ -320,8 +320,8 @@ class Cryptostore:
             LOG.warning('free-threaded interpreter, but the GIL is enabled: a C extension that does not declare free-threading support was imported '
                         '(hiredis is the usual one - run redis-py without it). PYTHON_GIL=0 overrides this at your own risk')
         if len(self.workers) > 1 and (not free_threaded or gil_enabled):
-            LOG.warning('%d workers but the GIL is in effect, so the threads take turns on one core. Use the free-threaded image (the -t tag) '
-                        'for parallelism, or split the config across containers', len(self.workers))
+            LOG.warning('%d workers but the GIL is in effect, so the threads take turns on one core. Use the free-threaded interpreter '
+                        '(3.15t, which the container image ships) for parallelism, or split the config across processes', len(self.workers))
 
         for server in self.servers.values():
             await server.start()

@@ -1,7 +1,10 @@
 name: docker
 
-# a published GitHub release publishes the versioned images (and pypi.yml publishes the package),
-# pushes to master and pull requests only build
+# a published GitHub release publishes the versioned image (and pypi.yml publishes the package),
+# pushes to master and pull requests only build.
+#
+# Only the free-threaded interpreter is shipped as a container: `latest`, `<version>` and `<major.minor>`
+# are all the 3.15t build. The PyPI package covers 3.15 and 3.15t.
 on:
   push:
     branches: [master]
@@ -20,19 +23,12 @@ permissions:
 
 env:
   IMAGE: ghcr.io/${{ github.repository }}
+  PYTHON_VERSION: '3.15t'
 
 jobs:
   image:
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - python: '3.15'
-            suffix: ''
-          - python: '3.15t'
-            suffix: '-t'
     steps:
       - uses: actions/checkout@v5
 
@@ -52,16 +48,13 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.IMAGE }}
-          flavor: |
-            latest=auto
-            suffix=${{ matrix.suffix }},onlatest=true
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=ref,event=pr
           labels: |
             org.opencontainers.image.title=cryptostore
-            org.opencontainers.image.description=Config-driven cryptocurrency market data collector built on cryptofeed (Python ${{ matrix.python }})
+            org.opencontainers.image.description=Config-driven cryptocurrency market data collector built on cryptofeed (free-threaded Python ${{ env.PYTHON_VERSION }})
 
       - name: Build${{ github.event_name == 'release' && ' and push' || '' }}
         uses: docker/build-push-action@v6
@@ -71,11 +64,11 @@ jobs:
           push: ${{ github.event_name == 'release' }}
           load: false
           build-args: |
-            PYTHON_VERSION=${{ matrix.python }}
+            PYTHON_VERSION=${{ env.PYTHON_VERSION }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ matrix.python }}
-          cache-to: type=gha,scope=${{ matrix.python }},mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Smoke test the amd64 image
         uses: docker/build-push-action@v6
@@ -85,9 +78,9 @@ jobs:
           load: true
           push: false
           build-args: |
-            PYTHON_VERSION=${{ matrix.python }}
+            PYTHON_VERSION=${{ env.PYTHON_VERSION }}
           tags: cryptostore:smoke
-          cache-from: type=gha,scope=${{ matrix.python }}
+          cache-from: type=gha
 
       - name: Run the CLI inside the image
         run: |
@@ -99,5 +92,6 @@ jobs:
           import cryptostore.cli
           from cryptofeed.backends import redis, mongo, postgres, kafka, zmq, influxdb, quest, socket
           print(sys.version)
-          assert not (sysconfig.get_config_var('Py_GIL_DISABLED') and sys._is_gil_enabled()), 'the GIL was re-enabled on the free-threaded image'
+          assert sysconfig.get_config_var('Py_GIL_DISABLED'), 'the image is not a free-threaded build'
+          assert not sys._is_gil_enabled(), 'the GIL was re-enabled on the free-threaded image'
           "

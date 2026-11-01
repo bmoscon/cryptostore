@@ -4,16 +4,17 @@
 # Please see the LICENSE file for the terms and conditions associated with this software.
 #
 # Build arguments
-#   PYTHON_VERSION   3.15 (default) or 3.15t for the free-threaded interpreter
+#   PYTHON_VERSION   3.15t (default), the free-threaded interpreter, or 3.15 for a GIL build
 #   UV_VERSION       the uv release used to install Python and the dependencies
 #
 #   docker build -t cryptostore .
-#   docker build -t cryptostore:t --build-arg PYTHON_VERSION=3.15t .
+#   docker build -t cryptostore:gil --build-arg PYTHON_VERSION=3.15 .
 #
-# The interpreter is a uv-managed python-build-standalone build, so the same Dockerfile produces the
-# free-threaded variant, which the official python images do not ship.
+# The interpreter is a uv-managed python-build-standalone build, which is how the image ships the
+# free-threaded interpreter the official python images do not. Only the 3.15t image is published to
+# ghcr.io. the 3.15 build arg is there for local builds.
 
-ARG PYTHON_VERSION=3.15
+ARG PYTHON_VERSION=3.15t
 ARG UV_VERSION=0.13
 
 FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv

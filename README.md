@@ -55,15 +55,12 @@ docker run --rm -v "$PWD/config.yaml:/config/config.yaml:ro" -p 8080:8080 ghcr.i
 ```
 
 The container reads `/config/config.yaml` (override with `CRYPTOSTORE_CONFIG` or pass the path after
-`run`), writes to `/data`, and runs as an unprivileged user. Two variants are published:
+`run`), writes to `/data`, and runs as an unprivileged user. The image runs CPython 3.15t, the
+free-threaded build, so `workers` run in parallel out of the box. `latest`, `2.0.0` and `2.0` all
+name that same image; there is no GIL variant on ghcr.io.
 
-| tag | interpreter |
-| --- | --- |
-| `latest`, `2.0.0` | CPython 3.15 |
-| `latest-t`, `2.0.0-t` | CPython 3.15t, the free-threaded build - use this one with `workers` |
-
-Build locally with `docker build -t cryptostore .` or
-`docker build --build-arg PYTHON_VERSION=3.15t -t cryptostore:t .`.
+Build locally with `docker build -t cryptostore .`. A GIL build is still possible for local use with
+`docker build --build-arg PYTHON_VERSION=3.15 -t cryptostore:gil .`.
 
 [examples/compose](examples/compose) has ready to run docker compose set-ups: Postgres plus streaming,
 and streaming only.
@@ -231,12 +228,12 @@ keepalive timeout closes the connection, cryptofeed reconnects, and for book cha
 snapshot is fetched again under the exchange's REST rate limits. The stats report shows this as
 climbing `loop_lag`, then rising `reconnects`.
 
-`workers` is the fix. Set `count` to the cores you can spend and run the free-threaded image
-(`latest-t`): the worker threads then run in parallel, each with its own share of the shards, while the
-main loop only fans frames out to stream clients and writes the stats. On the standard image the same
-config still runs correctly, but the threads take turns on one core, so there prefer several containers
-with the config split between them. Each worker has its own database writers, so a Postgres backend
-with four workers holds four connection pools.
+`workers` is the fix. Set `count` to the cores you can spend and run on free-threaded Python, which is
+what the container image ships: the worker threads then run in parallel, each with its own share of the
+shards, while the main loop only fans frames out to stream clients and writes the stats. On the standard
+3.15 interpreter the same config still runs correctly, but the threads take turns on one core, so there
+prefer several processes with the config split between them. Each worker has its own database writers,
+so a Postgres backend with four workers holds four connection pools.
 
 Every exchange still limits connections and REST weight per IP. `shards` caps how many connections one
 exchange is split into, cryptofeed's `delay_start` option staggers reconnects, and splitting across
@@ -280,8 +277,8 @@ make test-ft        # the same tests on the free-threaded interpreter
 ```
 
 The tests need no network and no databases. CI runs lint and the tests on 3.15 and 3.15t, builds the
-container for both interpreters on amd64 and arm64, and publishes the release images and the PyPI
-package when a GitHub release is published.
+free-threaded container on amd64 and arm64, and publishes the release image and the PyPI package when a
+GitHub release is published.
 
 ## Releasing
 
@@ -291,8 +288,9 @@ workflows:
 
 * `pypi.yml` builds the wheel and sdist, checks that the version matches the tag, and uploads to PyPI
   through trusted publishing - no API token is stored.
-* `docker.yml` builds both images for amd64 and arm64 and pushes `<version>`, `<major.minor>`, `latest`
-  and the `-t` variants to `ghcr.io/bmoscon/cryptostore`.
+* `docker.yml` builds the free-threaded (3.15t) image for amd64 and arm64 and pushes it as `<version>`,
+  `<major.minor>` and `latest` to `ghcr.io/bmoscon/cryptostore`. The GIL interpreter is only
+  distributed through PyPI.
 
 One-time setup, both in the browser: on pypi.org open the `cryptostore` project, *Publishing*, and add a
 GitHub publisher with owner `bmoscon`, repository `cryptostore`, workflow `pypi.yml`, environment

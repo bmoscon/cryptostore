@@ -1,7 +1,7 @@
 IMAGE ?= ghcr.io/bmoscon/cryptostore
 VERSION := $(shell uv version --short)
 
-.PHONY: sync lint test test-ft build build-ft run check
+.PHONY: sync lint test test-ft build run check
 
 sync:
 	uv sync --all-extras
@@ -20,9 +20,6 @@ test-ft:
 
 build:
 	docker build . -t $(IMAGE):$(VERSION) -t $(IMAGE):latest
-
-build-ft:
-	docker build . --build-arg PYTHON_VERSION=3.15t -t $(IMAGE):$(VERSION)-t -t $(IMAGE):latest-t
 
 check:
 	uv run cryptostore check $(CONFIG)
