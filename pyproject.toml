@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cryptostore"
-version = "2.0.0"
+version = "2.0.1"
 description = "Config-driven collector that subscribes to cryptocurrency exchanges with cryptofeed, stores the data and streams it to your applications"
 readme = "README.md"
 license = "AGPL-3.0-or-later"
