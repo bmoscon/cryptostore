@@ -190,7 +190,7 @@ wheels = [
 
 [[package]]
 name = "cryptofeed"
-version = "3.0.2"
+version = "3.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiodns" },
@@ -201,12 +201,14 @@ dependencies = [
     { name = "uvloop", marker = "sys_platform != 'win32'" },
     { name = "websockets" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/47/2a/343d2e2e970c616362d231aa40bd4108061213d4f1aca58f212d06e9b0ed/cryptofeed-3.0.2.tar.gz", hash = "sha256:f533cb882c49aa4057a0b13c4fef69c12b50dc5eae007344e290b19376a82aa8", size = 163637, upload-time = "2026-10-30T00:17:24.205Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9d/dc/f9be1a59ea4368b2032d3b053648ce1def0acd04b2c0f544fe02483ff2ff/cryptofeed-3.0.3.tar.gz", hash = "sha256:d5daf64f8cb024a255d8d879775f47c29d948793a904c91d9c9cee27e0c64704", size = 164877, upload-time = "2026-11-03T00:31:34.364Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a4/7d/145594d9c479f4d583d353d7de3deb3de2c41c8bd8dfc3a75163fe929c25/cryptofeed-3.0.2-cp315-cp315-macosx_11_0_arm64.whl", hash = "sha256:4873b9ee22fc913a5c06fc06cb3ff6384766d8e80733e5441e48dd89ed50963f", size = 322489, upload-time = "2026-10-30T00:17:17.501Z" },
-    { url = "https://files.pythonhosted.org/packages/ed/58/5de9cdbfd8ca7981d8dcba36cc63fdb681e328f9bee0a81630fcf0d56770/cryptofeed-3.0.2-cp315-cp315-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:95b48410cc114aa2231f17bfee28a5cbe091dd63b73cf675511788f0a265a3ba", size = 1264137, upload-time = "2026-10-30T00:17:19.324Z" },
-    { url = "https://files.pythonhosted.org/packages/00/1f/69ccf3c56dd35c3fbf3a40b65f7d40025cc45cf457970823fc4ff9fc065d/cryptofeed-3.0.2-cp315-cp315t-macosx_11_0_arm64.whl", hash = "sha256:35ef4c0edcdd39ffb17acdc4460f2292fe7b149105ea151a12b52a63bf1d8a6c", size = 341677, upload-time = "2026-10-30T00:17:20.953Z" },
-    { url = "https://files.pythonhosted.org/packages/94/a4/411feb1d5d4cb087a8d7945755978ddc1cdbf6a64c2b4da3c2ad4b7e1fb2/cryptofeed-3.0.2-cp315-cp315t-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:7602e9ccabb92f66e05746b0e747baf7d87c2f65e8c840d40356395c20af3999", size = 1320796, upload-time = "2026-10-30T00:17:22.605Z" },
+    { url = "https://files.pythonhosted.org/packages/25/3e/4d5e1284d4b87358e3c2a661469643a6b2bad082e1f89e409b9a2ace2e23/cryptofeed-3.0.3-cp315-cp315-macosx_11_0_arm64.whl", hash = "sha256:fc8753acc3d7a71f6139beaeb338eb53cb9209c067d6fa669614c33b0ccc6c65", size = 323269, upload-time = "2026-11-03T00:31:25.071Z" },
+    { url = "https://files.pythonhosted.org/packages/02/6a/525488f0681743a39bfc03845b7229a789f39b9cda046ef89db1d9813374/cryptofeed-3.0.3-cp315-cp315-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:1c228bfbedb9d1162866010265765dc70368b7f228cc1c0af69834e1d6168089", size = 1267042, upload-time = "2026-11-03T00:31:26.685Z" },
+    { url = "https://files.pythonhosted.org/packages/75/d0/7e7e11742f7b26c24d90d4889bf35b368ae796e723f4f4b539bb6eee44c1/cryptofeed-3.0.3-cp315-cp315-musllinux_1_2_x86_64.whl", hash = "sha256:91694f74512b972d70d10977327f63d1b6e91e2b20651fe1e8ccd1afd456456d", size = 1228096, upload-time = "2026-11-03T00:31:28.394Z" },
+    { url = "https://files.pythonhosted.org/packages/8e/0e/588df3f1313136e3d324babda7929c9b2a42161f5b0e9a9e3a95893cc2db/cryptofeed-3.0.3-cp315-cp315t-macosx_11_0_arm64.whl", hash = "sha256:3b599280432909a36927eb6f35f488b92ccbe34b48258b4a6b1d486aa5911f59", size = 342769, upload-time = "2026-11-03T00:31:29.797Z" },
+    { url = "https://files.pythonhosted.org/packages/e7/e0/f5666411f15e6c51958ddc4225a4267e24fcf90f8326404e705e554744ff/cryptofeed-3.0.3-cp315-cp315t-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:59d5e8d3ab93716ff15420c8fa00b10f584207b4e08a5bff2be84c6306d0c584", size = 1326021, upload-time = "2026-11-03T00:31:31.312Z" },
+    { url = "https://files.pythonhosted.org/packages/1d/a2/65b4209a4ef80dd276323e11d228b463048cf42513bd2710230cd6fdf241/cryptofeed-3.0.3-cp315-cp315t-musllinux_1_2_x86_64.whl", hash = "sha256:6a302d2272819832155559a4c37b06447f72600afb84ab8bde4c08e7ff31ac58", size = 1264216, upload-time = "2026-11-03T00:31:32.76Z" },
 ]
 
 [package.optional-dependencies]
@@ -237,7 +239,7 @@ zmq = [
 
 [[package]]
 name = "cryptostore"
-version = "2.0.0"
+version = "2.0.1"
 source = { editable = "." }
 dependencies = [
     { name = "cryptofeed" },
@@ -628,14 +630,14 @@ wheels = [
 
 [[package]]
 name = "pytest-asyncio"
-version = "1.4.1"
+version = "1.4.1.post1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pytest" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f8/9a/887535e477847f5159377ab35303923644840b13c0ca03c0a467f84d4680/pytest_asyncio-1.4.1.tar.gz", hash = "sha256:e8266eb094e5ee9ffdb2068c9836f33e209ea77a970eb846933d416b5602669b", size = 145237, upload-time = "2026-10-25T21:05:37.135Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/73/7f/c60a4338420b33453d4f814ac0c930abd399f162b9bdd21af4b9e363037f/pytest_asyncio-1.4.1.post1.tar.gz", hash = "sha256:f582d9ea4a1c082195abe8bd29a1fe106aeb1cd435e3dad2d3bc2749935c36a2", size = 145360, upload-time = "2026-11-01T18:26:03.732Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/46/d7/cd9e2708afdbf059658adaf08bdb0792ca52489871051d6ce7d498b51277/pytest_asyncio-1.4.1-py3-none-any.whl", hash = "sha256:507afa78ec77c6661164ef1a2368bc7820383fd1a14b2a7f813de8b5a92949cc", size = 17061, upload-time = "2026-10-25T21:05:35.473Z" },
+    { url = "https://files.pythonhosted.org/packages/e3/de/adbc7578959cfab07e5e7c05cf6d54224a51e7667ea2c07458b6bc571e75/pytest_asyncio-1.4.1.post1-py3-none-any.whl", hash = "sha256:0755e488cc0a2b9bd2eab7292cc6390d4cbb8390f1020745647bae5a708e0165", size = 17140, upload-time = "2026-11-01T18:26:02.168Z" },
 ]
 
 [[package]]
