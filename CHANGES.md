@@ -1,6 +1,6 @@
 ## Changelog
 
-### 2.0.1
+### 2.0.1 (2026-11-02)
   * Update: Multi-stage Dockerfile on debian slim with 3.15t, running as an unprivileged user. The container ships only 3.15t. PyPI release contains 3.15 and 3.15t builds
 
 ### 2.0.0 (2026-10-31)
